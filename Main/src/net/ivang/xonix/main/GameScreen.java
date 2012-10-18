@@ -28,6 +28,8 @@ public class GameScreen implements Screen {
         camera.setToOrtho(false);
 
         gameMap = new GameMap();
+        defineBlockSize();
+
         protagonist = new Protagonist(0, 0);
 
         enemy = new Enemy(15,10, gameMap);
@@ -43,14 +45,10 @@ public class GameScreen implements Screen {
 
         protagonist.update(delta);
         enemy.update(delta);
-//        enemy2.update(delta);
         gameMap.update(delta, protagonist, enemy);
 
-        // TODO: move to constructor and on resize?
-        int width = Gdx.graphics.getWidth();
-        int height = Gdx.graphics.getHeight();
-        GameMap.setBlockSize((int) min(floor(width / GameMap.WIDTH), floor(height / GameMap.HEIGHT)));
 
+        // rendering part
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Rectangle);
 
@@ -65,6 +63,7 @@ public class GameScreen implements Screen {
     @Override
     public void resize(int width, int height) {
         camera.setToOrtho(false, width, height);
+        defineBlockSize();
     }
 
     @Override
@@ -132,6 +131,12 @@ public class GameScreen implements Screen {
 
         shapeRenderer.setColor(1, 1, 0, 1);
         shapeRenderer.rect(enemy.pos.x * blockSize, enemy.pos.y * blockSize, blockSize, blockSize);
+    }
+
+    private void defineBlockSize() {
+        int width = Gdx.graphics.getWidth();
+        int height = Gdx.graphics.getHeight();
+        GameMap.setBlockSize((int) min(floor(width / GameMap.WIDTH), floor(height / GameMap.HEIGHT)));
     }
 
 }
