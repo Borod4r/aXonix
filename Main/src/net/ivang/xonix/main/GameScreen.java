@@ -1,7 +1,6 @@
 package net.ivang.xonix.main;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -17,23 +16,25 @@ import static java.lang.Math.min;
  */
 public class GameScreen implements Screen {
 
-    OrthographicCamera camera = new OrthographicCamera();
-    ShapeRenderer shapeRenderer = new ShapeRenderer();
+    private OrthographicCamera camera = new OrthographicCamera();
+    private ShapeRenderer shapeRenderer = new ShapeRenderer();
 
-    GameMap gameMap;
-    Protagonist protagonist;
-    Enemy enemy, enemy2;
+    private GameMap gameMap;
+    private Protagonist protagonist;
+    private Enemy enemy;
+
+    private int blockSize;
+    private Position shift;
 
     public GameScreen() {
         camera.setToOrtho(false);
 
         gameMap = new GameMap();
-        defineBlockSize();
-
         protagonist = new Protagonist(0, 0);
-
         enemy = new Enemy(15,10, gameMap);
-//        enemy2 = new Enemy(20,7, gameMap);
+
+        blockSize = calculateBlockSize();
+        shift = calculateShift();
     }
 
     @Override
@@ -52,10 +53,9 @@ public class GameScreen implements Screen {
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Rectangle);
 
-        renderMap();
-        renderProtagonist();
-        renderEnemy(enemy);
-//        renderEnemy(enemy2);
+            renderMap(shift);
+            renderProtagonist(shift);
+            renderEnemy(enemy, shift);
 
         shapeRenderer.end();
     }
@@ -63,7 +63,8 @@ public class GameScreen implements Screen {
     @Override
     public void resize(int width, int height) {
         camera.setToOrtho(false, width, height);
-        defineBlockSize();
+        blockSize = calculateBlockSize();
+        shift = calculateShift();
     }
 
     @Override
@@ -95,9 +96,7 @@ public class GameScreen implements Screen {
     // Helper methods
     //---------------------------------------------------------------------
 
-    private void renderMap() {
-        int blockSize = GameMap.getBlockSize();
-
+    private void renderMap(Position shift) {
         for(int i = 0; i < GameMap.WIDTH; i++) {
             for(int j = 0; j < GameMap.HEIGHT; j++) {
                 switch (gameMap.getTileState(i,j)) {
@@ -114,29 +113,32 @@ public class GameScreen implements Screen {
                         break;
                 }
 
-                shapeRenderer.rect(i*blockSize, j*blockSize, blockSize, blockSize);
+                shapeRenderer.rect(i*blockSize + shift.x, j*blockSize + shift.y, blockSize, blockSize);
             }
         }
     }
 
-    private void renderProtagonist() {
-        int blockSize = GameMap.getBlockSize();
-
+    private void renderProtagonist(Position shift) {
         shapeRenderer.setColor(1, 0, 0, 1);
-        shapeRenderer.rect(protagonist.getPosX() * blockSize, protagonist.getPosY() * blockSize, blockSize, blockSize);
+        shapeRenderer.rect(protagonist.getPosX() * blockSize + shift.x, protagonist.getPosY() * blockSize + shift.y, blockSize, blockSize);
     }
 
-    private void renderEnemy(Enemy enemy) {
-        int blockSize = GameMap.getBlockSize();
-
+    private void renderEnemy(Enemy enemy, Position shift) {
         shapeRenderer.setColor(1, 1, 0, 1);
-        shapeRenderer.rect(enemy.pos.x * blockSize, enemy.pos.y * blockSize, blockSize, blockSize);
+        shapeRenderer.rect(enemy.pos.x * blockSize + shift.x, enemy.pos.y * blockSize + shift.y, blockSize, blockSize);
     }
 
-    private void defineBlockSize() {
+    private int calculateBlockSize() {
         int width = Gdx.graphics.getWidth();
         int height = Gdx.graphics.getHeight();
-        GameMap.setBlockSize((int) min(floor(width / GameMap.WIDTH), floor(height / GameMap.HEIGHT)));
+        return (int) min(floor(width / GameMap.WIDTH), floor(height / GameMap.HEIGHT));
+    }
+
+    private Position calculateShift() {
+        int sx = (Gdx.graphics.getWidth() - (GameMap.WIDTH * blockSize)) / 2;
+        int sy = (Gdx.graphics.getHeight() - (GameMap.HEIGHT * blockSize)) / 2;
+
+        return new Position(sx, sy);
     }
 
 }

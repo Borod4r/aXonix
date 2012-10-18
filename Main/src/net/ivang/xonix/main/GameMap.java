@@ -18,8 +18,6 @@ public class GameMap {
     public static final byte TS_EARTH = 1;
     public static final byte TS_TAIL = 2;
 
-    private static int blockSize;
-
     private byte[][] state;
 
     public GameMap() {
@@ -51,18 +49,8 @@ public class GameMap {
         if (getTileState(prevX, prevY) == GameMap.TS_TAIL && getTileState(posX, posY) == GameMap.TS_EARTH) {
 
             byte[][] tmpState = new byte[WIDTH][HEIGHT];
-            // normalize
-//            for(int i = 1; i < GameMap.WIDTH - 1; i++) {
-//                for(int j = 1; j < GameMap.HEIGHT - 1; j++) {
-//                    if (state[i][j] == TS_WATER) {
-//                        tmpState[i][j] = 1;
-//                    } else {
-//                        tmpState[i][j] = 0;
-//                    }
-//                }
-//            }
 
-            // http://habrahabr.ru/post/119244/
+            // thanks to http://habrahabr.ru/post/119244/
             byte spotNum = 0;
             // TODO: HashMap and ArrayList?
             Map<Byte, List<Position>> spots = new HashMap<Byte, List<Position>>();
@@ -148,13 +136,5 @@ public class GameMap {
 
     public byte getTileState(int x, int y) {
         return state[x][y];
-    }
-
-    public static int getBlockSize() {
-        return blockSize;
-    }
-
-    public static void setBlockSize(int blockSize) {
-        GameMap.blockSize = blockSize;
     }
 }
