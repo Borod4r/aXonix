@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import static java.lang.Math.floor;
@@ -16,8 +18,9 @@ import static java.lang.Math.min;
  */
 public class GameScreen implements Screen {
 
-    private OrthographicCamera camera = new OrthographicCamera();
-    private ShapeRenderer shapeRenderer = new ShapeRenderer();
+    private OrthographicCamera camera;
+    private SpriteBatch batch;
+    private Texture texture;
 
     private GameMap gameMap;
     private Protagonist protagonist;
@@ -27,7 +30,11 @@ public class GameScreen implements Screen {
     private Position shift;
 
     public GameScreen() {
+        camera = new OrthographicCamera();
         camera.setToOrtho(false);
+
+        batch = new SpriteBatch();
+        texture = new Texture(Gdx.files.internal("data/tile.png"));
 
         gameMap = new GameMap();
         protagonist = new Protagonist(0, 0);
@@ -50,14 +57,14 @@ public class GameScreen implements Screen {
 
 
         // rendering part
-        shapeRenderer.setProjectionMatrix(camera.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Rectangle);
+        batch.setProjectionMatrix(camera.combined);
+        batch.begin();
 
             renderMap(shift);
             renderProtagonist(shift);
             renderEnemy(enemy, shift);
 
-        shapeRenderer.end();
+        batch.end();
     }
 
     @Override
@@ -97,35 +104,34 @@ public class GameScreen implements Screen {
     //---------------------------------------------------------------------
 
     private void renderMap(Position shift) {
+        batch.disableBlending();
         for(int i = 0; i < GameMap.WIDTH; i++) {
             for(int j = 0; j < GameMap.HEIGHT; j++) {
                 switch (gameMap.getTileState(i,j)) {
                     case GameMap.TS_WATER:
-                        continue;
+                        batch.setColor(0, 0, 0.07f, 1);
+                        break;
                     case GameMap.TS_EARTH:
-                        shapeRenderer.setColor(1, 1, 1, 1);
+                        batch.setColor(0.1f, 0.1f, 0.8f, 1);
                         break;
                     case GameMap.TS_TAIL:
-                        shapeRenderer.setColor(0, 1, 0, 1);
-                        break;
-                    default:
-                        shapeRenderer.setColor(1, 1, 1, 1);
+                        batch.setColor(0.3f, 0.3f, 1f, 1);
                         break;
                 }
 
-                shapeRenderer.rect(i*blockSize + shift.x, j*blockSize + shift.y, blockSize, blockSize);
+                batch.draw(texture, i*blockSize + shift.x, j*blockSize + shift.y, blockSize, blockSize);
             }
         }
     }
 
     private void renderProtagonist(Position shift) {
-        shapeRenderer.setColor(1, 0, 0, 1);
-        shapeRenderer.rect(protagonist.getPosX() * blockSize + shift.x, protagonist.getPosY() * blockSize + shift.y, blockSize, blockSize);
+        batch.setColor(1, 0, 0, 1);
+        batch.draw(texture, protagonist.getPosX() * blockSize + shift.x, protagonist.getPosY() * blockSize + shift.y, blockSize, blockSize);
     }
 
     private void renderEnemy(Enemy enemy, Position shift) {
-        shapeRenderer.setColor(1, 1, 0, 1);
-        shapeRenderer.rect(enemy.pos.x * blockSize + shift.x, enemy.pos.y * blockSize + shift.y, blockSize, blockSize);
+        batch.setColor(1, 1, 0, 1);
+        batch.draw(texture, enemy.pos.x * blockSize + shift.x, enemy.pos.y * blockSize + shift.y, blockSize, blockSize);
     }
 
     private int calculateBlockSize() {
