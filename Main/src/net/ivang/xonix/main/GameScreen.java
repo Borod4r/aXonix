@@ -1,10 +1,12 @@
 package net.ivang.xonix.main;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
@@ -18,9 +20,12 @@ import static java.lang.Math.min;
  */
 public class GameScreen implements Screen {
 
+    Game game;
+
     private OrthographicCamera camera;
     private SpriteBatch batch;
     private Texture texture;
+    private BitmapFont font;
 
     private GameMap gameMap;
     private Protagonist protagonist;
@@ -29,34 +34,61 @@ public class GameScreen implements Screen {
     private int blockSize;
     private Position shift;
 
-    public GameScreen() {
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false);
+    private int score;
 
+    public GameScreen(Game game) {
+        this.game = game;
+
+        camera = new OrthographicCamera();
         batch = new SpriteBatch();
         texture = new Texture(Gdx.files.internal("data/tile.png"));
 
+        font = new BitmapFont();
+        font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
         gameMap = new GameMap();
-        protagonist = new Protagonist(0, 0);
+        protagonist = new Protagonist(0, GameMap.HEIGHT - 1);
+        protagonist.setLives(2);
         enemy = new Enemy(15,10, gameMap);
 
-        blockSize = calculateBlockSize();
-        shift = calculateShift();
+        // adapt to the screen resolution
+        resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0, 0, 0.1f, 1);
-        Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
-        camera.update();
+        if (protagonist.pos.equals(enemy.pos) || gameMap.getTileState(enemy.pos.x, enemy.pos.y) == GameMap.TS_TAIL) {
+            protagonist.setLives(protagonist.getLives() - 1);
+            // TODO: Bull Shit
+            protagonist.pos.x = 0;
+            protagonist.pos.y = 0;
+            protagonist.prev.x = 0;
+            protagonist.prev.y = 0;
+
+            for(int i = 1; i < GameMap.WIDTH - 1; i++) {
+                for(int j = 1; j < GameMap.HEIGHT - 1; j++) {
+                    if (gameMap.getTileState(i,j) == GameMap.TS_TAIL) {
+                        gameMap.setTileState(i,j, GameMap.TS_WATER);
+                    }
+                }
+            }
+
+
+        }
+
+        if (protagonist.getLives() < 0) gameOver();
 
         protagonist.update(delta);
         enemy.update(delta);
         gameMap.update(delta, protagonist, enemy);
 
-
         // rendering part
+        Gdx.gl.glClearColor(0, 0, 0.1f, 1);
+        Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+
+        camera.update();
+
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
@@ -64,14 +96,19 @@ public class GameScreen implements Screen {
             renderProtagonist(shift);
             renderEnemy(enemy, shift);
 
+            String lives = "Lives: " + protagonist.getLives();
+            String score = "Score: " + gameMap.mapScore;
+            font.draw(batch, lives + "   " + score, blockSize + shift.x, (GameMap.HEIGHT + 1)* blockSize + shift.y);
+
         batch.end();
     }
 
     @Override
     public void resize(int width, int height) {
         camera.setToOrtho(false, width, height);
-        blockSize = calculateBlockSize();
-        shift = calculateShift();
+        blockSize = calculateBlockSize(width, height);
+        shift = calculateShift(width, height);
+        font.setScale((float) blockSize / 15);
     }
 
     @Override
@@ -104,7 +141,6 @@ public class GameScreen implements Screen {
     //---------------------------------------------------------------------
 
     private void renderMap(Position shift) {
-        batch.disableBlending();
         for(int i = 0; i < GameMap.WIDTH; i++) {
             for(int j = 0; j < GameMap.HEIGHT; j++) {
                 switch (gameMap.getTileState(i,j)) {
@@ -126,7 +162,7 @@ public class GameScreen implements Screen {
 
     private void renderProtagonist(Position shift) {
         batch.setColor(1, 0, 0, 1);
-        batch.draw(texture, protagonist.getPosX() * blockSize + shift.x, protagonist.getPosY() * blockSize + shift.y, blockSize, blockSize);
+        batch.draw(texture, protagonist.pos.x * blockSize + shift.x, protagonist.pos.y * blockSize + shift.y, blockSize, blockSize);
     }
 
     private void renderEnemy(Enemy enemy, Position shift) {
@@ -134,17 +170,20 @@ public class GameScreen implements Screen {
         batch.draw(texture, enemy.pos.x * blockSize + shift.x, enemy.pos.y * blockSize + shift.y, blockSize, blockSize);
     }
 
-    private int calculateBlockSize() {
-        int width = Gdx.graphics.getWidth();
-        int height = Gdx.graphics.getHeight();
-        return (int) min(floor(width / GameMap.WIDTH), floor(height / GameMap.HEIGHT));
+    private int calculateBlockSize(int width, int height) {
+        return (int) min(floor(width / GameMap.WIDTH), floor(height / (GameMap.HEIGHT + 1)));
     }
 
-    private Position calculateShift() {
-        int sx = (Gdx.graphics.getWidth() - (GameMap.WIDTH * blockSize)) / 2;
-        int sy = (Gdx.graphics.getHeight() - (GameMap.HEIGHT * blockSize)) / 2;
+    private Position calculateShift(int width, int height) {
+        int sx = (width - ((GameMap.WIDTH) * blockSize)) / 2;
+        int sy = (height - ((GameMap.HEIGHT + 1) * blockSize)) / 2;
 
         return new Position(sx, sy);
+    }
+
+    private void gameOver() {
+        game.getScreen().dispose();
+        game.setScreen(new GameScreen(game));
     }
 
 }

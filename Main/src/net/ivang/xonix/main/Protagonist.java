@@ -16,24 +16,25 @@ public class Protagonist {
 
 //    private GameMap gameMap;
 
-    private int posX;
-    private int posY;
+    private int lives;
 
-    private int prevX;
-    private int prevY;
+    public Position pos;
+    public Position prev;
 
     private int accel;
 
     private Moving moving;
     private float timeStep;
 
-    Protagonist(int posX, int posY) {
-//        this.gameMap = gameMap;
-        this.posX = posX;
-        this.posY = posY;
+    public Protagonist(Position pos) {
+        this.pos = pos;
+        this.prev = new Position();
         this.accel = 1;
+        this.moving = Moving.IDLE;
+    }
 
-        moving = Moving.IDLE;
+    public Protagonist(int posX, int posY) {
+        this(new Position(posX, posY));
     }
 
     public void update(float deltaTime) {
@@ -69,36 +70,33 @@ public class Protagonist {
     }
 
     private void updatePosition() {
-        int tmpX = posX;
-        int tmpY = posY;
-
+        Position tmp = new Position(pos.x, pos.y);
         switch (moving) {
             case UP:
-                if (posY > 0) {
-                    posY--;
+                if (pos.y > 0) {
+                    pos.y--;
                 }
                 break;
             case DOWN:
-                if (posY < GameMap.HEIGHT - 1) {
-                    posY++;
+                if (pos.y < GameMap.HEIGHT - 1) {
+                    pos.y++;
                 }
                 break;
             case LEFT:
-                if (posX > 0) {
-                    posX--;
+                if (pos.x > 0) {
+                    pos.x--;
                 }
                 break;
             case RIGHT:
-                if (posX < GameMap.WIDTH - 1) {
-                    posX++;
+                if (pos.x < GameMap.WIDTH - 1) {
+                    pos.x++;
                 }
                 break;
         }
-
         // update previous coords
-        if (tmpX != posX || tmpY != posY) {
-            prevX = tmpX;
-            prevY = tmpY;
+        if (tmp.x != pos.x || tmp.y != pos.y) {
+            prev.x = tmp.x;
+            prev.y = tmp.y;
         }
     }
 
@@ -106,35 +104,13 @@ public class Protagonist {
     // Getters & Setters
     //---------------------------------------------------------------------
 
-    public int getPosX() {
-        return posX;
+
+    public int getLives() {
+        return lives;
     }
 
-    public void setPosX(int posX) {
-        this.posX = posX;
+    public void setLives(int lives) {
+        this.lives = lives;
     }
 
-    public int getPosY() {
-        return posY;
-    }
-
-    public void setPosY(int posY) {
-        this.posY = posY;
-    }
-
-    public int getPrevX() {
-        return prevX;
-    }
-
-    public void setPrevX(int prevX) {
-        this.prevX = prevX;
-    }
-
-    public int getPrevY() {
-        return prevY;
-    }
-
-    public void setPrevY(int prevY) {
-        this.prevY = prevY;
-    }
 }

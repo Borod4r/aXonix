@@ -20,6 +20,8 @@ public class GameMap {
 
     private byte[][] state;
 
+    public int mapScore;
+
     public GameMap() {
         state = new byte[WIDTH][HEIGHT];
 
@@ -36,91 +38,90 @@ public class GameMap {
     }
 
     public void update(float deltaTime, Protagonist protagonist, Enemy enemy) {
-        int prevX = protagonist.getPrevX();
-        int prevY = protagonist.getPrevY();
-        if (getTileState(prevX, prevY) == GameMap.TS_WATER) {
-            setTileState(prevX, prevY, GameMap.TS_TAIL);
-        }
+        if (getTileState(protagonist.prev.x, protagonist.prev.y) == GameMap.TS_WATER) {
+            setTileState(protagonist.prev.x, protagonist.prev.y, GameMap.TS_TAIL);
 
-        // try to fill areas
-        int posX = protagonist.getPosX();
-        int posY = protagonist.getPosY();
+            if (getTileState(protagonist.pos.x, protagonist.pos.y) == GameMap.TS_EARTH) {
 
-        if (getTileState(prevX, prevY) == GameMap.TS_TAIL && getTileState(posX, posY) == GameMap.TS_EARTH) {
+                byte[][] tmpState = new byte[WIDTH][HEIGHT];
 
-            byte[][] tmpState = new byte[WIDTH][HEIGHT];
+                // thanks to http://habrahabr.ru/post/119244/
+                byte spotNum = 0;
+                // TODO: HashMap and ArrayList?
+                Map<Byte, List<Position>> spots = new HashMap<Byte, List<Position>>();
 
-            // thanks to http://habrahabr.ru/post/119244/
-            byte spotNum = 0;
-            // TODO: HashMap and ArrayList?
-            Map<Byte, List<Position>> spots = new HashMap<Byte, List<Position>>();
+                for(int i = 1; i < GameMap.WIDTH - 1; i++) {
+                    for(int j = 1; j < GameMap.HEIGHT - 1; j++) {
+                        byte A = state[i][j];
+                        if (A == TS_WATER) {
+                            byte B = tmpState[i][j-1];
+                            byte C = tmpState[i-1][j];
 
-            for(int i = 1; i < GameMap.WIDTH - 1; i++) {
-                for(int j = 1; j < GameMap.HEIGHT - 1; j++) {
-                    byte A = state[i][j];
-                    if (A == TS_WATER) {
-                        byte B = tmpState[i][j-1];
-                        byte C = tmpState[i-1][j];
+                            if ( B == 0) {
+                                if (C == 0) {
+                                    // New Spot
+                                    spotNum++;
+                                    tmpState[i][j] = spotNum;
 
-                        if ( B == 0) {
-                            if (C == 0) {
-                                // New Spot
-                                spotNum++;
-                                tmpState[i][j] = spotNum;
+                                    List<Position> spot = new ArrayList<Position>();
+                                    spot.add(new Position(i,j));
 
-                                List<Position> spot = new ArrayList<Position>();
-                                spot.add(new Position(i,j));
-
-                                spots.put(spotNum, spot);
-                            } else {   // C!=0
-                                tmpState[i][j] = C;
-                                spots.get(C).add(new Position(i,j));
-                            }
-                        }
-
-                        if (B != 0) {
-                            if(C == 0) {
-                                tmpState[i][j] = B;
-                                spots.get(B).add(new Position(i,j));
-                            } else { // C != 0
-                                tmpState[i][j] = B;
-                                spots.get(B).add(new Position(i,j));
-                                if (B != C) {
-                                    for(int m = 1; m < GameMap.WIDTH - 1; m++) {
-                                        for(int n = 1; n < GameMap.HEIGHT; n++) {
-                                            if (tmpState[m][n] == C) {
-                                                tmpState[m][n] = B;
-                                            }
-                                        }
-                                    }
-                                    spots.get(B).addAll(spots.get(C));
-                                    spots.remove(C);
+                                    spots.put(spotNum, spot);
+                                } else {   // C!=0
+                                    tmpState[i][j] = C;
+                                    spots.get(C).add(new Position(i,j));
                                 }
                             }
+
+                            if (B != 0) {
+                                if(C == 0) {
+                                    tmpState[i][j] = B;
+                                    spots.get(B).add(new Position(i,j));
+                                } else { // C != 0
+                                    tmpState[i][j] = B;
+                                    spots.get(B).add(new Position(i,j));
+                                    if (B != C) {
+                                        for(int m = 1; m < GameMap.WIDTH - 1; m++) {
+                                            for(int n = 1; n < GameMap.HEIGHT; n++) {
+                                                if (tmpState[m][n] == C) {
+                                                    tmpState[m][n] = B;
+                                                }
+                                            }
+                                        }
+                                        spots.get(B).addAll(spots.get(C));
+                                        spots.remove(C);
+                                    }
+                                }
+                            }
+                        } else if(A == TS_TAIL) {
+                            // turn trail to the land
+                            setTileState(i,j, TS_EARTH);
+                            mapScore++;
                         }
-                    } else if(A == TS_TAIL) {
-                        // turn trail to the land
-                        setTileState(i,j, TS_EARTH);
                     }
                 }
-            }
 
-            Iterator iterator = spots.keySet().iterator();
-            while (iterator.hasNext()) {
-                for(Position pos: spots.get((Byte) iterator.next())) {
-                    if (pos.equals(enemy.pos)) {
-                        iterator.remove();
-                        break;
+                Iterator iterator = spots.keySet().iterator();
+                while (iterator.hasNext()) {
+                    for(Position pos: spots.get((Byte) iterator.next())) {
+                        if (pos.equals(enemy.pos)) {
+                            iterator.remove();
+                            break;
+                        }
                     }
                 }
-            }
 
-            for(List<Position> spot : spots.values()) {
-                for(Position pos : spot) {
-                    setTileState(pos.x, pos.y, TS_EARTH);
+                for(List<Position> spot : spots.values()) {
+                    for(Position pos : spot) {
+                        setTileState(pos.x, pos.y, TS_EARTH);
+                        mapScore++;
+                    }
+                    float bonus = 1 + (float) spot.size() / 200;
+                    mapScore += spot.size() * bonus;
+
                 }
-            }
 
+            }
         }
     }
 

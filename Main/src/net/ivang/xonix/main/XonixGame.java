@@ -13,14 +13,14 @@ public class XonixGame extends Game {
 
     @Override
     public void create() {
-        setScreen(new GameScreen());
+        setScreen(new GameScreen(this));
     }
 
     @Override
     public void render () {
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             getScreen().dispose();
-            setScreen(new GameScreen());
+            setScreen(new GameScreen(this));
         }
         super.render();
     }
