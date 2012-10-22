@@ -5,13 +5,13 @@ package net.ivang.xonix.main;
  * @version $Id$
  * @since 0.1
  */
-public class Position {
+public class Point {
     public int x;
     public int y;
 
-    public Position() { }
+    public Point() { }
 
-    public Position(int x, int y) {
+    public Point(int x, int y) {
         this.x = x;
         this.y =y;
     }
@@ -20,9 +20,9 @@ public class Position {
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
-        if (!(obj instanceof Position))
+        if (!(obj instanceof Point))
             return false;
-        Position other = (Position) obj;
+        Point other = (Point) obj;
         return this.x == other.x && this.y == other.y;
     }
 

@@ -1,7 +1,5 @@
 package net.ivang.xonix.main;
 
-import com.badlogic.gdx.Gdx;
-
 /**
  * @author Ivan Gadzhega
  * @version $Id$
@@ -13,14 +11,14 @@ public class Enemy {
         UP_RIGHT, UP_LEFT, DOWN_RIGHT, DOWN_LEFT, IDLE
     }
 
-    public Position pos;
+    public Point pos;
     private Moving moving;
     private float timeStep;
 
     private GameMap gameMap;
 
     Enemy(int x, int y, GameMap gameMap) {
-        pos = new Position(x, y);
+        pos = new Point(x, y);
         moving = Moving.UP_LEFT;
         this.gameMap = gameMap;
     }

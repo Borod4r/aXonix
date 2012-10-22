@@ -1,7 +1,5 @@
 package net.ivang.xonix.main;
 
-import com.badlogic.gdx.Gdx;
-
 import java.util.*;
 
 /**
@@ -21,6 +19,8 @@ public class GameMap {
     private byte[][] state;
 
     public int mapScore;
+    public byte percentComplete;
+    private int eartTiles;
 
     public GameMap() {
         state = new byte[WIDTH][HEIGHT];
@@ -48,7 +48,7 @@ public class GameMap {
                 // thanks to http://habrahabr.ru/post/119244/
                 byte spotNum = 0;
                 // TODO: HashMap and ArrayList?
-                Map<Byte, List<Position>> spots = new HashMap<Byte, List<Position>>();
+                Map<Byte, List<Point>> spots = new HashMap<Byte, List<Point>>();
 
                 for(int i = 1; i < GameMap.WIDTH - 1; i++) {
                     for(int j = 1; j < GameMap.HEIGHT - 1; j++) {
@@ -63,23 +63,23 @@ public class GameMap {
                                     spotNum++;
                                     tmpState[i][j] = spotNum;
 
-                                    List<Position> spot = new ArrayList<Position>();
-                                    spot.add(new Position(i,j));
+                                    List<Point> spot = new ArrayList<Point>();
+                                    spot.add(new Point(i,j));
 
                                     spots.put(spotNum, spot);
                                 } else {   // C!=0
                                     tmpState[i][j] = C;
-                                    spots.get(C).add(new Position(i,j));
+                                    spots.get(C).add(new Point(i,j));
                                 }
                             }
 
                             if (B != 0) {
                                 if(C == 0) {
                                     tmpState[i][j] = B;
-                                    spots.get(B).add(new Position(i,j));
+                                    spots.get(B).add(new Point(i,j));
                                 } else { // C != 0
                                     tmpState[i][j] = B;
-                                    spots.get(B).add(new Position(i,j));
+                                    spots.get(B).add(new Point(i,j));
                                     if (B != C) {
                                         for(int m = 1; m < GameMap.WIDTH - 1; m++) {
                                             for(int n = 1; n < GameMap.HEIGHT; n++) {
@@ -97,13 +97,15 @@ public class GameMap {
                             // turn trail to the land
                             setTileState(i,j, TS_EARTH);
                             mapScore++;
+                            eartTiles++;
+
                         }
                     }
                 }
 
                 Iterator iterator = spots.keySet().iterator();
                 while (iterator.hasNext()) {
-                    for(Position pos: spots.get((Byte) iterator.next())) {
+                    for(Point pos: spots.get((Byte) iterator.next())) {
                         if (pos.equals(enemy.pos)) {
                             iterator.remove();
                             break;
@@ -111,15 +113,19 @@ public class GameMap {
                     }
                 }
 
-                for(List<Position> spot : spots.values()) {
-                    for(Position pos : spot) {
+                for(List<Point> spot : spots.values()) {
+                    for(Point pos : spot) {
                         setTileState(pos.x, pos.y, TS_EARTH);
                         mapScore++;
+                        eartTiles++;
                     }
                     float bonus = 1 + (float) spot.size() / 200;
                     mapScore += spot.size() * bonus;
 
                 }
+
+                // update percentage
+                percentComplete = (byte) (((float) eartTiles / ((WIDTH - 2) * (HEIGHT - 2))) * 100) ;
 
             }
         }

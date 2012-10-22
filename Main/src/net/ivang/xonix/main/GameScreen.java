@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import static java.lang.Math.floor;
 import static java.lang.Math.min;
@@ -25,6 +24,7 @@ public class GameScreen implements Screen {
     private OrthographicCamera camera;
     private SpriteBatch batch;
     private Texture texture;
+    private Texture enemyT;
     private BitmapFont font;
 
     private GameMap gameMap;
@@ -32,7 +32,7 @@ public class GameScreen implements Screen {
     private Enemy enemy;
 
     private int blockSize;
-    private Position shift;
+    private Point shift;
 
     private int score;
 
@@ -42,12 +42,14 @@ public class GameScreen implements Screen {
         camera = new OrthographicCamera();
         batch = new SpriteBatch();
         texture = new Texture(Gdx.files.internal("data/tile.png"));
+        enemyT = new Texture(Gdx.files.internal("data/bomb.png"));
+
 
         font = new BitmapFont();
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         gameMap = new GameMap();
-        protagonist = new Protagonist(0, GameMap.HEIGHT - 1);
+        protagonist = new Protagonist(0, GameMap.HEIGHT - 1, gameMap);
         protagonist.setLives(2);
         enemy = new Enemy(15,10, gameMap);
 
@@ -94,11 +96,12 @@ public class GameScreen implements Screen {
 
             renderMap(shift);
             renderProtagonist(shift);
-            renderEnemy(enemy, shift);
+            renderEnemy(delta, enemy, shift);
 
             String lives = "Lives: " + protagonist.getLives();
             String score = "Score: " + gameMap.mapScore;
-            font.draw(batch, lives + "   " + score, blockSize + shift.x, (GameMap.HEIGHT + 1)* blockSize + shift.y);
+            String percent = "Percent: " + gameMap.percentComplete;
+            font.draw(batch, lives + "   " + score + "   " + percent, blockSize + shift.x, (GameMap.HEIGHT + 1)* blockSize + shift.y);
 
         batch.end();
     }
@@ -140,7 +143,7 @@ public class GameScreen implements Screen {
     // Helper methods
     //---------------------------------------------------------------------
 
-    private void renderMap(Position shift) {
+    private void renderMap(Point shift) {
         for(int i = 0; i < GameMap.WIDTH; i++) {
             for(int j = 0; j < GameMap.HEIGHT; j++) {
                 switch (gameMap.getTileState(i,j)) {
@@ -160,25 +163,26 @@ public class GameScreen implements Screen {
         }
     }
 
-    private void renderProtagonist(Position shift) {
+    private void renderProtagonist(Point shift) {
         batch.setColor(1, 0, 0, 1);
         batch.draw(texture, protagonist.pos.x * blockSize + shift.x, protagonist.pos.y * blockSize + shift.y, blockSize, blockSize);
     }
 
-    private void renderEnemy(Enemy enemy, Position shift) {
-        batch.setColor(1, 1, 0, 1);
-        batch.draw(texture, enemy.pos.x * blockSize + shift.x, enemy.pos.y * blockSize + shift.y, blockSize, blockSize);
+    private void renderEnemy(float deltaTime, Enemy enemy, Point shift) {
+        batch.setColor(1, 1, 1, 1);
+        batch.draw(enemyT, enemy.pos.x * blockSize  + shift.x - (blockSize * 0.25f), enemy.pos.y * blockSize + shift.y - (blockSize * 0.25f), blockSize * 1.5f, blockSize * 1.5f);
+
     }
 
     private int calculateBlockSize(int width, int height) {
         return (int) min(floor(width / GameMap.WIDTH), floor(height / (GameMap.HEIGHT + 1)));
     }
 
-    private Position calculateShift(int width, int height) {
+    private Point calculateShift(int width, int height) {
         int sx = (width - ((GameMap.WIDTH) * blockSize)) / 2;
         int sy = (height - ((GameMap.HEIGHT + 1) * blockSize)) / 2;
 
-        return new Position(sx, sy);
+        return new Point(sx, sy);
     }
 
     private void gameOver() {
