@@ -10,10 +10,6 @@ import com.badlogic.gdx.Input;
  */
 public class Protagonist {
 
-    private enum Moving {
-        UP, DOWN, LEFT, RIGHT, IDLE
-    }
-
     private GameMap gameMap;
 
     private int lives;
@@ -23,14 +19,14 @@ public class Protagonist {
 
     private int accel;
 
-    private Moving moving;
+    private Move move;
     private float timeStep;
 
     public Protagonist(Point pos, GameMap gameMap) {
         this.pos = pos;
         this.prev = new Point();
         this.accel = 1;
-        this.moving = Moving.IDLE;
+        this.move = Move.IDLE;
         this.gameMap = gameMap;
     }
 
@@ -63,17 +59,17 @@ public class Protagonist {
 
         boolean onEarth = gameMap.getTileState(pos.x, pos.y) == GameMap.TS_EARTH;
 
-        if((onEarth || moving != Moving.DOWN) && (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S) || isDraggedUp)) {
-            moving = Moving.UP;
+        if((onEarth || move != Move.DOWN) && (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S) || isDraggedUp)) {
+            move = Move.UP;
         }
-        if((onEarth || moving != Moving.UP) && (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W) || isDraggedDown)) {
-            moving = Moving.DOWN;
+        if((onEarth || move != Move.UP) && (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W) || isDraggedDown)) {
+            move = Move.DOWN;
         }
-        if((onEarth || moving != Moving.RIGHT) && (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A) || isDraggedLeft)) {
-            moving = Moving.LEFT;
+        if((onEarth || move != Move.RIGHT) && (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A) || isDraggedLeft)) {
+            move = Move.LEFT;
         }
-        if((onEarth || moving != Moving.LEFT) && (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D) || isDraggedRight)) {
-            moving = Moving.RIGHT;
+        if((onEarth || move != Move.LEFT) && (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D) || isDraggedRight)) {
+            move = Move.RIGHT;
         }
 //        if(Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
 //            accel = 2;
@@ -82,38 +78,38 @@ public class Protagonist {
 
     private void updatePosition() {
         Point tmp = new Point(pos.x, pos.y);
-        switch (moving) {
+        switch (move) {
             case UP:
                 if (pos.y > 0) {
                     pos.y--;
                 } else {
-                    moving = Moving.IDLE;
+                    move = Move.IDLE;
                 }
                 break;
             case DOWN:
                 if (pos.y < GameMap.HEIGHT - 1) {
                     pos.y++;
                 } else {
-                    moving = Moving.IDLE;
+                    move = Move.IDLE;
                 }
                 break;
             case LEFT:
                 if (pos.x > 0) {
                     pos.x--;
                 } else {
-                    moving = Moving.IDLE;
+                    move = Move.IDLE;
                 }
                 break;
             case RIGHT:
                 if (pos.x < GameMap.WIDTH - 1) {
                     pos.x++;
                 } else {
-                    moving = Moving.IDLE;
+                    move = Move.IDLE;
                 }
                 break;
         }
         // update previous coords
-        if (moving != Moving.IDLE) {
+        if (move != Move.IDLE) {
             prev.x = tmp.x;
             prev.y = tmp.y;
         }

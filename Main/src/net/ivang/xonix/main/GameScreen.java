@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+import javax.swing.text.Position;
+
 import static java.lang.Math.floor;
 import static java.lang.Math.min;
 
@@ -35,6 +37,9 @@ public class GameScreen implements Screen {
     private Point shift;
 
     private int score;
+
+    private float timeStep;
+    int adjust;
 
     public GameScreen(Game game) {
         this.game = game;
