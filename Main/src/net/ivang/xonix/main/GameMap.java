@@ -106,7 +106,7 @@ public class GameMap {
                 Iterator iterator = spots.keySet().iterator();
                 while (iterator.hasNext()) {
                     for(Point pos: spots.get((Byte) iterator.next())) {
-                        if (pos.equals(enemy.pos)) {
+                        if ((pos.x == enemy.pos.x / GameScreen.blockSize) && (pos.y == enemy.pos.y / GameScreen.blockSize)) {
                             iterator.remove();
                             break;
                         }
@@ -143,5 +143,9 @@ public class GameMap {
 
     public byte getTileState(int x, int y) {
         return state[x][y];
+    }
+
+    public byte getTileStateByPos(float x, float y) {
+        return state[(int) x / GameScreen.blockSize][(int) y / GameScreen.blockSize];
     }
 }

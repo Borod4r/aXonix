@@ -21,10 +21,17 @@ import static java.lang.Math.min;
  */
 public class GameScreen implements Screen {
 
+    // TODO: review this one
+    public static int blockSize;
+
+    private int width;
+    private int height;
+
     Game game;
 
     private OrthographicCamera camera;
     private SpriteBatch batch;
+    // TODO: TextureRegion
     private Texture texture;
     private Texture enemyT;
     private BitmapFont font;
@@ -33,18 +40,15 @@ public class GameScreen implements Screen {
     private Protagonist protagonist;
     private Enemy enemy;
 
-    private int blockSize;
     private Point shift;
 
-    private int score;
-
-    private float timeStep;
-    int adjust;
-
     public GameScreen(Game game) {
+        this.width = 800;
+        this.height = 480;
+
         this.game = game;
 
-        camera = new OrthographicCamera();
+        camera = new OrthographicCamera(width, height);
         batch = new SpriteBatch();
         texture = new Texture(Gdx.files.internal("data/tile.png"));
         enemyT = new Texture(Gdx.files.internal("data/bomb.png"));
@@ -56,7 +60,7 @@ public class GameScreen implements Screen {
         gameMap = new GameMap();
         protagonist = new Protagonist(0, GameMap.HEIGHT - 1, gameMap);
         protagonist.setLives(2);
-        enemy = new Enemy(15,10, gameMap);
+        enemy = new Enemy(100,100, gameMap);
 
         // adapt to the screen resolution
         resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -64,8 +68,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-
-        if (protagonist.pos.equals(enemy.pos) || gameMap.getTileState(enemy.pos.x, enemy.pos.y) == GameMap.TS_TAIL) {
+        if (protagonist.pos.equals(enemy.pos) || gameMap.getTileState((int) enemy.pos.x/blockSize, (int) enemy.pos.y/blockSize) == GameMap.TS_TAIL) {
             protagonist.setLives(protagonist.getLives() - 1);
             // TODO: Bull Shit
             protagonist.pos.x = 0;
@@ -103,6 +106,7 @@ public class GameScreen implements Screen {
             renderProtagonist(shift);
             renderEnemy(delta, enemy, shift);
 
+            // TODO: Move strings to bundles
             String lives = "Lives: " + protagonist.getLives();
             String score = "Score: " + gameMap.mapScore;
             String percent = "Percent: " + gameMap.percentComplete;
@@ -114,9 +118,19 @@ public class GameScreen implements Screen {
     @Override
     public void resize(int width, int height) {
         camera.setToOrtho(false, width, height);
+
         blockSize = calculateBlockSize(width, height);
         shift = calculateShift(width, height);
         font.setScale((float) blockSize / 15);
+
+        float deltaX = (float) width / (float) this.width;
+        float deltaY = (float) height / (float) this.height;
+
+        enemy.pos.x = (int)(enemy.pos.x * deltaX);
+        enemy.pos.y = (int)(enemy.pos.y * deltaY);
+
+        this.width = width;
+        this.height = height;
     }
 
     @Override
@@ -175,7 +189,7 @@ public class GameScreen implements Screen {
 
     private void renderEnemy(float deltaTime, Enemy enemy, Point shift) {
         batch.setColor(1, 1, 1, 1);
-        batch.draw(enemyT, enemy.pos.x * blockSize  + shift.x - (blockSize * 0.25f), enemy.pos.y * blockSize + shift.y - (blockSize * 0.25f), blockSize * 1.5f, blockSize * 1.5f);
+        batch.draw(enemyT, enemy.pos.x  + shift.x - (blockSize * 0.75f), enemy.pos.y + shift.y - (blockSize * 0.75f), blockSize * 1.5f, blockSize * 1.5f);
 
     }
 
