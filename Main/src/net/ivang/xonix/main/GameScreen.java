@@ -9,8 +9,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import javax.swing.text.Position;
-
 import static java.lang.Math.floor;
 import static java.lang.Math.min;
 
@@ -68,7 +66,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        if (protagonist.pos.equals(enemy.pos) || gameMap.getTileState((int) enemy.pos.x/blockSize, (int) enemy.pos.y/blockSize) == GameMap.TS_TAIL) {
+        if (protagonist.pos.equals(enemy.pos) || gameMap.getBlockStateByPx(enemy.pos.x, enemy.pos.y) == GameMap.BS_TAIL) {
             protagonist.setLives(protagonist.getLives() - 1);
             // TODO: Bull Shit
             protagonist.pos.x = 0;
@@ -78,8 +76,8 @@ public class GameScreen implements Screen {
 
             for(int i = 1; i < GameMap.WIDTH - 1; i++) {
                 for(int j = 1; j < GameMap.HEIGHT - 1; j++) {
-                    if (gameMap.getTileState(i,j) == GameMap.TS_TAIL) {
-                        gameMap.setTileState(i,j, GameMap.TS_WATER);
+                    if (gameMap.getBlockState(i, j) == GameMap.BS_TAIL) {
+                        gameMap.setBlockState(i, j, GameMap.BS_WATER);
                     }
                 }
             }
@@ -145,7 +143,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void pause() {
-        // TODO Auto-generated method stub
+//        Gdx.app.log("Pause"," aha!");
     }
 
     @Override
@@ -165,14 +163,14 @@ public class GameScreen implements Screen {
     private void renderMap(Point shift) {
         for(int i = 0; i < GameMap.WIDTH; i++) {
             for(int j = 0; j < GameMap.HEIGHT; j++) {
-                switch (gameMap.getTileState(i,j)) {
-                    case GameMap.TS_WATER:
+                switch (gameMap.getBlockState(i, j)) {
+                    case GameMap.BS_WATER:
                         batch.setColor(0, 0, 0.07f, 1);
                         break;
-                    case GameMap.TS_EARTH:
+                    case GameMap.BS_EARTH:
                         batch.setColor(0.1f, 0.1f, 0.8f, 1);
                         break;
-                    case GameMap.TS_TAIL:
+                    case GameMap.BS_TAIL:
                         batch.setColor(0.3f, 0.3f, 1f, 1);
                         break;
                 }
@@ -184,7 +182,7 @@ public class GameScreen implements Screen {
 
     private void renderProtagonist(Point shift) {
         batch.setColor(1, 0, 0, 1);
-        batch.draw(texture, protagonist.pos.x * blockSize + shift.x, protagonist.pos.y * blockSize + shift.y, blockSize, blockSize);
+        batch.draw(texture, protagonist.pos.x + shift.x - (blockSize * 0.5f), protagonist.pos.y + shift.y - (blockSize * 0.5f), blockSize, blockSize);
     }
 
     private void renderEnemy(float deltaTime, Enemy enemy, Point shift) {

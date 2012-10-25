@@ -28,52 +28,52 @@ public class Enemy {
             case UP_LEFT:
                 pos.x -= deltaPx;
                 pos.y += deltaPx;
-                if (gameMap.getTileStateByPos(pos.x, (pos.y + radius)) == GameMap.TS_EARTH) {
-                    if (gameMap.getTileStateByPos((pos.x - radius), pos.y) == GameMap.TS_EARTH) {
+                if (gameMap.getBlockStateByPx(pos.x, (pos.y + radius)) == GameMap.BS_EARTH) {
+                    if (gameMap.getBlockStateByPx((pos.x - radius), pos.y) == GameMap.BS_EARTH) {
                         moveDirection = Move.DOWN_RIGHT;
                     } else {
                         moveDirection = Move.DOWN_LEFT;
                     }
-                } else if (gameMap.getTileStateByPos((pos.x - radius), pos.y) == GameMap.TS_EARTH) {
+                } else if (gameMap.getBlockStateByPx((pos.x - radius), pos.y) == GameMap.BS_EARTH) {
                     moveDirection = Move.UP_RIGHT;
                 }
                 break;
             case UP_RIGHT:
                 pos.x += deltaPx;
                 pos.y += deltaPx;
-                if (gameMap.getTileStateByPos(pos.x, (pos.y + radius)) == GameMap.TS_EARTH) {
-                    if (gameMap.getTileStateByPos((pos.x + radius), pos.y) == GameMap.TS_EARTH) {
+                if (gameMap.getBlockStateByPx(pos.x, (pos.y + radius)) == GameMap.BS_EARTH) {
+                    if (gameMap.getBlockStateByPx((pos.x + radius), pos.y) == GameMap.BS_EARTH) {
                         moveDirection = Move.DOWN_LEFT;
                     } else {
                         moveDirection = Move.DOWN_RIGHT;
                     }
-                } else if (gameMap.getTileStateByPos((pos.x + radius), pos.y)== GameMap.TS_EARTH) {
+                } else if (gameMap.getBlockStateByPx((pos.x + radius), pos.y)== GameMap.BS_EARTH) {
                     moveDirection = Move.UP_LEFT;
                 }
                 break;
             case DOWN_LEFT:
                 pos.x -= deltaPx;
                 pos.y -= deltaPx;
-                if (gameMap.getTileStateByPos(pos.x, (pos.y - radius)) == GameMap.TS_EARTH) {
-                    if (gameMap.getTileStateByPos((pos.x - radius), pos.y) == GameMap.TS_EARTH) {
+                if (gameMap.getBlockStateByPx(pos.x, (pos.y - radius)) == GameMap.BS_EARTH) {
+                    if (gameMap.getBlockStateByPx((pos.x - radius), pos.y) == GameMap.BS_EARTH) {
                         moveDirection = Move.UP_RIGHT;
                     } else {
                         moveDirection = Move.UP_LEFT;
                     }
-                } else if (gameMap.getTileStateByPos((pos.x - radius), pos.y) == GameMap.TS_EARTH) {
+                } else if (gameMap.getBlockStateByPx((pos.x - radius), pos.y) == GameMap.BS_EARTH) {
                     moveDirection = Move.DOWN_RIGHT;
                 }
                 break;
             case DOWN_RIGHT:
                 pos.x += deltaPx;
                 pos.y -= deltaPx;
-                if (gameMap.getTileStateByPos(pos.x, (pos.y - radius)) == GameMap.TS_EARTH) {
-                    if (gameMap.getTileStateByPos((pos.x + radius), pos.y) == GameMap.TS_EARTH) {
+                if (gameMap.getBlockStateByPx(pos.x, (pos.y - radius)) == GameMap.BS_EARTH) {
+                    if (gameMap.getBlockStateByPx((pos.x + radius), pos.y) == GameMap.BS_EARTH) {
                         moveDirection = Move.UP_LEFT;
                     } else {
                         moveDirection = Move.UP_RIGHT;
                     }
-                } else if (gameMap.getTileStateByPos((pos.x + radius), pos.y) == GameMap.TS_EARTH) {
+                } else if (gameMap.getBlockStateByPx((pos.x + radius), pos.y) == GameMap.BS_EARTH) {
                     moveDirection = Move.DOWN_LEFT;
                 }
                 break;

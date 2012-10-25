@@ -2,6 +2,7 @@ package net.ivang.xonix.main;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.math.Vector2;
 
 /**
  * @author Ivan Gadzhega
@@ -14,24 +15,24 @@ public class Protagonist {
 
     private int lives;
 
-    public Point pos;
-    public Point prev;
+    public Vector2 pos;
+    public Vector2 prev;
 
-    private int accel;
+    private float accel;
 
     private Move move;
     private float timeStep;
 
-    public Protagonist(Point pos, GameMap gameMap) {
+    public Protagonist(Vector2 pos, GameMap gameMap) {
         this.pos = pos;
-        this.prev = new Point();
-        this.accel = 1;
+        this.prev = new Vector2();
+        this.accel = 4;
         this.move = Move.IDLE;
         this.gameMap = gameMap;
     }
 
-    public Protagonist(int posX, int posY, GameMap gameMap) {
-        this(new Point(posX, posY), gameMap);
+    public Protagonist(float y, float x, GameMap gameMap) {
+        this(new Vector2(x, y), gameMap);
     }
 
     public void update(float deltaTime) {
@@ -40,8 +41,8 @@ public class Protagonist {
             timeStep = 0;
 
             processKeys();
-            updatePosition();
         }
+        updatePosition(deltaTime);
     }
 
     //---------------------------------------------------------------------
@@ -57,7 +58,7 @@ public class Protagonist {
         boolean isDraggedLeft = (Gdx.input.isTouched() && Gdx.input.getDeltaX() < 0 && diff > 0);
         boolean isDraggedRight = (Gdx.input.isTouched() && Gdx.input.getDeltaX() > 0 && diff >= 0);
 
-        boolean onEarth = gameMap.getTileState(pos.x, pos.y) == GameMap.TS_EARTH;
+        boolean onEarth = gameMap.getBlockStateByPx(pos.x, pos.y) == GameMap.BS_EARTH;
 
         if((onEarth || move != Move.DOWN) && (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S) || isDraggedUp)) {
             move = Move.UP;
@@ -76,38 +77,71 @@ public class Protagonist {
 //        }
     }
 
-    private void updatePosition() {
-        Point tmp = new Point(pos.x, pos.y);
+    private void updatePosition(float deltaTime) {
+        float deltaPx = GameScreen.blockSize * deltaTime * 4f;
+
+        Vector2 tmp = new Vector2(pos.x, pos.y);
+
         switch (move) {
             case UP:
-                if (pos.y > 0) {
-                    pos.y--;
+                if (pos.y > GameScreen.blockSize * 0.5) {
+                    pos.y -= deltaPx;
                 } else {
                     move = Move.IDLE;
                 }
                 break;
             case DOWN:
-                if (pos.y < GameMap.HEIGHT - 1) {
-                    pos.y++;
+                if (pos.y < (GameMap.HEIGHT - 0.5) * GameScreen.blockSize) {
+                    pos.y += deltaPx;
                 } else {
                     move = Move.IDLE;
                 }
                 break;
             case LEFT:
-                if (pos.x > 0) {
-                    pos.x--;
+                if (pos.x > GameScreen.blockSize * 0.5) {
+                    pos.x -= deltaPx;
                 } else {
                     move = Move.IDLE;
                 }
                 break;
             case RIGHT:
-                if (pos.x < GameMap.WIDTH - 1) {
-                    pos.x++;
+                if (pos.x < (GameMap.WIDTH - 0.5) * GameScreen.blockSize) {
+                    pos.x += deltaPx;
                 } else {
                     move = Move.IDLE;
                 }
                 break;
         }
+
+        switch (move) {
+
+            case UP:
+            case DOWN:
+                float nx = (pos.x + GameScreen.blockSize * 0.5f) / GameScreen.blockSize ;
+                float rx = Math.round(nx);
+                if (rx > nx) {
+                    pos.x++;
+                } else if (rx < nx) {
+                    pos.x--;
+                    pos.x = Math.round(pos.x); // round x for smoother movement
+                }
+                break;
+            case RIGHT:
+            case LEFT:
+                float ny = (pos.y + GameScreen.blockSize * 0.5f) / GameScreen.blockSize ;
+                float ry = Math.round(ny);
+                if (ry > ny) {
+                    pos.y++;
+                } else if (ry < ny) {
+                    pos.y--;
+                    pos.y = Math.round(pos.y); // round y for smoother movement
+                }
+                break;
+
+        }
+
+        Gdx.app.log("pos: ", pos.toString());
+
         // update previous coords
         if (move != Move.IDLE) {
             prev.x = tmp.x;
