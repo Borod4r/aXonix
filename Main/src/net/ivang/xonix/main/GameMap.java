@@ -1,5 +1,7 @@
 package net.ivang.xonix.main;
 
+import com.badlogic.gdx.Gdx;
+
 import java.util.*;
 
 /**
@@ -38,96 +40,99 @@ public class GameMap {
     }
 
     public void update(float deltaTime, Protagonist protagonist, Enemy enemy) {
-        if (getBlockStateByPx(protagonist.prev.x, protagonist.prev.y) == GameMap.BS_WATER) {
-            setBlockStateByPx(protagonist.prev.x, protagonist.prev.y, GameMap.BS_TAIL);
+        switch (getBlockStateByPx(protagonist.prev.x, protagonist.prev.y)) {
+            case BS_WATER:
+                setBlockStateByPx(protagonist.prev.x, protagonist.prev.y, GameMap.BS_TAIL);
+                break;
+            case BS_TAIL:
+                if (getBlockStateByPx(protagonist.pos.x, protagonist.pos.y) == GameMap.BS_EARTH) {
 
-            if (getBlockStateByPx(protagonist.pos.x, protagonist.pos.y) == GameMap.BS_EARTH) {
+                    byte[][] tmpState = new byte[WIDTH][HEIGHT];
 
-                byte[][] tmpState = new byte[WIDTH][HEIGHT];
+                    // thanks to http://habrahabr.ru/post/119244/
+                    byte spotNum = 0;
+                    // TODO: HashMap and ArrayList?
+                    Map<Byte, List<Point>> spots = new HashMap<Byte, List<Point>>();
 
-                // thanks to http://habrahabr.ru/post/119244/
-                byte spotNum = 0;
-                // TODO: HashMap and ArrayList?
-                Map<Byte, List<Point>> spots = new HashMap<Byte, List<Point>>();
+                    for(int i = 1; i < GameMap.WIDTH - 1; i++) {
+                        for(int j = 1; j < GameMap.HEIGHT - 1; j++) {
+                            byte A = state[i][j];
+                            if (A == BS_WATER) {
+                                byte B = tmpState[i][j-1];
+                                byte C = tmpState[i-1][j];
 
-                for(int i = 1; i < GameMap.WIDTH - 1; i++) {
-                    for(int j = 1; j < GameMap.HEIGHT - 1; j++) {
-                        byte A = state[i][j];
-                        if (A == BS_WATER) {
-                            byte B = tmpState[i][j-1];
-                            byte C = tmpState[i-1][j];
+                                if ( B == 0) {
+                                    if (C == 0) {
+                                        // New Spot
+                                        spotNum++;
+                                        tmpState[i][j] = spotNum;
 
-                            if ( B == 0) {
-                                if (C == 0) {
-                                    // New Spot
-                                    spotNum++;
-                                    tmpState[i][j] = spotNum;
+                                        List<Point> spot = new ArrayList<Point>();
+                                        spot.add(new Point(i,j));
 
-                                    List<Point> spot = new ArrayList<Point>();
-                                    spot.add(new Point(i,j));
-
-                                    spots.put(spotNum, spot);
-                                } else {   // C!=0
-                                    tmpState[i][j] = C;
-                                    spots.get(C).add(new Point(i,j));
-                                }
-                            }
-
-                            if (B != 0) {
-                                if(C == 0) {
-                                    tmpState[i][j] = B;
-                                    spots.get(B).add(new Point(i,j));
-                                } else { // C != 0
-                                    tmpState[i][j] = B;
-                                    spots.get(B).add(new Point(i,j));
-                                    if (B != C) {
-                                        for(int m = 1; m < GameMap.WIDTH - 1; m++) {
-                                            for(int n = 1; n < GameMap.HEIGHT; n++) {
-                                                if (tmpState[m][n] == C) {
-                                                    tmpState[m][n] = B;
-                                                }
-                                            }
-                                        }
-                                        spots.get(B).addAll(spots.get(C));
-                                        spots.remove(C);
+                                        spots.put(spotNum, spot);
+                                    } else {   // C!=0
+                                        tmpState[i][j] = C;
+                                        spots.get(C).add(new Point(i,j));
                                     }
                                 }
+
+                                if (B != 0) {
+                                    if(C == 0) {
+                                        tmpState[i][j] = B;
+                                        spots.get(B).add(new Point(i,j));
+                                    } else { // C != 0
+                                        tmpState[i][j] = B;
+                                        spots.get(B).add(new Point(i,j));
+                                        if (B != C) {
+                                            for(int m = 1; m < GameMap.WIDTH - 1; m++) {
+                                                for(int n = 1; n < GameMap.HEIGHT; n++) {
+                                                    if (tmpState[m][n] == C) {
+                                                        tmpState[m][n] = B;
+                                                    }
+                                                }
+                                            }
+                                            spots.get(B).addAll(spots.get(C));
+                                            spots.remove(C);
+                                        }
+                                    }
+                                }
+                            } else if(A == BS_TAIL) {
+                                // turn trail to the land
+                                setBlockState(i, j, BS_EARTH);
+                                mapScore++;
+                                eartBlocks++;
+
                             }
-                        } else if(A == BS_TAIL) {
-                            // turn trail to the land
-                            setBlockState(i, j, BS_EARTH);
+                        }
+                    }
+
+                    Iterator iterator = spots.keySet().iterator();
+                    while (iterator.hasNext()) {
+                        for(Point pos: spots.get((Byte) iterator.next())) {
+                            if ((pos.x == (int) (enemy.pos.x / GameScreen.blockSize)) && (pos.y == (int)(enemy.pos.y / GameScreen.blockSize))) {
+                                iterator.remove();
+                                break;
+                            }
+                        }
+                    }
+
+                    for(List<Point> spot : spots.values()) {
+                        for(Point pos : spot) {
+                            setBlockState(pos.x, pos.y, BS_EARTH);
                             mapScore++;
                             eartBlocks++;
-
                         }
-                    }
-                }
+                        float bonus = 1 + (float) spot.size() / 200;
+                        mapScore += spot.size() * bonus;
 
-                Iterator iterator = spots.keySet().iterator();
-                while (iterator.hasNext()) {
-                    for(Point pos: spots.get((Byte) iterator.next())) {
-                        if ((pos.x == (int) (enemy.pos.x / GameScreen.blockSize)) && (pos.y == (int)(enemy.pos.y / GameScreen.blockSize))) {
-                            iterator.remove();
-                            break;
-                        }
                     }
-                }
 
-                for(List<Point> spot : spots.values()) {
-                    for(Point pos : spot) {
-                        setBlockState(pos.x, pos.y, BS_EARTH);
-                        mapScore++;
-                        eartBlocks++;
-                    }
-                    float bonus = 1 + (float) spot.size() / 200;
-                    mapScore += spot.size() * bonus;
+                    // update percentage
+                    percentComplete = (byte) (((float) eartBlocks / ((WIDTH - 2) * (HEIGHT - 2))) * 100) ;
 
                 }
-
-                // update percentage
-                percentComplete = (byte) (((float) eartBlocks / ((WIDTH - 2) * (HEIGHT - 2))) * 100) ;
-
-            }
+            break;
         }
     }
 

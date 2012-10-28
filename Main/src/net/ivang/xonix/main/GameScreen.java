@@ -41,8 +41,8 @@ public class GameScreen implements Screen {
     private Point shift;
 
     public GameScreen(Game game) {
-        this.width = 800;
-        this.height = 480;
+        this.width = Gdx.graphics.getWidth();
+        this.height = Gdx.graphics.getHeight();
 
         this.game = game;
 
@@ -55,13 +55,15 @@ public class GameScreen implements Screen {
         font = new BitmapFont();
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
+        blockSize = calculateBlockSize(width, height);
+
         gameMap = new GameMap();
-        protagonist = new Protagonist(0, GameMap.HEIGHT - 1, gameMap);
+        protagonist = new Protagonist(0.5f * blockSize, (GameMap.HEIGHT - 0.5f) * blockSize, gameMap);
         protagonist.setLives(2);
         enemy = new Enemy(100,100, gameMap);
 
         // adapt to the screen resolution
-        resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        resize(width, height);
     }
 
     @Override
@@ -69,10 +71,10 @@ public class GameScreen implements Screen {
         if (protagonist.pos.equals(enemy.pos) || gameMap.getBlockStateByPx(enemy.pos.x, enemy.pos.y) == GameMap.BS_TAIL) {
             protagonist.setLives(protagonist.getLives() - 1);
             // TODO: Bull Shit
-            protagonist.pos.x = 0;
-            protagonist.pos.y = 0;
-            protagonist.prev.x = 0;
-            protagonist.prev.y = 0;
+            protagonist.pos.x = 0.5f * blockSize;
+            protagonist.pos.y = 0.5f * blockSize;
+            protagonist.prev.x = 0.5f * blockSize;
+            protagonist.prev.y = 0.5f * blockSize;
 
             for(int i = 1; i < GameMap.WIDTH - 1; i++) {
                 for(int j = 1; j < GameMap.HEIGHT - 1; j++) {
@@ -123,6 +125,9 @@ public class GameScreen implements Screen {
 
         float deltaX = (float) width / (float) this.width;
         float deltaY = (float) height / (float) this.height;
+
+        protagonist.pos.x = (int)(protagonist.pos.x * deltaX);
+        protagonist.pos.y = (int)(protagonist.pos.y * deltaY);
 
         enemy.pos.x = (int)(enemy.pos.x * deltaX);
         enemy.pos.y = (int)(enemy.pos.y * deltaY);

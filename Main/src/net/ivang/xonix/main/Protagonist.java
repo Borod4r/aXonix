@@ -25,23 +25,18 @@ public class Protagonist {
 
     public Protagonist(Vector2 pos, GameMap gameMap) {
         this.pos = pos;
-        this.prev = new Vector2();
+        this.prev = pos.cpy();
         this.accel = 4;
         this.move = Move.IDLE;
         this.gameMap = gameMap;
     }
 
-    public Protagonist(float y, float x, GameMap gameMap) {
+    public Protagonist(float x, float y, GameMap gameMap) {
         this(new Vector2(x, y), gameMap);
     }
 
     public void update(float deltaTime) {
-        timeStep += deltaTime;
-        if (timeStep > 0.1 / accel) {
-            timeStep = 0;
-
-            processKeys();
-        }
+        processKeys();
         updatePosition(deltaTime);
     }
 
@@ -79,7 +74,6 @@ public class Protagonist {
 
     private void updatePosition(float deltaTime) {
         float deltaPx = GameScreen.blockSize * deltaTime * 4f;
-
         Vector2 tmp = new Vector2(pos.x, pos.y);
 
         switch (move) {
@@ -114,7 +108,6 @@ public class Protagonist {
         }
 
         switch (move) {
-
             case UP:
             case DOWN:
                 float nx = (pos.x + GameScreen.blockSize * 0.5f) / GameScreen.blockSize ;
@@ -139,8 +132,6 @@ public class Protagonist {
                 break;
 
         }
-
-        Gdx.app.log("pos: ", pos.toString());
 
         // update previous coords
         if (move != Move.IDLE) {
