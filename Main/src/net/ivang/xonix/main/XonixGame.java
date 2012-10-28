@@ -7,7 +7,7 @@ import com.badlogic.gdx.Input;
 /**
  * @author Ivan Gadzhega
  * @version $Id$
- * @since 15.10.12 23:46
+ * @since 0.1
  */
 public class XonixGame extends Game {
 
@@ -18,6 +18,7 @@ public class XonixGame extends Game {
 
     @Override
     public void render () {
+        // TODO: only for testing
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             getScreen().dispose();
             setScreen(new GameScreen(this));

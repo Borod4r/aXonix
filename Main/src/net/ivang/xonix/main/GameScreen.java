@@ -19,13 +19,19 @@ import static java.lang.Math.min;
  */
 public class GameScreen implements Screen {
 
+    public enum State {
+        PLAYING, PAUSED, GAME_OVER
+    }
+
     // TODO: review this one
     public static int blockSize;
 
     private int width;
     private int height;
 
-    Game game;
+    private Game game;
+
+    private State state;
 
     private OrthographicCamera camera;
     private SpriteBatch batch;
@@ -45,6 +51,9 @@ public class GameScreen implements Screen {
         this.height = Gdx.graphics.getHeight();
 
         this.game = game;
+
+        this.state = State.PLAYING;
+        Gdx.input.setInputProcessor(new GameScreenInputProcessor(this));
 
         camera = new OrthographicCamera(width, height);
         batch = new SpriteBatch();
@@ -68,13 +77,17 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        if (protagonist.pos.equals(enemy.pos) || gameMap.getBlockStateByPx(enemy.pos.x, enemy.pos.y) == GameMap.BS_TAIL) {
+        // CHECKING
+        // check lives
+        if (protagonist.getLives() < 0) state = State.GAME_OVER;
+        // check collisions
+        if (gameMap.getBlockStateByPx(enemy.pos.x, enemy.pos.y) == GameMap.BS_TAIL) {
             protagonist.setLives(protagonist.getLives() - 1);
             // TODO: Bull Shit
             protagonist.pos.x = 0.5f * blockSize;
-            protagonist.pos.y = 0.5f * blockSize;
+            protagonist.pos.y = (GameMap.HEIGHT - 0.5f) * blockSize;
             protagonist.prev.x = 0.5f * blockSize;
-            protagonist.prev.y = 0.5f * blockSize;
+            protagonist.prev.y = (GameMap.HEIGHT - 0.5f) * blockSize;
 
             for(int i = 1; i < GameMap.WIDTH - 1; i++) {
                 for(int j = 1; j < GameMap.HEIGHT - 1; j++) {
@@ -84,16 +97,23 @@ public class GameScreen implements Screen {
                 }
             }
 
-
+            this.state = State.PAUSED;
         }
 
-        if (protagonist.getLives() < 0) gameOver();
+        // UPDATING
+        switch (state) {
+            case PLAYING:
+                protagonist.update(delta);
+                enemy.update(delta);
+                gameMap.update(delta, protagonist, enemy);
+                break;
+            case PAUSED:
+                break;
+            case GAME_OVER:
+                break;
+        }
 
-        protagonist.update(delta);
-        enemy.update(delta);
-        gameMap.update(delta, protagonist, enemy);
-
-        // rendering part
+        // RENDERING
         Gdx.gl.glClearColor(0, 0, 0.1f, 1);
         Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
@@ -102,15 +122,30 @@ public class GameScreen implements Screen {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
-            renderMap(shift);
-            renderProtagonist(shift);
-            renderEnemy(delta, enemy, shift);
+        renderMap(shift);
+        renderProtagonist(shift);
+        renderEnemy(delta, enemy, shift);
 
-            // TODO: Move strings to bundles
-            String lives = "Lives: " + protagonist.getLives();
-            String score = "Score: " + gameMap.mapScore;
-            String percent = "Percent: " + gameMap.percentComplete;
-            font.draw(batch, lives + "   " + score + "   " + percent, blockSize + shift.x, (GameMap.HEIGHT + 1)* blockSize + shift.y);
+        // TODO: Move strings to bundles
+        String lives = "Lives: " + protagonist.getLives();
+        String score = "Score: " + gameMap.mapScore;
+        String percent = "Percent: " + gameMap.percentComplete;
+        font.draw(batch, lives + "   " + score + "   " + percent, blockSize + shift.x, (GameMap.HEIGHT + 1)* blockSize + shift.y);
+
+        switch (state) {
+            case PAUSED: {
+                String text = "PAUSE";
+                BitmapFont.TextBounds bounds = font.getBounds(text);
+                font.draw(batch, text, (GameMap.WIDTH/2)*blockSize + shift.x - bounds.width/2, (GameMap.HEIGHT/2 + 0.5f)*blockSize + shift.y - bounds.height/2);
+                break;
+            }
+            case GAME_OVER: {
+                String text = "GAME OVER";
+                BitmapFont.TextBounds bounds = font.getBounds(text);
+                font.draw(batch, text, (GameMap.WIDTH/2)*blockSize + shift.x - bounds.width/2, (GameMap.HEIGHT/2 + 0.5f)*blockSize + shift.y - bounds.height/2);
+                break;
+            }
+        }
 
         batch.end();
     }
@@ -160,6 +195,19 @@ public class GameScreen implements Screen {
     public void dispose() {
         // TODO Auto-generated method stub
     }
+
+    //---------------------------------------------------------------------
+    // Getters & Setters
+    //---------------------------------------------------------------------
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
+
 
     //---------------------------------------------------------------------
     // Helper methods

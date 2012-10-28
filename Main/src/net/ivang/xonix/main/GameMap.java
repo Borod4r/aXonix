@@ -1,7 +1,5 @@
 package net.ivang.xonix.main;
 
-import com.badlogic.gdx.Gdx;
-
 import java.util.*;
 
 /**
