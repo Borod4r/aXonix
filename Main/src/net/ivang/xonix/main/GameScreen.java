@@ -20,7 +20,7 @@ import static java.lang.Math.min;
 public class GameScreen implements Screen {
 
     public enum State {
-        PLAYING, PAUSED, GAME_OVER
+        PLAYING, PAUSED, LOST_LIFE, LEVEL_COMPLETED, GAME_OVER
     }
 
     // TODO: review this one
@@ -78,6 +78,10 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         // CHECKING
+        // check win
+        if (gameMap.percentComplete > 80) {
+            setState(State.LEVEL_COMPLETED);
+        }
         // check lives
         if (protagonist.getLives() < 0) state = State.GAME_OVER;
         // check collisions
@@ -141,6 +145,12 @@ public class GameScreen implements Screen {
             }
             case GAME_OVER: {
                 String text = "GAME OVER";
+                BitmapFont.TextBounds bounds = font.getBounds(text);
+                font.draw(batch, text, (GameMap.WIDTH/2)*blockSize + shift.x - bounds.width/2, (GameMap.HEIGHT/2 + 0.5f)*blockSize + shift.y - bounds.height/2);
+                break;
+            }
+            case LEVEL_COMPLETED: {
+                String text = "LEVEL COMPLETED";
                 BitmapFont.TextBounds bounds = font.getBounds(text);
                 font.draw(batch, text, (GameMap.WIDTH/2)*blockSize + shift.x - bounds.width/2, (GameMap.HEIGHT/2 + 0.5f)*blockSize + shift.y - bounds.height/2);
                 break;

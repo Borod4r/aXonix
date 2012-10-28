@@ -29,8 +29,10 @@ public class GameScreenInputProcessor extends InputAdapter {
                     case PAUSED:
                         gameScreen.setState(State.PLAYING);
                         break;
-                    case GAME_OVER:
-                        break;
+//                    case GAME_OVER:
+//                        break;
+//                    case LEVEL_COMPLETED:
+//                        break;
                 }
             return true;
         }
