@@ -46,6 +46,9 @@ public class GameScreen implements Screen {
 
     private Point shift;
 
+    // other
+    float lostLifeLabelDelay;
+
     public GameScreen(Game game) {
         this.width = Gdx.graphics.getWidth();
         this.height = Gdx.graphics.getHeight();
@@ -83,7 +86,7 @@ public class GameScreen implements Screen {
             setState(State.LEVEL_COMPLETED);
         }
         // check lives
-        if (protagonist.getLives() < 0) state = State.GAME_OVER;
+        if (protagonist.getLives() <= 0) state = State.GAME_OVER;
         // check collisions
         if (gameMap.getBlockStateByPx(enemy.pos.x, enemy.pos.y) == GameMap.BS_TAIL) {
             protagonist.setLives(protagonist.getLives() - 1);
@@ -101,7 +104,7 @@ public class GameScreen implements Screen {
                 }
             }
 
-            this.state = State.PAUSED;
+            setState(State.LOST_LIFE);
         }
 
         // UPDATING
@@ -137,27 +140,32 @@ public class GameScreen implements Screen {
         font.draw(batch, lives + "   " + score + "   " + percent, blockSize + shift.x, (GameMap.HEIGHT + 1)* blockSize + shift.y);
 
         switch (state) {
-            case PAUSED: {
-                String text = "PAUSE";
-                BitmapFont.TextBounds bounds = font.getBounds(text);
-                font.draw(batch, text, (GameMap.WIDTH/2)*blockSize + shift.x - bounds.width/2, (GameMap.HEIGHT/2 + 0.5f)*blockSize + shift.y - bounds.height/2);
+            case PAUSED:
+                drawStringAtCenter(batch, font, "PAUSE");
                 break;
-            }
-            case GAME_OVER: {
-                String text = "GAME OVER";
-                BitmapFont.TextBounds bounds = font.getBounds(text);
-                font.draw(batch, text, (GameMap.WIDTH/2)*blockSize + shift.x - bounds.width/2, (GameMap.HEIGHT/2 + 0.5f)*blockSize + shift.y - bounds.height/2);
+            case GAME_OVER:
+                drawStringAtCenter(batch, font, "GAME OVER");
                 break;
-            }
-            case LEVEL_COMPLETED: {
-                String text = "LEVEL COMPLETED";
-                BitmapFont.TextBounds bounds = font.getBounds(text);
-                font.draw(batch, text, (GameMap.WIDTH/2)*blockSize + shift.x - bounds.width/2, (GameMap.HEIGHT/2 + 0.5f)*blockSize + shift.y - bounds.height/2);
+            case LEVEL_COMPLETED:
+                drawStringAtCenter(batch, font, "LEVEL COMPLETED");
                 break;
-            }
+            case LOST_LIFE:
+                if (protagonist.getLives() > 0) lostLifeLabelDelay = 2;
+                setState(State.PLAYING);
+                break;
+        }
+
+        if (lostLifeLabelDelay > 0) {
+            drawStringAtCenter(batch, font, "LIFE LEFT!!!");
+            lostLifeLabelDelay -= delta;
         }
 
         batch.end();
+    }
+
+    private void drawStringAtCenter(SpriteBatch batch, BitmapFont font, String str) {
+        BitmapFont.TextBounds bounds = font.getBounds(str);
+        font.draw(batch, str, (GameMap.WIDTH/2)*blockSize + shift.x - bounds.width/2, (GameMap.HEIGHT/2 + 0.5f)*blockSize + shift.y - bounds.height/2);
     }
 
     @Override
