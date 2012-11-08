@@ -1,6 +1,5 @@
 package net.ivang.xonix.main;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
@@ -29,7 +28,7 @@ public class GameScreen implements Screen {
     private int width;
     private int height;
 
-    private Game game;
+    private XonixGame game;
 
     private State state;
 
@@ -40,85 +39,53 @@ public class GameScreen implements Screen {
     private Texture enemyT;
     private BitmapFont font;
 
-    private GameMap gameMap;
-    private Protagonist protagonist;
-    private Enemy enemy;
+    private Level level;
+    private int levelIndex;
 
     private Point shift;
 
     // other
     float lostLifeLabelDelay;
 
-    public GameScreen(Game game) {
-        this.width = Gdx.graphics.getWidth();
-        this.height = Gdx.graphics.getHeight();
-
+    public GameScreen(XonixGame game) {
         this.game = game;
+        this.state = State.PAUSED; // init?
 
-        this.state = State.PLAYING;
-        Gdx.input.setInputProcessor(new GameScreenInputProcessor(this));
+        // input event handling
+        Gdx.input.setInputProcessor(new GameScreenInputProcessor(game, this));
 
         camera = new OrthographicCamera(width, height);
         batch = new SpriteBatch();
         texture = new Texture(Gdx.files.internal("data/tile.png"));
         enemyT = new Texture(Gdx.files.internal("data/bomb.png"));
 
-
         font = new BitmapFont();
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+    }
+
+    public void setLevel(int index) {
+        this.levelIndex = index;
+        this.level = game.getLevels().get(index);
+
+        this.width = Gdx.graphics.getWidth();
+        this.height = Gdx.graphics.getHeight();
+
+        this.state = State.PLAYING;
 
         blockSize = calculateBlockSize(width, height);
 
-        gameMap = new GameMap();
-        protagonist = new Protagonist(0.5f * blockSize, (GameMap.HEIGHT - 0.5f) * blockSize, gameMap);
-        protagonist.setLives(2);
-        enemy = new Enemy(100,100, gameMap);
-
-        // adapt to the screen resolution
         resize(width, height);
     }
 
     @Override
     public void render(float delta) {
-        // CHECKING
-        // check win
-        if (gameMap.percentComplete > 80) {
-            setState(State.LEVEL_COMPLETED);
-        }
-        // check lives
-        if (protagonist.getLives() <= 0) state = State.GAME_OVER;
-        // check collisions
-        if (gameMap.getBlockStateByPx(enemy.pos.x, enemy.pos.y) == GameMap.BS_TAIL) {
-            protagonist.setLives(protagonist.getLives() - 1);
-            // TODO: Bull Shit
-            protagonist.pos.x = 0.5f * blockSize;
-            protagonist.pos.y = (GameMap.HEIGHT - 0.5f) * blockSize;
-            protagonist.prev.x = 0.5f * blockSize;
-            protagonist.prev.y = (GameMap.HEIGHT - 0.5f) * blockSize;
+        GameMap gameMap = level.getGameMap();
+        Protagonist protagonist = level.getProtagonist();
+        Enemy enemy = level.getEnemy();
 
-            for(int i = 1; i < GameMap.WIDTH - 1; i++) {
-                for(int j = 1; j < GameMap.HEIGHT - 1; j++) {
-                    if (gameMap.getBlockState(i, j) == GameMap.BS_TAIL) {
-                        gameMap.setBlockState(i, j, GameMap.BS_WATER);
-                    }
-                }
-            }
+        check(level);
 
-            setState(State.LOST_LIFE);
-        }
-
-        // UPDATING
-        switch (state) {
-            case PLAYING:
-                protagonist.update(delta);
-                enemy.update(delta);
-                gameMap.update(delta, protagonist, enemy);
-                break;
-            case PAUSED:
-                break;
-            case GAME_OVER:
-                break;
-        }
+        update(delta, level);
 
         // RENDERING
         Gdx.gl.glClearColor(0, 0, 0.1f, 1);
@@ -129,14 +96,14 @@ public class GameScreen implements Screen {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
-        renderMap(shift);
-        renderProtagonist(shift);
-        renderEnemy(delta, enemy, shift);
+        renderMap(gameMap, shift);
+        renderProtagonist(protagonist, shift);
+        renderEnemy(enemy,shift, delta);
 
         // TODO: Move strings to bundles
         String lives = "Lives: " + protagonist.getLives();
         String score = "Score: " + gameMap.mapScore;
-        String percent = "Percent: " + gameMap.percentComplete;
+        String percent = "Progress: " + gameMap.percentComplete;
         font.draw(batch, lives + "   " + score + "   " + percent, blockSize + shift.x, (GameMap.HEIGHT + 1)* blockSize + shift.y);
 
         switch (state) {
@@ -148,10 +115,6 @@ public class GameScreen implements Screen {
                 break;
             case LEVEL_COMPLETED:
                 drawStringAtCenter(batch, font, "LEVEL COMPLETED");
-                break;
-            case LOST_LIFE:
-                if (protagonist.getLives() > 0) lostLifeLabelDelay = 2;
-                setState(State.PLAYING);
                 break;
         }
 
@@ -170,6 +133,10 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
+//        GameMap gameMap = level.getGameMap();
+        Protagonist protagonist = level.getProtagonist();
+        Enemy enemy = level.getEnemy();
+
         camera.setToOrtho(false, width, height);
 
         blockSize = calculateBlockSize(width, height);
@@ -215,23 +182,64 @@ public class GameScreen implements Screen {
     }
 
     //---------------------------------------------------------------------
-    // Getters & Setters
-    //---------------------------------------------------------------------
-
-    public State getState() {
-        return state;
-    }
-
-    public void setState(State state) {
-        this.state = state;
-    }
-
-
-    //---------------------------------------------------------------------
     // Helper methods
     //---------------------------------------------------------------------
 
-    private void renderMap(Point shift) {
+    private void check(Level level) {
+        GameMap gameMap = level.getGameMap();
+        Protagonist protagonist = level.getProtagonist();
+        Enemy enemy = level.getEnemy();
+
+        // check win
+        if (gameMap.percentComplete > 80) {
+            setState(State.LEVEL_COMPLETED);
+        }
+        // check lives
+        if (protagonist.getLives() <= 0) state = State.GAME_OVER;
+        // check collisions
+        if (gameMap.getBlockStateByPx(enemy.pos.x, enemy.pos.y) == GameMap.BS_TAIL) {
+            protagonist.setLives(protagonist.getLives() - 1);
+            // TODO: Bull Shit
+            protagonist.pos.x = 0.5f * blockSize;
+            protagonist.pos.y = (GameMap.HEIGHT - 0.5f) * blockSize;
+            protagonist.prev.x = 0;
+            protagonist.prev.y = 0;
+
+            for(int i = 1; i < GameMap.WIDTH - 1; i++) {
+                for(int j = 1; j < GameMap.HEIGHT - 1; j++) {
+                    if (gameMap.getBlockState(i, j) == GameMap.BS_TAIL) {
+                        gameMap.setBlockState(i, j, GameMap.BS_WATER);
+                    }
+                }
+            }
+
+            setState(State.LOST_LIFE);
+        }
+    }
+
+    private void update(float deltaTime, Level level) {
+        GameMap gameMap = level.getGameMap();
+        Protagonist protagonist = level.getProtagonist();
+        Enemy enemy = level.getEnemy();
+
+        switch (state) {
+            case PLAYING:
+                protagonist.update(deltaTime);
+                enemy.update(deltaTime);
+                gameMap.update(deltaTime, protagonist, enemy);
+                break;
+//            case PAUSED:
+//                break;
+//            case GAME_OVER:
+//                break;
+            case LOST_LIFE:
+                if (protagonist.getLives() > 0) lostLifeLabelDelay = 2;
+                setState(State.PLAYING);
+                break;
+        }
+    }
+
+    private void renderMap(GameMap gameMap, Point shift) {
         for(int i = 0; i < GameMap.WIDTH; i++) {
             for(int j = 0; j < GameMap.HEIGHT; j++) {
                 switch (gameMap.getBlockState(i, j)) {
@@ -251,12 +259,12 @@ public class GameScreen implements Screen {
         }
     }
 
-    private void renderProtagonist(Point shift) {
+    private void renderProtagonist(Protagonist protagonist, Point shift) {
         batch.setColor(1, 0, 0, 1);
         batch.draw(texture, protagonist.pos.x + shift.x - (blockSize * 0.5f), protagonist.pos.y + shift.y - (blockSize * 0.5f), blockSize, blockSize);
     }
 
-    private void renderEnemy(float deltaTime, Enemy enemy, Point shift) {
+    private void renderEnemy(Enemy enemy, Point shift, float deltaTime) {
         batch.setColor(1, 1, 1, 1);
         batch.draw(enemyT, enemy.pos.x  + shift.x - (blockSize * 0.75f), enemy.pos.y + shift.y - (blockSize * 0.75f), blockSize * 1.5f, blockSize * 1.5f);
 
@@ -278,4 +286,23 @@ public class GameScreen implements Screen {
         game.setScreen(new GameScreen(game));
     }
 
+    //---------------------------------------------------------------------
+    // Getters & Setters
+    //---------------------------------------------------------------------
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
+
+    public int getLevelIndex() {
+        return levelIndex;
+    }
+
+    public void setLevelIndex(int levelIndex) {
+        this.levelIndex = levelIndex;
+    }
 }

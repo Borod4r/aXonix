@@ -12,9 +12,11 @@ import static com.badlogic.gdx.Input.Keys;
  */
 public class GameScreenInputProcessor extends InputAdapter {
 
+    private XonixGame game;
     private GameScreen gameScreen;
 
-    public  GameScreenInputProcessor(GameScreen gameScreen) {
+    public  GameScreenInputProcessor(XonixGame game, GameScreen gameScreen) {
+        this.game = game;
         this.gameScreen = gameScreen;
     }
 
@@ -31,8 +33,15 @@ public class GameScreenInputProcessor extends InputAdapter {
                         break;
 //                    case GAME_OVER:
 //                        break;
-//                    case LEVEL_COMPLETED:
-//                        break;
+                    case LEVEL_COMPLETED:
+                        int nextIndex = gameScreen.getLevelIndex() + 1;
+                        if (nextIndex < game.getLevels().size()) {
+                            gameScreen.setLevel(nextIndex);
+                        } else {
+                            // WIN!!!
+                        }
+
+                        break;
                 }
             return true;
         }
