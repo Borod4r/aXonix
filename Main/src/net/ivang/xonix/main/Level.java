@@ -13,9 +13,9 @@ public class Level {
 
     public Level() {
         gameMap = new GameMap();
-        protagonist = new Protagonist(0.5f * GameScreen.blockSize, (GameMap.HEIGHT - 0.5f) * GameScreen.blockSize, gameMap);
+        protagonist = new Protagonist(0.5f, GameMap.HEIGHT - 0.5f, gameMap);
         protagonist.setLives(2);
-        enemy = new Enemy(100,100, gameMap);
+        enemy = new Enemy(5,5, gameMap);
     }
 
     public GameMap getGameMap() {

@@ -18,7 +18,7 @@ public class Protagonist {
     public Vector2 pos;
     public Vector2 prev;
 
-    private float accel;
+//    private float accel;
 
     private Move move;
     private float timeStep;
@@ -26,7 +26,7 @@ public class Protagonist {
     public Protagonist(Vector2 pos, GameMap gameMap) {
         this.pos = pos;
         this.prev = pos.cpy();
-        this.accel = 4;
+//        this.accel = 4;
         this.move = Move.IDLE;
         this.gameMap = gameMap;
     }
@@ -53,7 +53,7 @@ public class Protagonist {
         boolean isDraggedLeft = (Gdx.input.isTouched() && Gdx.input.getDeltaX() < 0 && diff > 0);
         boolean isDraggedRight = (Gdx.input.isTouched() && Gdx.input.getDeltaX() > 0 && diff >= 0);
 
-        boolean onEarth = gameMap.getBlockStateByPx(pos.x, pos.y) == GameMap.BS_EARTH;
+        boolean onEarth = gameMap.getBlockState(pos.x, pos.y) == GameMap.BS_EARTH;
 
         if((onEarth || move != Move.DOWN) && (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S) || isDraggedUp)) {
             move = Move.UP;
@@ -73,33 +73,33 @@ public class Protagonist {
     }
 
     private void updatePosition(float deltaTime) {
-        float deltaPx = GameScreen.blockSize * deltaTime * 4f;
+        float deltaPx = deltaTime * 4f;
         Vector2 tmp = new Vector2(pos.x, pos.y);
 
         switch (move) {
             case UP:
-                if (pos.y > GameScreen.blockSize * 0.5) {
+                if (pos.y > 0.5) {
                     pos.y -= deltaPx;
                 } else {
                     move = Move.IDLE;
                 }
                 break;
             case DOWN:
-                if (pos.y < (GameMap.HEIGHT - 0.5) * GameScreen.blockSize) {
+                if (pos.y < GameMap.HEIGHT - 0.5) {
                     pos.y += deltaPx;
                 } else {
                     move = Move.IDLE;
                 }
                 break;
             case LEFT:
-                if (pos.x > GameScreen.blockSize * 0.5) {
+                if (pos.x > 0.5) {
                     pos.x -= deltaPx;
                 } else {
                     move = Move.IDLE;
                 }
                 break;
             case RIGHT:
-                if (pos.x < (GameMap.WIDTH - 0.5) * GameScreen.blockSize) {
+                if (pos.x < GameMap.WIDTH - 0.5) {
                     pos.x += deltaPx;
                 } else {
                     move = Move.IDLE;
@@ -107,27 +107,34 @@ public class Protagonist {
                 break;
         }
 
+        float step = 0.05f;
         switch (move) {
             case UP:
             case DOWN:
-                float nx = (pos.x + GameScreen.blockSize * 0.5f) / GameScreen.blockSize ;
+                float nx = pos.x + 0.5f;
                 float rx = Math.round(nx);
                 if (rx > nx) {
-                    pos.x++;
+                    pos.x += step;
                 } else if (rx < nx) {
-                    pos.x--;
-                    pos.x = Math.round(pos.x); // round x for smoother movement
+                    if (rx - nx < step) {
+                        pos.x = rx - 0.5f; // round x for smoother movement
+                    } else {
+                        pos.x -= step;
+                    }
                 }
                 break;
             case RIGHT:
             case LEFT:
-                float ny = (pos.y + GameScreen.blockSize * 0.5f) / GameScreen.blockSize ;
+                float ny = pos.y + 0.5f;
                 float ry = Math.round(ny);
                 if (ry > ny) {
-                    pos.y++;
+                    pos.y += step;
                 } else if (ry < ny) {
-                    pos.y--;
-                    pos.y = Math.round(pos.y); // round y for smoother movement
+                    if (ry - ny < step) {
+                        pos.y = ry - 0.5f; // round y for smoother movement
+                    } else {
+                        pos.y -= step;
+                    }
                 }
                 break;
 

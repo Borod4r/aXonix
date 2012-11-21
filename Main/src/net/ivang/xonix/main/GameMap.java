@@ -20,7 +20,7 @@ public class GameMap {
 
     public int mapScore;
     public byte percentComplete;
-    private int eartBlocks;
+    private int earthBlocks;
 
     public GameMap() {
         state = new byte[WIDTH][HEIGHT];
@@ -38,12 +38,12 @@ public class GameMap {
     }
 
     public void update(float deltaTime, Protagonist protagonist, Enemy enemy) {
-        switch (getBlockStateByPx(protagonist.prev.x, protagonist.prev.y)) {
+        switch (getBlockState(protagonist.prev.x, protagonist.prev.y)) {
             case BS_WATER:
-                setBlockStateByPx(protagonist.prev.x, protagonist.prev.y, GameMap.BS_TAIL);
+                setBlockState(protagonist.prev.x, protagonist.prev.y, GameMap.BS_TAIL);
                 break;
             case BS_TAIL:
-                if (getBlockStateByPx(protagonist.pos.x, protagonist.pos.y) == GameMap.BS_EARTH) {
+                if (getBlockState(protagonist.pos.x, protagonist.pos.y) == GameMap.BS_EARTH) {
 
                     byte[][] tmpState = new byte[WIDTH][HEIGHT];
 
@@ -99,7 +99,7 @@ public class GameMap {
                                 // turn trail to the land
                                 setBlockState(i, j, BS_EARTH);
                                 mapScore++;
-                                eartBlocks++;
+                                earthBlocks++;
 
                             }
                         }
@@ -108,7 +108,7 @@ public class GameMap {
                     Iterator iterator = spots.keySet().iterator();
                     while (iterator.hasNext()) {
                         for(Point pos: spots.get((Byte) iterator.next())) {
-                            if ((pos.x == (int) (enemy.pos.x / GameScreen.blockSize)) && (pos.y == (int)(enemy.pos.y / GameScreen.blockSize))) {
+                            if ((pos.x == (int) enemy.pos.x) && (pos.y == (int) enemy.pos.y)) {
                                 iterator.remove();
                                 break;
                             }
@@ -119,7 +119,7 @@ public class GameMap {
                         for(Point pos : spot) {
                             setBlockState(pos.x, pos.y, BS_EARTH);
                             mapScore++;
-                            eartBlocks++;
+                            earthBlocks++;
                         }
                         float bonus = 1 + (float) spot.size() / 200;
                         mapScore += spot.size() * bonus;
@@ -127,7 +127,7 @@ public class GameMap {
                     }
 
                     // update percentage
-                    percentComplete = (byte) (((float) eartBlocks / ((WIDTH - 2) * (HEIGHT - 2))) * 100) ;
+                    percentComplete = (byte) (((float) earthBlocks / ((WIDTH - 2) * (HEIGHT - 2))) * 100) ;
 
                 }
             break;
@@ -144,27 +144,18 @@ public class GameMap {
         }
     }
 
+    public void setBlockState(float x, float y, byte value) {
+        if (x >= 0 && x < WIDTH && y >=0 && y < HEIGHT) {
+            state[(int) x][(int) y] = value;
+        }
+    }
+
     public byte getBlockState(int x, int y) {
         return state[x][y];
     }
 
-    public void setBlockStateByPx(float px, float py, byte value) {
-        int x = pixelsToBlocks(px);
-        int y = pixelsToBlocks(py);
-        if (x >= 0 && x < WIDTH && y >=0 && y < HEIGHT) {
-            state[x][y] = value;
-        }
+    public byte getBlockState(float x, float y) {
+        return state[(int) x][ (int) y];
     }
 
-    public byte getBlockStateByPx(float x, float y) {
-        return state[(int) x / GameScreen.blockSize][(int) y / GameScreen.blockSize];
-    }
-
-    //---------------------------------------------------------------------
-    // Helper Methods
-    //---------------------------------------------------------------------
-
-    private int pixelsToBlocks(float px) {
-        return (int) (px / GameScreen.blockSize);
-    }
 }
