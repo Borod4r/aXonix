@@ -101,7 +101,7 @@ public class GameScreen implements Screen {
         // TODO: Move strings to bundles
         String lives = "Lives: " + protagonist.getLives();
         String score = "Score: " + gameMap.mapScore;
-        String percent = "Progress: " + gameMap.percentComplete;
+        String percent = "Level: " + (levelIndex + 1) +" (" + gameMap.percentComplete + "/80%)";
         font.draw(batch, lives + "   " + score + "   " + percent, 1, gmHeight + 1);
 
         switch (state) {
