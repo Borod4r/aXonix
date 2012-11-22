@@ -13,7 +13,7 @@ public class Enemy {
     private Move moveDirection;
     private GameMap gameMap;
 
-    Enemy(int x, int y, GameMap gameMap) {
+    Enemy(float x, float y, GameMap gameMap) {
         pos = new Vector2(x, y);
         moveDirection = Move.UP_LEFT;
         this.gameMap = gameMap;
@@ -93,4 +93,5 @@ public class Enemy {
     public void setMoveDirection(Move moveDirection) {
         this.moveDirection = moveDirection;
     }
+
 }

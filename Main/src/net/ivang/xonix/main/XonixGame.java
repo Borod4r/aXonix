@@ -3,6 +3,8 @@ package net.ivang.xonix.main;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Pixmap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +22,13 @@ public class XonixGame extends Game {
 
     @Override
     public void create() {
-
+        // init levels list from files
         levels = new ArrayList<Level>();
-        levels.add(new Level());
-        levels.add(new Level());
+        FileHandle dirHandle = Gdx.files.internal("data/levels");
+        for (FileHandle entry: dirHandle.list()) {
+            Pixmap pixmap = new Pixmap(entry);
+            levels.add(new Level(pixmap));
+        }
 
         gameScreen = new GameScreen(this);
         gameScreen.setLevel(0);

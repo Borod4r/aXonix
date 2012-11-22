@@ -18,7 +18,7 @@ public class Protagonist {
     public Vector2 pos;
     public Vector2 prev;
 
-//    private float accel;
+    private float speed;
 
     private Move move;
     private float timeStep;
@@ -26,7 +26,7 @@ public class Protagonist {
     public Protagonist(Vector2 pos, GameMap gameMap) {
         this.pos = pos;
         this.prev = pos.cpy();
-//        this.accel = 4;
+        this.speed = 8;
         this.move = Move.IDLE;
         this.gameMap = gameMap;
     }
@@ -73,7 +73,7 @@ public class Protagonist {
     }
 
     private void updatePosition(float deltaTime) {
-        float deltaPx = deltaTime * 4f;
+        float deltaPx = deltaTime * speed;;
         Vector2 tmp = new Vector2(pos.x, pos.y);
 
         switch (move) {
@@ -85,7 +85,7 @@ public class Protagonist {
                 }
                 break;
             case DOWN:
-                if (pos.y < GameMap.HEIGHT - 0.5) {
+                if (pos.y < gameMap.getHeight() - 0.5) {
                     pos.y += deltaPx;
                 } else {
                     move = Move.IDLE;
@@ -99,7 +99,7 @@ public class Protagonist {
                 }
                 break;
             case RIGHT:
-                if (pos.x < GameMap.WIDTH - 0.5) {
+                if (pos.x < gameMap.getWidth() - 0.5) {
                     pos.x += deltaPx;
                 } else {
                     move = Move.IDLE;
