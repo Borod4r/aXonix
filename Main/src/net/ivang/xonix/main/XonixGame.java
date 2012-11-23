@@ -2,7 +2,6 @@ package net.ivang.xonix.main;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 
 import java.util.Arrays;
@@ -20,7 +19,6 @@ public class XonixGame extends Game {
     @Override
     public void create() {
         // init list of levels files
-
         FileHandle dirHandle = Gdx.files.internal("data/levels");
         levelsFiles = Arrays.asList(dirHandle.list());
 
@@ -28,15 +26,6 @@ public class XonixGame extends Game {
         gameScreen.setLevel(0);
 
         setScreen(gameScreen);
-    }
-
-    @Override
-    public void render () {
-        //TODO: only for testing
-        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-            ((GameScreen) getScreen()).setLevel(0);
-        }
-        super.render();
     }
 
     //---------------------------------------------------------------------

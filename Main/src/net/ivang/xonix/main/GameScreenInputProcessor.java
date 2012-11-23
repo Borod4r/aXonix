@@ -24,6 +24,7 @@ public class GameScreenInputProcessor extends InputAdapter {
     public boolean keyDown(int keycode) {
         switch (keycode) {
             case Keys.SPACE:
+            case Keys.MENU:
                 switch (gameScreen.getState()) {
                     case PLAYING:
                         gameScreen.setState(State.PAUSED);
@@ -43,7 +44,11 @@ public class GameScreenInputProcessor extends InputAdapter {
 
                         break;
                 }
-            return true;
+                return true;
+            case Keys.ESCAPE:
+                //TODO: only for testing
+                gameScreen.setLevel(0);
+                return true;
         }
         return false;
     }

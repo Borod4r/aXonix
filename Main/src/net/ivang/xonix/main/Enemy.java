@@ -15,7 +15,7 @@ public class Enemy {
 
     Enemy(float x, float y, GameMap gameMap) {
         pos = new Vector2(x, y);
-        moveDirection = Move.UP_LEFT;
+        moveDirection = Move.getRandomDiagonal();
         this.gameMap = gameMap;
     }
 

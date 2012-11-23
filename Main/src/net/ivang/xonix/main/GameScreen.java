@@ -64,7 +64,6 @@ public class GameScreen implements Screen {
 
         Pixmap pixmap = new Pixmap(game.getLevelsFiles().get(index));
         this.level = new Level(pixmap);
-        this.state = State.PLAYING;
 
         int width = Gdx.graphics.getWidth();
         int height = Gdx.graphics.getHeight();
@@ -76,6 +75,8 @@ public class GameScreen implements Screen {
 
         camera = new OrthographicCamera(width/blockSize, height/blockSize);
         camera.translate(gmWidth/2, gmHeight/2);
+
+        this.state = State.PLAYING;
     }
 
     @Override
