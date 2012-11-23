@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -38,11 +39,13 @@ public class GameScreen implements Screen {
     private int levelIndex;
 
     // other
+    int lives;
     float lostLifeLabelDelay;
 
     public GameScreen(XonixGame game) {
         this.game = game;
         this.state = State.PAUSED; // init?
+        this.lives = 3;
         // input event handling
         Gdx.input.setInputProcessor(new GameScreenInputProcessor(game, this));
         /* Textures */
@@ -58,7 +61,9 @@ public class GameScreen implements Screen {
 
     public void setLevel(int index) {
         this.levelIndex = index;
-        this.level = game.getLevels().get(index);
+
+        Pixmap pixmap = new Pixmap(game.getLevelsFiles().get(index));
+        this.level = new Level(pixmap);
         this.state = State.PLAYING;
 
         int width = Gdx.graphics.getWidth();
@@ -70,7 +75,7 @@ public class GameScreen implements Screen {
         int blockSize = calculateBlockSize(width, height, gmWidth, gmHeight);
 
         camera = new OrthographicCamera(width/blockSize, height/blockSize);
-        camera.translate(level.getGameMap().getWidth()/2, level.getGameMap().getHeight()/2);
+        camera.translate(gmWidth/2, gmHeight/2);
     }
 
     @Override
@@ -99,10 +104,10 @@ public class GameScreen implements Screen {
         int gmHeight = gameMap.getHeight();
 
         // TODO: Move strings to bundles
-        String lives = "Lives: " + protagonist.getLives();
-        String score = "Score: " + gameMap.mapScore;
-        String percent = "Level: " + (levelIndex + 1) +" (" + gameMap.percentComplete + "/80%)";
-        font.draw(batch, lives + "   " + score + "   " + percent, 1, gmHeight + 1);
+        String livesLabel = "Lives: " + lives;
+        String scoreLabel = "Score: " + gameMap.mapScore;
+        String percentLabel = "Level: " + (levelIndex + 1) +" (" + gameMap.percentComplete + "/80%)";
+        font.draw(batch, livesLabel + "   " + scoreLabel + "   " + percentLabel, 1, gmHeight + 1);
 
         switch (state) {
             case PAUSED:
@@ -172,7 +177,6 @@ public class GameScreen implements Screen {
 
     private void check(Level level) {
         GameMap gameMap = level.getGameMap();
-        Protagonist protagonist = level.getProtagonist();
         List<Enemy> enemies = level.getEnemies();
 
         // check win
@@ -180,16 +184,13 @@ public class GameScreen implements Screen {
             setState(State.LEVEL_COMPLETED);
         }
         // check lives
-        if (protagonist.getLives() <= 0) state = State.GAME_OVER;
+        if (lives <= 0) state = State.GAME_OVER;
         // check collisions
         for (Enemy enemy : enemies) {
             if (gameMap.getBlockState(enemy.pos.x, enemy.pos.y) == GameMap.BS_TAIL) {
-                protagonist.setLives(protagonist.getLives() - 1);
-                // TODO: Bull Shit
-                protagonist.pos.x = 0.5f;
-                protagonist.pos.y = gameMap.getHeight() - 0.5f;
-                protagonist.prev.x = 0;
-                protagonist.prev.y = 0;
+                lives--;
+                Protagonist protagonist = new Protagonist(level.getProtStartPos().cpy(), level.getGameMap());
+                level.setProtagonist(protagonist);
 
                 for(int i = 1; i < gameMap.getWidth() - 1; i++) {
                     for(int j = 1; j < gameMap.getHeight() - 1; j++) {
@@ -222,7 +223,7 @@ public class GameScreen implements Screen {
 //            case GAME_OVER:
 //                break;
             case LOST_LIFE:
-                if (protagonist.getLives() > 0) lostLifeLabelDelay = 2;
+                if (lives > 0) lostLifeLabelDelay = 2;
                 setState(State.PLAYING);
                 break;
         }
@@ -287,5 +288,9 @@ public class GameScreen implements Screen {
 
     public void setLevelIndex(int levelIndex) {
         this.levelIndex = levelIndex;
+    }
+
+    public Level getLevel() {
+        return level;
     }
 }

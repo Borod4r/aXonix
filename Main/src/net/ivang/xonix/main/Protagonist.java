@@ -11,17 +11,14 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class Protagonist {
 
-    private GameMap gameMap;
-
-    private int lives;
-
     public Vector2 pos;
     public Vector2 prev;
 
     private float speed;
 
     private Move move;
-    private float timeStep;
+
+    private GameMap gameMap;
 
     public Protagonist(Vector2 pos, GameMap gameMap) {
         this.pos = pos;
@@ -31,9 +28,9 @@ public class Protagonist {
         this.gameMap = gameMap;
     }
 
-    public Protagonist(float x, float y, GameMap gameMap) {
-        this(new Vector2(x, y), gameMap);
-    }
+//    public Protagonist(float x, float y, GameMap gameMap) {
+//        this(new Vector2(x, y), gameMap);
+//    }
 
     public void update(float deltaTime) {
         processKeys();
@@ -145,19 +142,6 @@ public class Protagonist {
             prev.x = tmp.x;
             prev.y = tmp.y;
         }
-    }
-
-    //---------------------------------------------------------------------
-    // Getters & Setters
-    //---------------------------------------------------------------------
-
-
-    public int getLives() {
-        return lives;
-    }
-
-    public void setLives(int lives) {
-        this.lives = lives;
     }
 
 }

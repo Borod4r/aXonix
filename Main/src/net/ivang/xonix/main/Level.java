@@ -1,6 +1,7 @@
 package net.ivang.xonix.main;
 
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,8 @@ public class Level {
     private GameMap gameMap;
     private Protagonist protagonist;
     private List<Enemy> enemies;
+
+    private Vector2 protStartPos;
 
     public Level(Pixmap pixmap) {
         final int EARTH = 0x000000;
@@ -38,14 +41,15 @@ public class Level {
                     enemies.add(enemy);
                     state[x][y] = GameMap.BS_WATER;
                 } else if (pix == PROTAGONIST) {
-                    protagonist = new Protagonist(x + 0.5f, y + 0.5f, gameMap);
-                    protagonist.setLives(2);
+                    protStartPos = new Vector2(x + 0.5f, y + 0.5f);
                     state[x][y] = GameMap.BS_EARTH;
                 } else {
                     state[x][y] = GameMap.BS_WATER;
                 }
             }
         }
+
+        protagonist = new Protagonist(protStartPos.cpy(), gameMap);
 
         gameMap.setState(state);
     }
@@ -72,5 +76,13 @@ public class Level {
 
     public void setEnemies(List<Enemy> enemies) {
         this.enemies = enemies;
+    }
+
+    public Vector2 getProtStartPos() {
+        return protStartPos;
+    }
+
+    public void setProtStartPos(Vector2 protStartPos) {
+        this.protStartPos = protStartPos;
     }
 }

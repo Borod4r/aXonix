@@ -4,9 +4,8 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Pixmap;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -16,21 +15,16 @@ import java.util.List;
  */
 public class XonixGame extends Game {
 
-    private GameScreen gameScreen;
-
-    private List<Level> levels;
+    private List<FileHandle> levelsFiles;
 
     @Override
     public void create() {
-        // init levels list from files
-        levels = new ArrayList<Level>();
-        FileHandle dirHandle = Gdx.files.internal("data/levels");
-        for (FileHandle entry: dirHandle.list()) {
-            Pixmap pixmap = new Pixmap(entry);
-            levels.add(new Level(pixmap));
-        }
+        // init list of levels files
 
-        gameScreen = new GameScreen(this);
+        FileHandle dirHandle = Gdx.files.internal("data/levels");
+        levelsFiles = Arrays.asList(dirHandle.list());
+
+        GameScreen gameScreen = new GameScreen(this);
         gameScreen.setLevel(0);
 
         setScreen(gameScreen);
@@ -40,8 +34,7 @@ public class XonixGame extends Game {
     public void render () {
         //TODO: only for testing
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-            getScreen().dispose();
-            setScreen(new GameScreen(this));
+            ((GameScreen) getScreen()).setLevel(0);
         }
         super.render();
     }
@@ -50,11 +43,13 @@ public class XonixGame extends Game {
     // Getters & Setters
     //---------------------------------------------------------------------
 
-    public List<Level> getLevels() {
-        return levels;
+
+    public List<FileHandle> getLevelsFiles() {
+        return levelsFiles;
     }
 
-    public void setLevels(List<Level> levels) {
-        this.levels = levels;
+    public void setLevelsFiles(List<FileHandle> levelsFiles) {
+        this.levelsFiles = levelsFiles;
     }
+
 }
