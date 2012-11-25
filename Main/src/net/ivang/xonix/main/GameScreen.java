@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import java.util.List;
 
@@ -30,9 +32,8 @@ public class GameScreen implements Screen {
 
     private OrthographicCamera camera;
     private SpriteBatch batch;
-    // TODO: TextureRegion
-    private Texture texture;
-    private Texture enemyT;
+    private TextureRegion tile;
+    private TextureRegion enemyT;
     private BitmapFont font;
 
     private Level level;
@@ -50,8 +51,9 @@ public class GameScreen implements Screen {
         Gdx.input.setInputProcessor(new GameScreenInputProcessor(game, this));
         /* Textures */
         batch = new SpriteBatch();
-        texture = new Texture(Gdx.files.internal("data/tile.png"));
-        enemyT = new Texture(Gdx.files.internal("data/bomb.png"));
+        TextureAtlas atlas = new TextureAtlas("data/atlas/game_screen.atlas");
+        tile = atlas.findRegion("tile");
+        enemyT = atlas.findRegion("bomb");
         /* BitmapFont */
         font = new BitmapFont();
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
@@ -244,14 +246,14 @@ public class GameScreen implements Screen {
                         batch.setColor(0.3f, 0.3f, 1f, 1);
                         break;
                 }
-                batch.draw(texture, i, j, 1, 1);
+                batch.draw(tile, i, j, 1, 1);
             }
         }
     }
 
     private void renderProtagonist(Protagonist protagonist) {
         batch.setColor(1, 0, 0, 1);
-        batch.draw(texture, protagonist.pos.x - 0.5f, protagonist.pos.y - 0.5f, 1, 1);
+        batch.draw(tile, protagonist.pos.x - 0.5f, protagonist.pos.y - 0.5f, 1, 1);
     }
 
     private void renderEnemies(List<Enemy> enemies) {
