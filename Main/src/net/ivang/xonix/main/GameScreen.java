@@ -18,7 +18,6 @@ import static java.lang.Math.min;
 
 /**
  * @author Ivan Gadzhega
- * @version $Id$
  * @since 0.1
  */
 public class GameScreen implements Screen {
@@ -47,8 +46,6 @@ public class GameScreen implements Screen {
         this.game = game;
         this.state = State.PAUSED; // init?
         this.lives = 3;
-        // input event handling
-        Gdx.input.setInputProcessor(new GameScreenInputProcessor(game, this));
         /* Textures */
         batch = new SpriteBatch();
         TextureAtlas atlas = new TextureAtlas("data/atlas/game_screen.atlas");
@@ -151,7 +148,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        // TODO Auto-generated method stub
+        /* input event handling */
+        Gdx.input.setInputProcessor(new GameScreenInputProcessor(game, this));
     }
 
     @Override
@@ -223,8 +221,10 @@ public class GameScreen implements Screen {
                 break;
 //            case PAUSED:
 //                break;
-//            case GAME_OVER:
-//                break;
+            case GAME_OVER:
+                // TODO: notification here
+                game.setStartScreen();
+                break;
             case LOST_LIFE:
                 if (lives > 0) lostLifeLabelDelay = 2;
                 setState(State.PLAYING);

@@ -1,0 +1,19 @@
+
+start_screen.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+logo
+  rotate: false
+  xy: 1, 46
+  size: 200, 75
+  orig: 200, 75
+  offset: 0, 0
+  index: -1
+button
+  rotate: false
+  xy: 1, 1
+  size: 202, 43
+  orig: 202, 43
+  offset: 0, 0
+  index: -1

@@ -1,0 +1,15 @@
+{
+    "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+        "default": { "file": "data/font/arial-15.fnt" }
+    },
+
+    "com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
+        "default":{
+            "up": "button",
+            "down": "button",
+            "font": "default",
+            "fontColor": { "r": 1, "g": 1, "b": 1, "a": 1 },
+            "overFontColor": { "r": 0, "g": 0, "b": 1, "a": 1 }
+        }
+    }
+}

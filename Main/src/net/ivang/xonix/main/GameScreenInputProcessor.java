@@ -7,7 +7,6 @@ import static com.badlogic.gdx.Input.Keys;
 
 /**
  * @author Ivan Gadzhega
- * @version $Id$
  * @since 0.1
  */
 public class GameScreenInputProcessor extends InputAdapter {
@@ -39,7 +38,8 @@ public class GameScreenInputProcessor extends InputAdapter {
                         if (nextIndex < game.getLevelsFiles().size()) {
                             gameScreen.setLevel(nextIndex);
                         } else {
-                            // WIN!!!
+//                          // TODO: WIN msg here
+                            game.setStartScreen();
                         }
 
                         break;
@@ -47,7 +47,7 @@ public class GameScreenInputProcessor extends InputAdapter {
                 return true;
             case Keys.ESCAPE:
                 //TODO: only for testing
-                gameScreen.setLevel(0);
+                game.setStartScreen();
                 return true;
         }
         return false;
