@@ -23,7 +23,8 @@ public class GameScreenInputProcessor extends InputAdapter {
     public boolean keyDown(int keycode) {
         switch (keycode) {
             case Keys.SPACE:
-            case Keys.MENU:
+            case Keys.MENU:  // TODO: Change it to some gesture
+//                gameScreen.getNotification().setVisible(false);
                 switch (gameScreen.getState()) {
                     case PLAYING:
                         gameScreen.setState(State.PAUSED);
@@ -31,17 +32,19 @@ public class GameScreenInputProcessor extends InputAdapter {
                     case PAUSED:
                         gameScreen.setState(State.PLAYING);
                         break;
-//                    case GAME_OVER:
-//                        break;
+                    case GAME_OVER:
+                        game.setStartScreen();
+                        break;
                     case LEVEL_COMPLETED:
                         int nextIndex = gameScreen.getLevelIndex() + 1;
                         if (nextIndex < game.getLevelsFiles().size()) {
                             gameScreen.setLevel(nextIndex);
                         } else {
-//                          // TODO: WIN msg here
-                            game.setStartScreen();
+                            gameScreen.setState(State.WIN);
                         }
-
+                        break;
+                    case WIN:
+                        game.setStartScreen();
                         break;
                 }
                 return true;

@@ -1,7 +1,7 @@
 
 game_screen.png
 format: RGBA8888
-filter: Nearest,Nearest
+filter: MipMapLinearNearest,Nearest
 repeat: none
 bomb
   rotate: false

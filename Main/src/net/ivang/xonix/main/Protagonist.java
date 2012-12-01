@@ -2,39 +2,45 @@ package net.ivang.xonix.main;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 /**
  * @author Ivan Gadzhega
- * @version $Id$
  * @since 0.1
  */
-public class Protagonist {
+public class Protagonist extends Actor {
 
-    public Vector2 pos;
-    public Vector2 prev;
-
+    private float px, py;
     private float speed;
-
     private Move move;
 
-    private GameMap gameMap;
+    private Level level;
 
-    public Protagonist(Vector2 pos, GameMap gameMap) {
-        this.pos = pos;
-        this.prev = pos.cpy();
+    private TextureRegion region;
+
+    public Protagonist(float x, float y, Level level, Skin skin) {
         this.speed = 8;
         this.move = Move.IDLE;
-        this.gameMap = gameMap;
+        this.level = level;
+        this.region = skin.getRegion("tile");
+        setX(x); setY(y);
+        setPx(x); setPy(y);
     }
 
-//    public Protagonist(float x, float y, GameMap gameMap) {
-//        this(new Vector2(x, y), gameMap);
-//    }
-
-    public void update(float deltaTime) {
+    @Override
+    public void act(float delta) {
+        super.act(delta);
         processKeys();
-        updatePosition(deltaTime);
+        updatePosition(delta);
+    }
+
+    @Override
+    public void draw(SpriteBatch batch, float parentAlpha) {
+        batch.setColor(1, 0, 0, 1);
+        batch.draw(region, getX() - 0.5f, getY() - 0.5f, 1, 1);
     }
 
     //---------------------------------------------------------------------
@@ -42,62 +48,65 @@ public class Protagonist {
     //---------------------------------------------------------------------
 
     private void processKeys() {
-        Point delta = new Point(Gdx.input.getDeltaX(), Gdx.input.getDeltaY());
-        int diff = Math.abs(delta.x) - Math.abs(delta.y);
+        int dx = Gdx.input.getDeltaX();
+        int dy = Gdx.input.getDeltaY();
+        float diff = Math.abs(dx) - Math.abs(dy);
 
-        boolean isDraggedDown = (Gdx.input.isTouched() && delta.y < 0 && diff < 0);
-        boolean isDraggedUp = (Gdx.input.isTouched() && Gdx.input.getDeltaY() > 0 && diff <= 0);
-        boolean isDraggedLeft = (Gdx.input.isTouched() && Gdx.input.getDeltaX() < 0 && diff > 0);
-        boolean isDraggedRight = (Gdx.input.isTouched() && Gdx.input.getDeltaX() > 0 && diff >= 0);
+        boolean isDraggedDown = (Gdx.input.isTouched() && dy < 0 && diff < 0);
+        boolean isDraggedUp = (Gdx.input.isTouched() && dy > 0 && diff <= 0);
+        boolean isDraggedLeft = (Gdx.input.isTouched() && dx < 0 && diff > 0);
+        boolean isDraggedRight = (Gdx.input.isTouched() && dx > 0 && diff >= 0);
 
-        boolean onEarth = gameMap.getBlockState(pos.x, pos.y) == GameMap.BS_EARTH;
+        boolean onEarth = level.getBlockState(getX(), getY()) == Level.BS_EARTH;
 
-        if((onEarth || move != Move.DOWN) && (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S) || isDraggedUp)) {
+        if((onEarth || move != Move.DOWN)
+                && (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S) || isDraggedUp)) {
             move = Move.UP;
         }
-        if((onEarth || move != Move.UP) && (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W) || isDraggedDown)) {
+        if((onEarth || move != Move.UP)
+                && (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W) || isDraggedDown)) {
             move = Move.DOWN;
         }
-        if((onEarth || move != Move.RIGHT) && (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A) || isDraggedLeft)) {
+        if((onEarth || move != Move.RIGHT)
+                && (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A) || isDraggedLeft)) {
             move = Move.LEFT;
         }
-        if((onEarth || move != Move.LEFT) && (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D) || isDraggedRight)) {
+        if((onEarth || move != Move.LEFT)
+                && (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D) || isDraggedRight)) {
             move = Move.RIGHT;
         }
-//        if(Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-//            accel = 2;
-//        }
     }
 
     private void updatePosition(float deltaTime) {
-        float deltaPx = deltaTime * speed;;
-        Vector2 tmp = new Vector2(pos.x, pos.y);
+        float deltaPx = deltaTime * speed;
+        float x = getX();
+        float y = getY();
 
         switch (move) {
             case UP:
-                if (pos.y > 0.5) {
-                    pos.y -= deltaPx;
+                if (y > 0.5) {
+                    y -= deltaPx;
                 } else {
                     move = Move.IDLE;
                 }
                 break;
             case DOWN:
-                if (pos.y < gameMap.getHeight() - 0.5) {
-                    pos.y += deltaPx;
+                if (y < level.getHeight() - 0.5) {
+                    y += deltaPx;
                 } else {
                     move = Move.IDLE;
                 }
                 break;
             case LEFT:
-                if (pos.x > 0.5) {
-                    pos.x -= deltaPx;
+                if (x > 0.5) {
+                    x -= deltaPx;
                 } else {
                     move = Move.IDLE;
                 }
                 break;
             case RIGHT:
-                if (pos.x < gameMap.getWidth() - 0.5) {
-                    pos.x += deltaPx;
+                if (x < level.getWidth() - 0.5) {
+                    x += deltaPx;
                 } else {
                     move = Move.IDLE;
                 }
@@ -108,29 +117,29 @@ public class Protagonist {
         switch (move) {
             case UP:
             case DOWN:
-                float nx = pos.x + 0.5f;
+                float nx = x + 0.5f;
                 float rx = Math.round(nx);
                 if (rx > nx) {
-                    pos.x += step;
+                    x += step;
                 } else if (rx < nx) {
                     if (rx - nx < step) {
-                        pos.x = rx - 0.5f; // round x for smoother movement
+                        x = rx - 0.5f; // round x for smoother movement
                     } else {
-                        pos.x -= step;
+                        x -= step;
                     }
                 }
                 break;
             case RIGHT:
             case LEFT:
-                float ny = pos.y + 0.5f;
+                float ny = y + 0.5f;
                 float ry = Math.round(ny);
                 if (ry > ny) {
-                    pos.y += step;
+                    y += step;
                 } else if (ry < ny) {
                     if (ry - ny < step) {
-                        pos.y = ry - 0.5f; // round y for smoother movement
+                        y = ry - 0.5f; // round y for smoother movement
                     } else {
-                        pos.y -= step;
+                        y -= step;
                     }
                 }
                 break;
@@ -139,9 +148,30 @@ public class Protagonist {
 
         // update previous coords
         if (move != Move.IDLE) {
-            prev.x = tmp.x;
-            prev.y = tmp.y;
+            px = getX();
+            py = getY();
         }
+
+        setX(x); setY(y);
     }
 
+    //---------------------------------------------------------------------
+    // Getters & Setters
+    //---------------------------------------------------------------------
+
+    public float getPx() {
+        return px;
+    }
+
+    public void setPx(float px) {
+        this.px = px;
+    }
+
+    public float getPy() {
+        return py;
+    }
+
+    public void setPy(float py) {
+        this.py = py;
+    }
 }
