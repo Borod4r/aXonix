@@ -24,7 +24,6 @@ public class GameScreenInputProcessor extends InputAdapter {
         switch (keycode) {
             case Keys.SPACE:
             case Keys.MENU:  // TODO: Change it to some gesture
-//                gameScreen.getNotification().setVisible(false);
                 switch (gameScreen.getState()) {
                     case PLAYING:
                         gameScreen.setState(State.PAUSED);

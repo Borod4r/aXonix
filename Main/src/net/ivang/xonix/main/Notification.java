@@ -41,7 +41,9 @@ public class Notification extends Label {
                 setVisible(true);
                 break;
             default:
-                setVisible(false);
+                if (getActions().size == 0) {
+                    setVisible(false);
+                }
                 break;
         }
     }
