@@ -68,8 +68,11 @@ public class GameScreen implements Screen {
 
         notification = new Notification(null, this, skin);
 
+        DebugBar debugBar = new DebugBar(skin);
+
         stage.addActor(rootTable);
         stage.addActor(notification);
+        stage.addActor(debugBar);
 
     }
 
