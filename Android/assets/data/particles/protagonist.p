@@ -106,12 +106,24 @@ active: false
 - Gravity - 
 active: false
 - Tint - 
-colorsCount: 3
-colors0: 1.0
-colors1: 0.12156863
-colors2: 0.047058824
-timelineCount: 1
+colorsCount: 12
+colors0: 0.12156863
+colors1: 0.7294118
+colors2: 0.06666667
+colors3: 0.06666667
+colors4: 0.4
+colors5: 0.12156863
+colors6: 0.28627452
+colors7: 0.45882353
+colors8: 0.73333335
+colors9: 0.05490196
+colors10: 0.08235294
+colors11: 0.49803922
+timelineCount: 4
 timeline0: 0.0
+timeline1: 0.24612737
+timeline2: 0.6316695
+timeline3: 1.0
 - Transparency - 
 lowMin: 0.0
 lowMax: 0.0
@@ -135,5 +147,5 @@ aligned: false
 additive: true
 behind: false
 - Image Path -
-protagonist
+circular_flare
 

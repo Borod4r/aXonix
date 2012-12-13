@@ -27,7 +27,7 @@ public class Protagonist extends Actor {
         this.speed = 8;
         this.move = Move.IDLE;
         this.level = level;
-        this.region = skin.getRegion("protagonist");
+        this.region = skin.getRegion("circular_flare");
         setX(x); setY(y);
         setPx(x); setPy(y);
 
@@ -51,9 +51,11 @@ public class Protagonist extends Actor {
 
     @Override
     public void draw(SpriteBatch batch, float parentAlpha) {
-        batch.setColor(1, 1, 1, 1);
+        // draw particles
         particleEffect.setPosition(getX(), getY());
         particleEffect.draw(batch);
+        // draw texture
+        batch.setColor(1, 1, 1, 1);
         batch.draw(region, getX() - getOriginX(), getY() - getOriginY(), getOriginX(), getOriginY(),
                 getWidth(), getHeight(), getScaleX(), getScaleY(), getRotation());
 
@@ -73,7 +75,7 @@ public class Protagonist extends Actor {
         boolean isDraggedLeft = (Gdx.input.isTouched() && dx < 0 && diff > 0);
         boolean isDraggedRight = (Gdx.input.isTouched() && dx > 0 && diff >= 0);
 
-        boolean onEarth = level.getBlockState(getX(), getY()) == Level.BS_EARTH;
+        boolean onEarth = level.getBlockState(getX(), getY()) == Level.BS_BLUE;
 
         if((onEarth || move != Move.DOWN)
                 && (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S) || isDraggedUp)) {
