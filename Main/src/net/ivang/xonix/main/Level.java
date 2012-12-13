@@ -15,9 +15,10 @@ import java.util.*;
  */
 public class Level extends Group {
 
-    public static final byte BS_WATER = 0;
-    public static final byte BS_EARTH = 1;
-    public static final byte BS_TAIL = 2;
+    public static final byte BS_EMPTY = 0;
+    public static final byte BS_BLUE = 1;
+    public static final byte BS_GREEN = 2;
+    public static final byte BS_TAIL = 3;
 
     private GameScreen gameScreen;
 
@@ -57,17 +58,17 @@ public class Level extends Group {
             for (int y = 0; y < height; y++) {
                 int pix = (pixmap.getPixel(x, height-y-1) >>> 8) & 0xffffff;
                 if(pix == EARTH) {
-                    levelMap[x][y] = Level.BS_EARTH;
+                    levelMap[x][y] = Level.BS_BLUE;
                 }else if (pix == ENEMY) {
                     Enemy enemy = new Enemy(x + 0.5f, y + 0.5f, skin);
                     enemies.add(enemy);
                     addActor(enemy);
-                    levelMap[x][y] = Level.BS_WATER;
+                    levelMap[x][y] = Level.BS_EMPTY;
                 } else if (pix == PROTAGONIST) {
                     protStartPos = new Vector2(x + 0.5f, y + 0.5f);
-                    levelMap[x][y] = Level.BS_EARTH;
+                    levelMap[x][y] = Level.BS_BLUE;
                 } else {
-                    levelMap[x][y] = Level.BS_WATER;
+                    levelMap[x][y] = Level.BS_EMPTY;
                 }
             }
         }
@@ -86,11 +87,11 @@ public class Level extends Group {
             check();
             super.act(delta);
             switch (getBlockState(protagonist.getPx(), protagonist.getPy())) {
-                case BS_WATER:
+                case BS_EMPTY:
                     setBlockState(protagonist.getPx(), protagonist.getPy(), Level.BS_TAIL);
                     break;
                 case BS_TAIL:
-                    if (getBlockState(protagonist.getX(), protagonist.getY()) == Level.BS_EARTH) {
+                    if (getBlockState(protagonist.getX(), protagonist.getY()) == Level.BS_BLUE) {
                         fillAreas();
                     }
                     break;
@@ -103,17 +104,19 @@ public class Level extends Group {
         for(int i = 0; i < getWidth(); i++) {
             for(int j = 0; j < getHeight(); j++) {
                 switch (getBlockState(i, j)) {
-                    case Level.BS_WATER:
-                        batch.setColor(0, 0, 0.07f, 1);
+                    case Level.BS_BLUE:
+                        batch.setColor(1, 1, 1, 1);
                         break;
-                    case Level.BS_EARTH:
-                        batch.setColor(0.1f, 0.1f, 0.8f, 1);
+                    case Level.BS_GREEN:
+                        batch.setColor(0, 1, 0.3f, 1);
                         break;
                     case Level.BS_TAIL:
                         batch.setColor(0.3f, 0.3f, 1f, 1);
                         break;
+                    default:
+                        continue;
                 }
-                batch.draw(skin.getRegion("tile"), getX() + i * getScaleX(), getY() + j * getScaleY(), getScaleX(), getScaleY());
+                batch.draw(skin.getRegion("block"), getX() + i * getScaleX(), getY() + j * getScaleY(), getScaleX(), getScaleY());
             }
         }
 
@@ -140,7 +143,7 @@ public class Level extends Group {
                 for(int i = 1; i < getWidth() - 1; i++) {
                     for(int j = 1; j < getHeight() - 1; j++) {
                         if (getBlockState(i, j) == Level.BS_TAIL) {
-                            setBlockState(i, j, Level.BS_WATER);
+                            setBlockState(i, j, Level.BS_EMPTY);
                         }
                     }
                 }
@@ -159,7 +162,7 @@ public class Level extends Group {
         for(int i = 1; i < width - 1; i++) {
             for(int j = 1; j < height - 1; j++) {
                 byte A = levelMap[i][j];
-                if (A == BS_WATER) {
+                if (A == BS_EMPTY) {
                     byte B = tmpState[i][j-1];
                     byte C = tmpState[i-1][j];
 
@@ -200,8 +203,8 @@ public class Level extends Group {
                         }
                     }
                 } else if(A == BS_TAIL) {
-                    // turn trail to the land
-                    setBlockState(i, j, BS_EARTH);
+                    // turn tail to blue blocks
+                    setBlockState(i, j, BS_BLUE);
                     score++;
                     earthBlocks++;
 
@@ -224,7 +227,7 @@ public class Level extends Group {
 
         for(List<Vector2> spot : spots.values()) {
             for(Vector2 pos : spot) {
-                setBlockState(pos.x, pos.y, BS_EARTH);
+                setBlockState(pos.x, pos.y, BS_GREEN);
                 score++;
                 earthBlocks++;
             }

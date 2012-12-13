@@ -75,21 +75,22 @@ public class Protagonist extends Actor {
         boolean isDraggedLeft = (Gdx.input.isTouched() && dx < 0 && diff > 0);
         boolean isDraggedRight = (Gdx.input.isTouched() && dx > 0 && diff >= 0);
 
-        boolean onEarth = level.getBlockState(getX(), getY()) == Level.BS_BLUE;
+        byte blockState = level.getBlockState(getX(), getY());
+        boolean onFilledBlock = (blockState == Level.BS_BLUE) || ((blockState == Level.BS_GREEN));
 
-        if((onEarth || move != Move.DOWN)
+        if((onFilledBlock || move != Move.DOWN)
                 && (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S) || isDraggedUp)) {
             move = Move.UP;
         }
-        if((onEarth || move != Move.UP)
+        if((onFilledBlock || move != Move.UP)
                 && (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W) || isDraggedDown)) {
             move = Move.DOWN;
         }
-        if((onEarth || move != Move.RIGHT)
+        if((onFilledBlock || move != Move.RIGHT)
                 && (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A) || isDraggedLeft)) {
             move = Move.LEFT;
         }
-        if((onEarth || move != Move.LEFT)
+        if((onFilledBlock || move != Move.LEFT)
                 && (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D) || isDraggedRight)) {
             move = Move.RIGHT;
         }
