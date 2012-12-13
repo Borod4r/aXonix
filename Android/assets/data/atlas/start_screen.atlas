@@ -1,7 +1,7 @@
 
 start_screen.png
 format: RGBA8888
-filter: Nearest,Nearest
+filter: MipMapLinearNearest,Nearest
 repeat: none
 logo
   rotate: false

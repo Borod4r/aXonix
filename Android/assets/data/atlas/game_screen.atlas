@@ -3,17 +3,17 @@ game_screen.png
 format: RGBA8888
 filter: MipMapLinearNearest,Nearest
 repeat: none
-bomb
+block
   rotate: false
-  xy: 1, 19
+  xy: 1, 1
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-tile
+circular_flare
   rotate: false
-  xy: 1, 1
-  size: 16, 16
-  orig: 16, 16
+  xy: 67, 1
+  size: 64, 64
+  orig: 64, 64
   offset: 0, 0
   index: -1
