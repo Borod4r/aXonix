@@ -2,6 +2,7 @@ package net.ivang.xonix.main;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -20,14 +21,24 @@ public class Protagonist extends Actor {
     private Level level;
 
     private TextureRegion region;
+    ParticleEffect particleEffect;
 
     public Protagonist(float x, float y, Level level, Skin skin) {
         this.speed = 8;
         this.move = Move.IDLE;
         this.level = level;
-        this.region = skin.getRegion("tile");
+        this.region = skin.getRegion("protagonist");
         setX(x); setY(y);
         setPx(x); setPy(y);
+
+        setWidth(1.5f);
+        setHeight(1.5f);
+        setOriginX(0.75f);
+        setOriginY(0.75f);
+
+        particleEffect = new ParticleEffect();
+        particleEffect.load(Gdx.files.internal("data/particles/protagonist.p"), skin.getAtlas());
+        particleEffect.setPosition(x, y);
     }
 
     @Override
@@ -35,12 +46,17 @@ public class Protagonist extends Actor {
         super.act(delta);
         processKeys();
         updatePosition(delta);
+        particleEffect.update(delta);
     }
 
     @Override
     public void draw(SpriteBatch batch, float parentAlpha) {
-        batch.setColor(1, 0, 0, 1);
-        batch.draw(region, getX() - 0.5f, getY() - 0.5f, 1, 1);
+        batch.setColor(1, 1, 1, 1);
+        particleEffect.setPosition(getX(), getY());
+        particleEffect.draw(batch);
+        batch.draw(region, getX() - getOriginX(), getY() - getOriginY(), getOriginX(), getOriginY(),
+                getWidth(), getHeight(), getScaleX(), getScaleY(), getRotation());
+
     }
 
     //---------------------------------------------------------------------
