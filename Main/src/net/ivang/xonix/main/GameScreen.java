@@ -42,6 +42,7 @@ public class GameScreen implements Screen {
     private StatusBar statusBar;
     private Cell levelCell;
     private Label notification;
+    private Background background;
 
     public GameScreen(XonixGame game) {
         this.game = game;
@@ -66,14 +67,14 @@ public class GameScreen implements Screen {
         rootTable.row();
         levelCell = rootTable.add();
 
+        background = new Background(skin);
         notification = new Notification(null, this, skin);
-
         DebugBar debugBar = new DebugBar(skin);
 
+        stage.addActor(background);
         stage.addActor(rootTable);
         stage.addActor(notification);
         stage.addActor(debugBar);
-
     }
 
     public void setLevel(int index) {
@@ -101,6 +102,8 @@ public class GameScreen implements Screen {
         float scale = calculateScaling(stage, level);
         level.setScale(scale);
         levelCell.width(level.getWidth() * scale).height(level.getHeight() * scale);
+        background.update(true);
+
     }
 
     @Override
