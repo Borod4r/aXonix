@@ -14,12 +14,12 @@ public class DebugBar extends Table {
     private Label fpsLabel;
     private Label sizeLabel;
 
-    public DebugBar(Skin skin) {
+    public DebugBar(Skin skin, String fontName) {
         this.setFillParent(true);
         this.right().top();
 
-        fpsLabel = new Label(null, skin);
-        sizeLabel = new Label(null, skin);
+        fpsLabel = new Label(null, skin, fontName, "white");
+        sizeLabel = new Label(null, skin, fontName, "white");
 
         add(fpsLabel).padRight(5);
         add(sizeLabel).padRight(5);

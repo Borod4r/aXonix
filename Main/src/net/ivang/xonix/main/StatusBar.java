@@ -1,5 +1,6 @@
 package net.ivang.xonix.main;
 
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -12,20 +13,28 @@ public class StatusBar extends Table {
 
     private GameScreen gameScreen;
 
+    private Label livesLabel;
     private Label livesValue;
+
+    private Label scoreLabel;
     private Label scoreValue;
+
+    private Label levelLabel;
     private Label levelValue;
 
-    public StatusBar(GameScreen gameScreen, Skin skin) {
+    private Skin skin;
+
+    public StatusBar(GameScreen gameScreen, Skin skin, String fontName) {
         this.gameScreen = gameScreen;
+        this.skin = skin;
 
-        Label livesLabel = new Label("Lives: ", skin);
-        Label scoreLabel = new Label("Score: ", skin);
-        Label levelLabel = new Label("Level: ", skin);
+        livesLabel = new Label("Lives: ", skin, fontName, "white");
+        scoreLabel = new Label("Score: ", skin, fontName, "white");
+        levelLabel = new Label("Level: ", skin, fontName, "white");
 
-        livesValue = new Label("n/a", skin, "yellow");
-        scoreValue = new Label("n/a", skin, "yellow");
-        levelValue = new Label("n/a", skin, "yellow");
+        livesValue = new Label("n/a", skin, fontName, "yellow");
+        scoreValue = new Label("n/a", skin, fontName, "yellow");
+        levelValue = new Label("n/a", skin, fontName, "yellow");
 
         // lives
         add(livesLabel).padLeft(5);
@@ -51,5 +60,19 @@ public class StatusBar extends Table {
         String level = Integer.toString(gameScreen.getLevelIndex() + 1);
         String percent = Byte.toString(gameScreen.getLevel().getPercentComplete());
         levelValue.setText(level + " (" + percent + "/80%)");
+    }
+
+    public void setFont(String fontName) {
+        setFont(skin.getFont(fontName));
+
+    }
+
+    public void setFont(BitmapFont font) {
+        livesLabel.setStyle(new Label.LabelStyle(font, skin.getColor("white")));
+        livesValue.setStyle(new Label.LabelStyle(font, skin.getColor("yellow")));
+        scoreLabel.setStyle(new Label.LabelStyle(font, skin.getColor("white")));
+        scoreValue.setStyle(new Label.LabelStyle(font, skin.getColor("yellow")));
+        levelLabel.setStyle(new Label.LabelStyle(font, skin.getColor("white")));
+        levelValue.setStyle(new Label.LabelStyle(font, skin.getColor("yellow")));
     }
 }

@@ -1,18 +1,13 @@
 {
-    "com.badlogic.gdx.graphics.g2d.BitmapFont": {
-        "default": { "file": "data/font/arial-15.fnt" }
+    "com.badlogic.gdx.graphics.Color": {
+        "white": { "r": 1, "g": 1, "b": 1, "a": 1 },
+        "yellow": { "r": 1, "g": 1, "b": 0, "a": 1 }
     },
+    
+    "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+        "small": { "file": "data/font/russo_12.fnt" },
+        "normal": { "file": "data/font/russo_18.fnt" },
+        "large": { "file": "data/font/russo_28.fnt" }
 
-    "com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
-
-        "default": {
-            "font": "default",
-            "fontColor": { "r": 1, "g": 1, "b": 1, "a": 1 }
-        },
-
-        "yellow": {
-            "font": "default",
-            "fontColor": { "r": 1, "g": 1, "b": 0, "a": 1 }
-        }
     }
 }
