@@ -1,0 +1,7 @@
+THIRD PARTY COMPONENTS
+-------------------------------
+This software includes third party software subject to the associated copyrights, as follows:
+- Libgdx (Apache 2.0) - http://libgdx.badlogicgames.com/
+- Russo One Font (SIL Open Font License, 1.1) - http://www.jovanny.ru/
+
+The text of licenses for the above software is included in the /licenses folder.
