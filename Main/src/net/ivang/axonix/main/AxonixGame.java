@@ -14,7 +14,7 @@
  * the License.
  */
 
-package net.ivang.xonix.main;
+package net.ivang.axonix.main;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -28,7 +28,7 @@ import java.util.List;
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class XonixGame extends Game {
+public class AxonixGame extends Game {
 
     private Screen startScreen;
 

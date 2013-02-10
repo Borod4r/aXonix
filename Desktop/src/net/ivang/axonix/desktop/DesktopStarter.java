@@ -14,24 +14,26 @@
  * the License.
  */
 
-package net.ivang.xonix;
+package net.ivang.axonix.desktop;
 
-import android.os.Bundle;
-import com.badlogic.gdx.backends.android.AndroidApplication;
-import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import net.ivang.xonix.main.XonixGame;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import net.ivang.axonix.main.AxonixGame;
 
-public class XonixAndroidStarter extends AndroidApplication {
+/**
+ * @author Ivan Gadzhega
+ * @version $Id$
+ * @since 0.1
+ */
+public class DesktopStarter {
 
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        AndroidApplicationConfiguration cfg = new AndroidApplicationConfiguration();
-        cfg.useAccelerometer = false;
-        cfg.useCompass = false;
-        cfg.useWakelock = false;
+    public static void main(String[] args) {
+        LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
+        cfg.title = "aXonix";
         cfg.useGL20 = true;
-        initialize(new XonixGame(), cfg);
+        cfg.width = 800;
+        cfg.height = 480;
+        new LwjglApplication(new AxonixGame(), cfg);
     }
+
 }
