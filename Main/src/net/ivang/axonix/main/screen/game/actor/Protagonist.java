@@ -14,7 +14,7 @@
  * the License.
  */
 
-package net.ivang.axonix.main;
+package net.ivang.axonix.main.screen.game.actor;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;

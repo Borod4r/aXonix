@@ -14,12 +14,13 @@
  * the License.
  */
 
-package net.ivang.axonix.main;
+package net.ivang.axonix.main.screen.game.actor;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
+import net.ivang.axonix.main.screen.game.GameScreen;
 
 /**
  * @author Ivan Gadzhega

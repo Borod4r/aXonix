@@ -14,10 +14,11 @@
  * the License.
  */
 
-package net.ivang.axonix.main;
+package net.ivang.axonix.main.screen.game;
 
 import com.badlogic.gdx.InputAdapter;
-import net.ivang.axonix.main.GameScreen.State;
+import net.ivang.axonix.main.AxonixGame;
+import net.ivang.axonix.main.screen.game.GameScreen.State;
 
 import static com.badlogic.gdx.Input.Keys;
 

@@ -14,7 +14,7 @@
  * the License.
  */
 
-package net.ivang.axonix.main;
+package net.ivang.axonix.main.screen.game.actor;
 
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -22,6 +22,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import net.ivang.axonix.main.screen.game.GameScreen;
 
 import java.util.*;
 

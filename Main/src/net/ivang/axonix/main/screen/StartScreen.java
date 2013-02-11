@@ -14,28 +14,25 @@
  * the License.
  */
 
-package net.ivang.axonix.main;
+package net.ivang.axonix.main.screen;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import net.ivang.axonix.main.AxonixGame;
+import net.ivang.axonix.main.screen.game.GameScreen;
 
 /**
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class StartScreen implements Screen {
-
-    private AxonixGame game;
-    private Stage stage;
+public class StartScreen extends BaseScreen {
 
     public StartScreen(final AxonixGame game) {
-        stage = new Stage();
+        super(game);
         /* atlas and skin */
         TextureAtlas atlas = new TextureAtlas("data/atlas/start_screen.atlas");
         Skin skin = new Skin(Gdx.files.internal("data/skin/start_screen.json"), atlas);
@@ -80,21 +77,6 @@ public class StartScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
-    }
-
-    @Override
-    public void hide() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void pause() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void resume() {
-        // TODO Auto-generated method stub
     }
 
     @Override

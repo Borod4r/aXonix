@@ -14,11 +14,10 @@
  * the License.
  */
 
-package net.ivang.axonix.main;
+package net.ivang.axonix.main.screen.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -27,6 +26,9 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.esotericsoftware.tablelayout.Cell;
+import net.ivang.axonix.main.AxonixGame;
+import net.ivang.axonix.main.screen.BaseScreen;
+import net.ivang.axonix.main.screen.game.actor.*;
 
 import static java.lang.Math.min;
 
@@ -34,19 +36,12 @@ import static java.lang.Math.min;
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class GameScreen implements Screen {
+public class GameScreen extends BaseScreen {
 
     public enum State {
         PLAYING, PAUSED, LEVEL_COMPLETED, GAME_OVER, WIN
     }
 
-//    private final static int STATUS_BAR_HEIGHT = 20;
-    private final static String FONT_NAME_SMALL = "small";
-    private final static String FONT_NAME_NORMAL = "normal";
-    private final static String FONT_NAME_LARGE = "large";
-
-    private AxonixGame game;
-    private Stage stage;
     private InputMultiplexer inputMultiplexer;
 
     private State state;
@@ -64,8 +59,7 @@ public class GameScreen implements Screen {
     private Background background;
 
     public GameScreen(AxonixGame game) {
-        this.game = game;
-        this.stage = new Stage();
+        super(game);
         this.state = State.PAUSED;
         this.lives = 3;
 
@@ -109,9 +103,9 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        act(delta);
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+        act(delta);
         stage.draw();
     }
 
@@ -137,23 +131,8 @@ public class GameScreen implements Screen {
     }
 
     @Override
-    public void hide() {
-        // do nothing
-    }
-
-    @Override
     public void pause() {
         setState(State.PAUSED);
-    }
-
-    @Override
-    public void resume() {
-        // do nothing
-    }
-
-    @Override
-    public void dispose() {
-        // do nothing
     }
 
     //---------------------------------------------------------------------
@@ -175,16 +154,6 @@ public class GameScreen implements Screen {
         float wScaling = (stage.getWidth() - padding)/ level.getWidth();
         float hScaling = (stage.getHeight() - statusBarHeight - padding) / level.getHeight();
         return min(wScaling, hScaling);
-    }
-
-    private String getFontNameByHeight(int height) {
-        if (height < 480) {
-            return FONT_NAME_SMALL;
-        } else if (height < 720) {
-            return FONT_NAME_NORMAL;
-        } else {
-            return FONT_NAME_LARGE;
-        }
     }
 
     //---------------------------------------------------------------------
