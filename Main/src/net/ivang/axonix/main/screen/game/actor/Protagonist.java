@@ -77,6 +77,10 @@ public class Protagonist extends Actor {
 
     }
 
+    public boolean isOnNewBlock() {
+        return ((int) getX() - (int) getPx() != 0) || ((int) getY() - (int) getPy() != 0);
+    }
+
     //---------------------------------------------------------------------
     // Helper Methods
     //---------------------------------------------------------------------

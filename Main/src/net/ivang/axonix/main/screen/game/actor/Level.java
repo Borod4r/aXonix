@@ -96,22 +96,26 @@ public class Level extends Group {
         this.setLevelMap(levelMap);
     }
 
-
-
     @Override
     public void act(float delta) {
         if (gameScreen.getState() == GameScreen.State.PLAYING) {
             check();
             super.act(delta);
-            switch (getBlockState(protagonist.getPx(), protagonist.getPy())) {
-                case BS_EMPTY:
-                    setBlockState(protagonist.getPx(), protagonist.getPy(), Level.BS_TAIL);
-                    break;
-                case BS_TAIL:
-                    if (getBlockState(protagonist.getX(), protagonist.getY()) == Level.BS_BLUE) {
-                        fillAreas();
-                    }
-                    break;
+            // change blocks states
+            if(protagonist.isOnNewBlock()) {
+                switch (getBlockState(protagonist.getX(), protagonist.getY())) {
+                    case BS_EMPTY:
+                        setBlockState(protagonist.getX(), protagonist.getY(), Level.BS_TAIL);
+                        break;
+                    case BS_TAIL:
+                        killProtagonist();
+                        break;
+                    case BS_BLUE:
+                        if (getBlockState(protagonist.getPx(), protagonist.getPy()) == Level.BS_TAIL) {
+                            fillAreas();
+                        }
+                        break;
+                }
             }
         }
     }
@@ -152,23 +156,28 @@ public class Level extends Group {
         // check collisions
         for (Enemy enemy : enemies) {
             if (getBlockState(enemy.getX(), enemy.getY()) == Level.BS_TAIL) {
-                gameScreen.setLives(gameScreen.getLives() - 1);
-                removeActor(protagonist);
-                protagonist = new Protagonist(protStartPos.x, protStartPos.y, this, skin);
-                addActor(protagonist);
-
-                for(int i = 1; i < getWidth() - 1; i++) {
-                    for(int j = 1; j < getHeight() - 1; j++) {
-                        if (getBlockState(i, j) == Level.BS_TAIL) {
-                            setBlockState(i, j, Level.BS_EMPTY);
-                        }
-                    }
-                }
-
-                gameScreen.getNotification().setText("LIFE LEFT!");
-                gameScreen.getNotification().addAction(Actions.sequence(Actions.show(), Actions.delay(1), Actions.hide()));
+                killProtagonist();
+                break;
             }
         }
+    }
+
+    private void killProtagonist() {
+        removeActor(protagonist);
+        protagonist = new Protagonist(protStartPos.x, protStartPos.y, this, skin);
+        addActor(protagonist);
+
+        for(int i = 1; i < getWidth() - 1; i++) {
+            for(int j = 1; j < getHeight() - 1; j++) {
+                if (getBlockState(i, j) == Level.BS_TAIL) {
+                    setBlockState(i, j, Level.BS_EMPTY);
+                }
+            }
+        }
+
+        gameScreen.setLives(gameScreen.getLives() - 1);
+        gameScreen.getNotification().setText("LIFE LEFT!");
+        gameScreen.getNotification().addAction(Actions.sequence(Actions.show(), Actions.delay(1), Actions.hide()));
     }
 
     private void fillAreas() {
