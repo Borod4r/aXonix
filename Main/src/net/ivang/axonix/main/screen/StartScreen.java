@@ -19,9 +19,10 @@ package net.ivang.axonix.main.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.esotericsoftware.tablelayout.Cell;
 import net.ivang.axonix.main.AxonixGame;
 import net.ivang.axonix.main.screen.game.GameScreen;
 
@@ -31,34 +32,42 @@ import net.ivang.axonix.main.screen.game.GameScreen;
  */
 public class StartScreen extends BaseScreen {
 
+    private Skin skin;
+    private Image logo;
+    private Button startButton;
+    private Button optionsButton;
+    private Cell logoCell;
+    private Cell startButtonCell;
+    private Cell optionsButtonCell;
+
     public StartScreen(final AxonixGame game) {
         super(game);
-        /* atlas and skin */
+        // atlas and skin
         TextureAtlas atlas = new TextureAtlas("data/atlas/start_screen.atlas");
-        Skin skin = new Skin(Gdx.files.internal("data/skin/start_screen.json"), atlas);
-        /* logo */
-        Image logo = new Image(skin, "logo");
-        /* start button */
-        Button startButton = new TextButton("Start", skin);
-        startButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
+        skin = new Skin(Gdx.files.internal("data/skin/start_screen.json"), atlas);
+        // root table
+        Table rootTable = new Table();
+        rootTable.setFillParent(true);
+        // logo
+        logo = new Image(skin, "logo");
+        logoCell = rootTable.add(logo);
+        rootTable.row();
+        // start button
+        Style style = getStyleByHeight(Gdx.graphics.getHeight());
+        startButton = new TextButton("Start", skin, style.toString());
+        startButton.addListener(new ChangeListener() {
+            public void changed(ChangeEvent event, Actor actor) {
                 GameScreen gameScreen = new GameScreen(game);
                 gameScreen.setLevel(0);
                 game.setScreen(gameScreen);
             }
         });
-        /* options button */
-        Button optionsButton = new TextButton("Options", skin);
-        /* root table */
-        Table rootTable = new Table();
-//        rootTable.debug();
-        rootTable.setFillParent(true);
-        rootTable.add(logo);
+        startButtonCell = rootTable.add(startButton);
         rootTable.row();
-        rootTable.add(startButton);
-        rootTable.row();
-        rootTable.add(optionsButton).pad(10);
+        // options button
+        optionsButton = new TextButton("Options", skin, style.toString());
+        optionsButtonCell = rootTable.add(optionsButton);
+        // stage
         stage.addActor(rootTable);
     }
 
@@ -72,6 +81,11 @@ public class StartScreen extends BaseScreen {
     @Override
     public void resize(int width, int height) {
         stage.setViewport(width, height, true);
+        Style style = getStyleByHeight(height);
+        float scale = getScaleByStyle(style);
+        resizeLogo(scale);
+        resizeButtons(style, scale);
+
     }
 
     @Override
@@ -82,6 +96,43 @@ public class StartScreen extends BaseScreen {
     @Override
     public void dispose() {
         stage.dispose();
+    }
+
+    //---------------------------------------------------------------------
+    // Helper methods
+    //---------------------------------------------------------------------
+
+    private void resizeLogo(float scale) {
+        float logoWidth = 512 * scale;
+        float logoHeight = 120 * scale;
+        float padding = 16 * scale;
+        logoCell.width(logoWidth).height(logoHeight).pad(padding);
+    }
+
+    private void resizeButtons(Style style, float scale) {
+        Button.ButtonStyle buttonStyle = skin.get(style.toString(), TextButton.TextButtonStyle.class);
+        float buttonWidth = 400 * scale;
+        float buttonHeight = 85 * scale;
+        float padding = 8 * scale;
+        // start button
+        startButton.setStyle(buttonStyle);
+        startButtonCell.width(buttonWidth).height(buttonHeight).pad(padding);
+        // options button
+        optionsButton.setStyle(buttonStyle);
+        optionsButtonCell.width(buttonWidth).height(buttonHeight).pad(padding);
+    }
+
+    private float getScaleByStyle(Style style) {
+        float scale = 1f;
+        switch (style) {
+            case SMALL:
+                scale = 0.44f; // 320/720
+                break;
+            case NORMAL:
+                scale = 0.67f; // 480/720
+                break;
+        }
+        return scale;
     }
 
 }

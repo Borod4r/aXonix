@@ -1,15 +1,38 @@
 {
+    "com.badlogic.gdx.graphics.Color": {
+        "white": { "r": 1, "g": 1, "b": 1, "a": 1 },
+        "blue": { "r": 0, "g": 0, "b": 1, "a": 1 }
+    },
+
     "com.badlogic.gdx.graphics.g2d.BitmapFont": {
-        "default": { "file": "data/font/russo_18.fnt" }
+        "small": { "file": "data/font/russo_12.fnt" },
+        "normal": { "file": "data/font/russo_18.fnt" },
+        "large": { "file": "data/font/russo_28.fnt" }
+
     },
 
     "com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
-        "default":{
+        "small":{
             "up": "button",
-            "down": "button",
-            "font": "default",
-            "fontColor": { "r": 1, "g": 1, "b": 1, "a": 1 },
-            "overFontColor": { "r": 0, "g": 0, "b": 1, "a": 1 }
+            "down": "button_over",
+            "over": "button_over",
+            "font": "small",
+            "fontColor": "white",
+            "overFontColor": "blue"
+        },
+        "normal":{
+            "up": "button",
+            "down": "button_over",
+            "over": "button_over",
+            "font": "normal",
+            "fontColor": "white"
+        },
+        "large":{
+            "up": "button",
+            "down": "button_over",
+            "over": "button_over",
+            "font": "large",
+            "fontColor": "white"
         }
     }
 }

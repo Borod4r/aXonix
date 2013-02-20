@@ -26,10 +26,6 @@ import net.ivang.axonix.main.AxonixGame;
  */
 public abstract class BaseScreen implements Screen {
 
-    protected final static String FONT_NAME_SMALL = "small";
-    protected final static String FONT_NAME_NORMAL = "normal";
-    protected final static String FONT_NAME_LARGE = "large";
-
     protected AxonixGame game;
     protected Stage stage;
 
@@ -70,13 +66,33 @@ public abstract class BaseScreen implements Screen {
     // Helper methods
     //---------------------------------------------------------------------
 
-    protected String getFontNameByHeight(int height) {
+    protected Style getStyleByHeight(int height) {
         if (height < 480) {
-            return FONT_NAME_SMALL;
+            return Style.SMALL;
         } else if (height < 720) {
-            return FONT_NAME_NORMAL;
+            return Style.NORMAL;
         } else {
-            return FONT_NAME_LARGE;
+            return Style.LARGE;
+        }
+    }
+
+    //---------------------------------------------------------------------
+    // Nested Classes
+    //---------------------------------------------------------------------
+
+    protected enum Style {
+        SMALL("small"),
+        NORMAL("normal"),
+        LARGE("large");
+
+        private final String styleName;
+
+        private Style(String styleName) {
+            this.styleName = styleName;
+        }
+
+        public String toString() {
+            return styleName;
         }
     }
 

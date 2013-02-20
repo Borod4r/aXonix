@@ -71,19 +71,21 @@ public class GameScreen extends BaseScreen {
         // Look & feel
         TextureAtlas atlas = new TextureAtlas("data/atlas/game_screen.atlas");
         skin = new Skin(Gdx.files.internal("data/skin/game_screen.json"), atlas);
-        String fontName = getFontNameByHeight(Gdx.graphics.getHeight());
-
-        statusBar = new StatusBar(this, skin, fontName);
+        Style style = getStyleByHeight(Gdx.graphics.getHeight());
 
         Table rootTable = new Table();
         rootTable.setFillParent(true);
-        statusCell = rootTable.add(statusBar).height(skin.getFont(fontName).getLineHeight()).left();
+        // status bar
+        statusBar = new StatusBar(this, skin, style.toString());
+        statusCell = rootTable.add(statusBar);
+        statusCell.height(skin.getFont(style.toString()).getLineHeight()).left();
         rootTable.row();
+        // level cell
         levelCell = rootTable.add();
-
+        // background
         background = new Background(skin);
-        notification = new Notification(null, this, skin, fontName);
-        DebugBar debugBar = new DebugBar(skin, FONT_NAME_SMALL);
+        notification = new Notification(null, this, skin, style.toString());
+        DebugBar debugBar = new DebugBar(skin, Style.SMALL.toString());
 
         stage.addActor(background);
         stage.addActor(rootTable);
@@ -117,8 +119,8 @@ public class GameScreen extends BaseScreen {
         levelCell.width(level.getWidth() * scale).height(level.getHeight() * scale);
         background.update(true);
 
-        String fontName = getFontNameByHeight(height);
-        BitmapFont font = skin.getFont(fontName);
+        Style style = getStyleByHeight(height);
+        BitmapFont font = skin.getFont(style.toString());
 
         statusCell.height(font.getLineHeight());
         statusBar.setFont(font);
