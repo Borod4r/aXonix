@@ -36,6 +36,18 @@ public class AxonixGameGestureListener extends GestureDetector.GestureAdapter {
     @Override
     public boolean tap (float x, float y, int count, int button) {
         switch (gameScreen.getState()) {
+            case PLAYING:
+                if (count == 2) {
+                    gameScreen.setState(GameScreen.State.PAUSED);
+                    return true;
+                }
+                break;
+            case PAUSED:
+                if (count == 2) {
+                    gameScreen.setState(GameScreen.State.PLAYING);
+                    return true;
+                }
+                break;
             case LEVEL_COMPLETED:
                 int nextIndex = gameScreen.getLevelIndex() + 1;
                 if (nextIndex < game.getLevelsFiles().size()) {
