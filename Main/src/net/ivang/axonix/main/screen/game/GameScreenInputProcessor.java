@@ -40,16 +40,12 @@ public class GameScreenInputProcessor extends InputAdapter {
     public boolean keyDown(int keycode) {
         switch (keycode) {
             case Keys.SPACE:
-            case Keys.MENU:  // TODO: Change it to some gesture
                 switch (gameScreen.getState()) {
                     case PLAYING:
                         gameScreen.setState(State.PAUSED);
                         break;
                     case PAUSED:
                         gameScreen.setState(State.PLAYING);
-                        break;
-                    case GAME_OVER:
-                        game.setStartScreen();
                         break;
                     case LEVEL_COMPLETED:
                         int nextIndex = gameScreen.getLevelIndex() + 1;
@@ -58,6 +54,9 @@ public class GameScreenInputProcessor extends InputAdapter {
                         } else {
                             gameScreen.setState(State.WIN);
                         }
+                        break;
+                    case GAME_OVER:
+                        game.setStartScreen();
                         break;
                     case WIN:
                         game.setStartScreen();

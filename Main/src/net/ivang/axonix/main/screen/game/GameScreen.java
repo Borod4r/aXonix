@@ -22,6 +22,7 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -66,6 +67,7 @@ public class GameScreen extends BaseScreen {
         // Input event handling
         inputMultiplexer = new InputMultiplexer();
         inputMultiplexer.addProcessor(new GameScreenInputProcessor(game, this));
+        inputMultiplexer.addProcessor(new GestureDetector(new AxonixGameGestureListener(game, this)));
         inputMultiplexer.addProcessor(stage);
 
         // Look & feel
