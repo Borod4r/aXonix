@@ -61,6 +61,9 @@ public class Level extends Group {
         this.skin = skin;
 
         initFromPixmap(pixmap);
+
+        String levelIndex = Integer.toString(gameScreen.getLevelIndex() + 1);
+        showNotification("Level " + levelIndex + ". Go-go-go!", 0.25f, 1.5f);
     }
 
     private void initFromPixmap(Pixmap pixmap) {
@@ -176,8 +179,7 @@ public class Level extends Group {
         }
 
         gameScreen.setLives(gameScreen.getLives() - 1);
-        gameScreen.getNotification().setText("LIFE LEFT!");
-        gameScreen.getNotification().addAction(Actions.sequence(Actions.show(), Actions.delay(1), Actions.hide()));
+        showNotification("LIFE LEFT!", 0, 1);
     }
 
     private void fillAreas() {
@@ -264,6 +266,16 @@ public class Level extends Group {
 
         // update percentage
         percentComplete = (byte) (((float) earthBlocks / ((width - 2) * (height - 2))) * 100) ;
+    }
+
+    //---------------------------------------------------------------------
+    // Helper methods
+    //---------------------------------------------------------------------
+
+    private void showNotification(String text, float showDelay, float hideDelay) {
+        gameScreen.getNotification().setText(text);
+        gameScreen.getNotification().addAction(Actions.sequence(Actions.delay(showDelay), Actions.show(),
+                Actions.delay(hideDelay), Actions.hide()));
     }
 
     //---------------------------------------------------------------------
