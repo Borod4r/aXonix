@@ -56,7 +56,8 @@ public class GameScreen extends BaseScreen {
     private StatusBar statusBar;
     private Cell levelCell;
     private Cell statusCell;
-    private Notification notification;
+    private NotificationLabel notificationLabel;
+    private NotificationWindow notificationWindow;
     private Background background;
 
     public GameScreen(AxonixGame game) {
@@ -86,12 +87,14 @@ public class GameScreen extends BaseScreen {
         levelCell = rootTable.add();
         // background
         background = new Background(skin);
-        notification = new Notification(null, this, skin, style.toString());
+        notificationLabel = new NotificationLabel(null, skin, style.toString());
+        notificationWindow = new NotificationWindow(null, skin, style.toString());
         DebugBar debugBar = new DebugBar(skin, Style.SMALL.toString());
 
         stage.addActor(background);
         stage.addActor(rootTable);
-        stage.addActor(notification);
+        stage.addActor(notificationLabel);
+        stage.addActor(notificationWindow);
         stage.addActor(debugBar);
     }
 
@@ -126,7 +129,8 @@ public class GameScreen extends BaseScreen {
 
         statusCell.height(font.getLineHeight());
         statusBar.setFont(font);
-        notification.setFont(font);
+        notificationLabel.setFont(font);
+        notificationWindow.setStyle(style.toString());
     }
 
     @Override
@@ -145,12 +149,50 @@ public class GameScreen extends BaseScreen {
 
     private void act(float delta) {
         check();
+        showNotifications();
         stage.act();
     }
 
     private void check() {
         // check lives
         if (lives <= 0) state = State.GAME_OVER;
+    }
+
+    private void showNotifications() {
+        switch (state) {
+            case PLAYING:
+                // hide notifications
+                if (notificationLabel.getActions().size == 0 || notificationWindow.isVisible()) {
+                    notificationLabel.clearActions();
+                    notificationLabel.setVisible(false);
+                }
+                if (notificationWindow.getActions().size == 0) {
+                    notificationWindow.setVisible(false);
+                }
+                break;
+            case PAUSED:
+                notificationWindow.setTitle("PAUSE");
+                notificationWindow.setScores(getLevel().getScore(), getLevel().getScore());
+                notificationWindow.setVisible(true);
+                break;
+            case LEVEL_COMPLETED:
+                notificationWindow.setTitle("LEVEL COMPLETED");
+                notificationWindow.setScores(getLevel().getScore(), getLevel().getScore());
+                notificationWindow.setVisible(true);
+                break;
+            case GAME_OVER:
+                notificationWindow.setTitle("GAME OVER");
+                notificationWindow.setScores(getLevel().getScore(), getLevel().getScore());
+                notificationWindow.setVisible(true);
+                break;
+            case WIN:
+//                notificationLabel.setText("WIN!!!");
+//                notificationLabel.setVisible(true);
+                notificationWindow.setTitle("YOU WIN!");
+                notificationWindow.setScores(getLevel().getScore(), getLevel().getScore());
+                notificationWindow.setVisible(true);
+                break;
+        }
     }
 
     private float calculateScaling(Stage stage, Level level, float statusBarHeight) {
@@ -188,12 +230,12 @@ public class GameScreen extends BaseScreen {
         this.lives = lives;
     }
 
-    public Notification getNotification() {
-        return notification;
+    public NotificationLabel getNotificationLabel() {
+        return notificationLabel;
     }
 
-    public void setNotification(Notification notification) {
-        this.notification = notification;
+    public void setNotificationLabel(NotificationLabel notificationLabel) {
+        this.notificationLabel = notificationLabel;
     }
 
     public StatusBar getStatusBar() {

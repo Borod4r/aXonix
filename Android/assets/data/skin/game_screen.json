@@ -7,7 +7,36 @@
     "com.badlogic.gdx.graphics.g2d.BitmapFont": {
         "small": { "file": "data/font/russo_12.fnt" },
         "normal": { "file": "data/font/russo_18.fnt" },
-        "large": { "file": "data/font/russo_28.fnt" }
+        "large": { "file": "data/font/russo_28.fnt" },
+        "xlarge": { "file": "data/font/russo_46.fnt" }
+
+    },
+
+    "net.ivang.axonix.main.screen.game.actor.NotificationWindow$Style": {
+        "small": {
+            "background": "window_background",
+            "hPad": 24,
+            "vPad": 12,
+            "titleFont": "normal",
+            "labelsValuesFont": "small",
+            "valuesColor": "yellow"
+        },
+        "normal": {
+            "background": "window_background",
+            "hPad": 36,
+            "vPad": 18,
+            "titleFont": "large",
+            "labelsValuesFont": "normal",
+            "valuesColor": "yellow"
+        },
+        "large": {
+            "background": "window_background",
+            "hPad": 56,
+            "vPad": 28,
+            "titleFont": "xlarge",
+            "labelsValuesFont": "large",
+            "valuesColor": "yellow"
+        }
 
     }
 }

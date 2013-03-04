@@ -17,3 +17,11 @@ circular_flare
   orig: 64, 64
   offset: 0, 0
   index: -1
+window_background
+  rotate: false
+  xy: 133, 3
+  size: 19, 62
+  split: 9, 9, 9, 9
+  orig: 19, 62
+  offset: 0, 0
+  index: -1

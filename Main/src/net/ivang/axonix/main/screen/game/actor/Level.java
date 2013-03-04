@@ -273,8 +273,8 @@ public class Level extends Group {
     //---------------------------------------------------------------------
 
     private void showNotification(String text, float showDelay, float hideDelay) {
-        gameScreen.getNotification().setText(text);
-        gameScreen.getNotification().addAction(Actions.sequence(Actions.delay(showDelay), Actions.show(),
+        gameScreen.getNotificationLabel().setText(text);
+        gameScreen.getNotificationLabel().addAction(Actions.sequence(Actions.delay(showDelay), Actions.show(),
                 Actions.delay(hideDelay), Actions.hide()));
     }
 
