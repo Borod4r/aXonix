@@ -5,23 +5,30 @@ filter: MipMapLinearNearest,Nearest
 repeat: none
 block
   rotate: false
-  xy: 1, 1
+  xy: 1, 4
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 circular_flare
   rotate: false
-  xy: 67, 1
+  xy: 67, 4
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-window_background
+window_bg
   rotate: false
-  xy: 133, 3
+  xy: 133, 6
   size: 19, 62
   split: 9, 9, 9, 9
   orig: 19, 62
+  offset: 0, 0
+  index: -1
+window_bg_stage
+  rotate: false
+  xy: 1, 1
+  size: 1, 1
+  orig: 1, 1
   offset: 0, 0
   index: -1

@@ -14,7 +14,8 @@
 
     "net.ivang.axonix.main.screen.game.actor.NotificationWindow$Style": {
         "small": {
-            "background": "window_background",
+            "background": "window_bg",
+            "stageBackground": "window_bg_stage",
             "hPad": 24,
             "vPad": 12,
             "titleFont": "normal",
@@ -22,7 +23,8 @@
             "valuesColor": "yellow"
         },
         "normal": {
-            "background": "window_background",
+            "background": "window_bg",
+            "stageBackground": "window_bg_stage",
             "hPad": 36,
             "vPad": 18,
             "titleFont": "large",
@@ -30,7 +32,8 @@
             "valuesColor": "yellow"
         },
         "large": {
-            "background": "window_background",
+            "background": "window_bg",
+            "stageBackground": "window_bg_stage",
             "hPad": 56,
             "vPad": 28,
             "titleFont": "xlarge",

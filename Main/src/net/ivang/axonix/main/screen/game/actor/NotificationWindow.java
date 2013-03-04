@@ -18,6 +18,9 @@ package net.ivang.axonix.main.screen.game.actor;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -112,8 +115,26 @@ public class NotificationWindow extends Table {
         setTotalScore(totalScore);
     }
 
+    protected void drawBackground (SpriteBatch batch, float parentAlpha) {
+        if (style.stageBackground != null) {
+            Color color = getColor();
+            batch.setColor(color.r, color.g, color.b, color.a * parentAlpha);
+            Stage stage = getStage();
+            Vector2 position = stageToLocalCoordinates(Vector2.tmp.set(0, 0));
+            Vector2 size = stageToLocalCoordinates(Vector2.tmp2.set(stage.getWidth(), stage.getHeight()));
+            style.stageBackground.draw(batch, getX() + position.x, getY() + position.y, getX() + size.x, getY() + size.y);
+        }
+
+        super.drawBackground(batch, parentAlpha);
+    }
+
+    //---------------------------------------------------------------------
+    // Nested Classes
+    //---------------------------------------------------------------------
+
     static public class Style {
         public Drawable background;
+        public Drawable stageBackground;
         public float hPad, vPad;
         public BitmapFont titleFont;
         public BitmapFont labelsValuesFont;
