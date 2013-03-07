@@ -56,7 +56,7 @@ public class StatusBar extends Table {
         // lives
         add(livesLabel).padLeft(5);
         add(livesValue).padRight(5);
-        // score
+        // level score
         add(scoreLabel).padLeft(5);
         add(scoreValue).padRight(5);
         // level
@@ -70,8 +70,8 @@ public class StatusBar extends Table {
         // lives
         String lives = Integer.toString(gameScreen.getLives());
         livesValue.setText(lives);
-        // score
-        String score = Integer.toString(gameScreen.getLevel().getScore());
+        // level score
+        String score = Integer.toString(gameScreen.getLevel().getLevelScore());
         scoreValue.setText(score);
         // level
         String level = Integer.toString(gameScreen.getLevelIndex() + 1);

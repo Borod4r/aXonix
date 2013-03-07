@@ -47,7 +47,8 @@ public class GameScreen extends BaseScreen {
 
     private State state;
 
-    int lives;
+    private int lives;
+    private long totalScore;
     private int levelIndex;
     Level level;
 
@@ -62,8 +63,8 @@ public class GameScreen extends BaseScreen {
 
     public GameScreen(AxonixGame game) {
         super(game);
-        this.state = State.PAUSED;
-        this.lives = 3;
+        setState(State.PAUSED);
+        setLives(3);
 
         // Input event handling
         inputMultiplexer = new InputMultiplexer();
@@ -105,7 +106,7 @@ public class GameScreen extends BaseScreen {
         float scale = calculateScaling(stage, level, statusCell.getMaxHeight());
         level.setScale(scale);
         levelCell.setWidget(level).width(level.getWidth() * scale).height(level.getHeight() * scale);
-        this.state = State.PLAYING;
+        setState(State.PLAYING);
     }
 
     @Override
@@ -143,6 +144,10 @@ public class GameScreen extends BaseScreen {
         setState(State.PAUSED);
     }
 
+    public boolean isInState(State state) {
+        return this.state == state;
+    }
+
     //---------------------------------------------------------------------
     // Helper methods
     //---------------------------------------------------------------------
@@ -155,7 +160,9 @@ public class GameScreen extends BaseScreen {
 
     private void check() {
         // check lives
-        if (lives <= 0) state = State.GAME_OVER;
+        if (lives <= 0 && !isInState(State.GAME_OVER)) {
+            setState(State.GAME_OVER);
+        }
     }
 
     private void showNotifications() {
@@ -172,25 +179,32 @@ public class GameScreen extends BaseScreen {
                 break;
             case PAUSED:
                 notificationWindow.setTitle("PAUSE");
-                notificationWindow.setScores(getLevel().getScore(), getLevel().getScore());
+                notificationWindow.setScores(getLevel().getLevelScore(), getTotalScore() + getLevel().getLevelScore());
                 notificationWindow.setVisible(true);
                 break;
             case LEVEL_COMPLETED:
                 notificationWindow.setTitle("LEVEL COMPLETED");
-                notificationWindow.setScores(getLevel().getScore(), getLevel().getScore());
+                notificationWindow.setScores(getLevel().getLevelScore(), getTotalScore());
                 notificationWindow.setVisible(true);
                 break;
             case GAME_OVER:
                 notificationWindow.setTitle("GAME OVER");
-                notificationWindow.setScores(getLevel().getScore(), getLevel().getScore());
+                notificationWindow.setScores(getLevel().getLevelScore(), getTotalScore());
                 notificationWindow.setVisible(true);
                 break;
             case WIN:
-//                notificationLabel.setText("WIN!!!");
-//                notificationLabel.setVisible(true);
                 notificationWindow.setTitle("YOU WIN!");
-                notificationWindow.setScores(getLevel().getScore(), getLevel().getScore());
+                notificationWindow.setScores(getLevel().getLevelScore(), getTotalScore());
                 notificationWindow.setVisible(true);
+                break;
+        }
+    }
+
+    private void onStateChanged() {
+        switch (state) {
+            case LEVEL_COMPLETED:
+            case GAME_OVER:
+                setTotalScore(getTotalScore() + level.getLevelScore());
                 break;
         }
     }
@@ -212,6 +226,7 @@ public class GameScreen extends BaseScreen {
 
     public void setState(State state) {
         this.state = state;
+        onStateChanged();
     }
 
     public int getLevelIndex() {
@@ -260,5 +275,13 @@ public class GameScreen extends BaseScreen {
 
     public void setSkin(Skin skin) {
         this.skin = skin;
+    }
+
+    public long getTotalScore() {
+        return totalScore;
+    }
+
+    public void setTotalScore(long totalScore) {
+        this.totalScore = totalScore;
     }
 }

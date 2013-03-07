@@ -43,8 +43,8 @@ public class Level extends Group {
     private int height;
     private byte[][] levelMap;
 
-    public int score;
-    public byte percentComplete;
+    private int levelScore;
+    private byte percentComplete;
     private int earthBlocks;
 
     private Protagonist protagonist;
@@ -101,7 +101,7 @@ public class Level extends Group {
 
     @Override
     public void act(float delta) {
-        if (gameScreen.getState() == GameScreen.State.PLAYING) {
+        if (gameScreen.isInState(GameScreen.State.PLAYING)) {
             check();
             super.act(delta);
             // change blocks states
@@ -233,7 +233,7 @@ public class Level extends Group {
                 } else if(A == BS_TAIL) {
                     // turn tail to blue blocks
                     setBlockState(i, j, BS_BLUE);
-                    score++;
+                    levelScore++;
                     earthBlocks++;
 
                 }
@@ -256,11 +256,11 @@ public class Level extends Group {
         for(List<Vector2> spot : spots.values()) {
             for(Vector2 pos : spot) {
                 setBlockState(pos.x, pos.y, BS_GREEN);
-                score++;
+                levelScore++;
                 earthBlocks++;
             }
             float bonus = 1 + (float) spot.size() / 200;
-            score += spot.size() * bonus;
+            levelScore += spot.size() * bonus;
 
         }
 
@@ -324,12 +324,12 @@ public class Level extends Group {
         this.levelMap = levelMap;
     }
 
-    public int getScore() {
-        return score;
+    public int getLevelScore() {
+        return levelScore;
     }
 
-    public void setScore(int score) {
-        this.score = score;
+    public void setLevelScore(int levelScore) {
+        this.levelScore = levelScore;
     }
 
     public byte getPercentComplete() {
