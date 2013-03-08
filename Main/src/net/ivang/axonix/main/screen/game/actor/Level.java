@@ -45,7 +45,7 @@ public class Level extends Group {
 
     private int levelScore;
     private byte percentComplete;
-    private int earthBlocks;
+    private int filledBlocks;
 
     private Protagonist protagonist;
     private Vector2 protStartPos;
@@ -115,7 +115,14 @@ public class Level extends Group {
                         break;
                     case BS_BLUE:
                         if (getBlockState(protagonist.getPx(), protagonist.getPy()) == Level.BS_TAIL) {
-                            fillAreas();
+                            // fill areas
+                            int newBlocks = fillAreas();
+                            // update level score
+                            float bonus = 1 + newBlocks / 200f;
+                            levelScore += newBlocks * bonus;
+                            // update percentage
+                            filledBlocks += newBlocks;
+                            percentComplete = (byte) (((float) filledBlocks / ((width - 2) * (height - 2))) * 100) ;
                         }
                         break;
                 }
@@ -182,10 +189,17 @@ public class Level extends Group {
         showNotification("LIFE LEFT!", 0, 1);
     }
 
-    private void fillAreas() {
+    /**
+     * Fills fenced areas if they do not contain enemies.
+     *
+     * @return the number of filled blocks
+     */
+
+    private int fillAreas() {
         // thanks to http://habrahabr.ru/post/119244/
         byte[][] tmpState = new byte[width][height];
         byte spotNum = 0;
+        int blocks = 0;
         Map<Byte, List<Vector2>> spots = new HashMap<Byte, List<Vector2>>();
         for(int i = 1; i < width - 1; i++) {
             for(int j = 1; j < height - 1; j++) {
@@ -233,8 +247,7 @@ public class Level extends Group {
                 } else if(A == BS_TAIL) {
                     // turn tail to blue blocks
                     setBlockState(i, j, BS_BLUE);
-                    levelScore++;
-                    earthBlocks++;
+                    blocks++;
 
                 }
             }
@@ -256,16 +269,12 @@ public class Level extends Group {
         for(List<Vector2> spot : spots.values()) {
             for(Vector2 pos : spot) {
                 setBlockState(pos.x, pos.y, BS_GREEN);
-                levelScore++;
-                earthBlocks++;
+                blocks++;
             }
-            float bonus = 1 + (float) spot.size() / 200;
-            levelScore += spot.size() * bonus;
 
         }
 
-        // update percentage
-        percentComplete = (byte) (((float) earthBlocks / ((width - 2) * (height - 2))) * 100) ;
+        return blocks;
     }
 
     //---------------------------------------------------------------------
