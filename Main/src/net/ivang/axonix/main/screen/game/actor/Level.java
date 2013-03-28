@@ -21,6 +21,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.ParallelAction;
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import net.ivang.axonix.main.screen.game.GameScreen;
 
@@ -119,7 +122,10 @@ public class Level extends Group {
                             int newBlocks = fillAreas();
                             // update level score
                             float bonus = 1 + newBlocks / 200f;
-                            levelScore += newBlocks * bonus;
+                            int obtainedPoints = (int) (newBlocks * bonus);
+                            levelScore += obtainedPoints;
+                            // show obtained points
+                            showObtainedPoints(obtainedPoints);
                             // update percentage
                             filledBlocks += newBlocks;
                             percentComplete = (byte) (((float) filledBlocks / ((width - 2) * (height - 2))) * 100) ;
@@ -253,10 +259,10 @@ public class Level extends Group {
             }
         }
 
-        Iterator iterator = spots.keySet().iterator();
+        Iterator<Byte> iterator = spots.keySet().iterator();
         while (iterator.hasNext()) {
             check_spot_points:
-            for(Vector2 pos: spots.get((Byte) iterator.next())) {
+            for(Vector2 pos: spots.get(iterator.next())) {
                 for (Enemy enemy : enemies) {
                     if ((pos.x == (int) enemy.getX()) && (pos.y == (int) enemy.getY())) {
                         iterator.remove();
@@ -275,6 +281,30 @@ public class Level extends Group {
         }
 
         return blocks;
+    }
+
+    private void showObtainedPoints(int obtainedPoints) {
+        Label pointsLabel = gameScreen.getPointsLabel();
+        pointsLabel.setText(Integer.toString(obtainedPoints));
+        // calculate new position for label
+        float protX = protagonist.getX();
+        float protY = protagonist.getY();
+        float labelX = (protX) * getScaleX() + this.getX();
+        float labelY = (protY) * getScaleY() + this.getY();
+        // correct position if is on the right side
+        if (protX > getWidth()/2) {
+            labelX -= pointsLabel.getTextBounds().width;
+        }
+        // movement distance and direction
+        float moveY = ((protY > getHeight()/2) ? -3 : 3) * getScaleY();
+        // update position
+        pointsLabel.setPosition(labelX, labelY);
+        // add actions
+        SequenceAction fadeInFadeOut = Actions.sequence(Actions.visible(true), Actions.fadeIn(0.2f), Actions.delay(1f),
+                Actions.fadeOut(0.3f), Actions.visible(false));
+        ParallelAction fadeAndMove = Actions.parallel(Actions.moveTo(labelX, labelY + moveY, 1.5f), fadeInFadeOut);
+        pointsLabel.clearActions();
+        pointsLabel.addAction(fadeAndMove);
     }
 
     //---------------------------------------------------------------------

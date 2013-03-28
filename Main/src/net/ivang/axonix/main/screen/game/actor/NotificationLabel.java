@@ -19,7 +19,6 @@ package net.ivang.axonix.main.screen.game.actor;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.utils.Align;
 
 /**
  * @author Ivan Gadzhega
@@ -32,8 +31,6 @@ public class NotificationLabel extends Label {
     public NotificationLabel(CharSequence text, Skin skin, String fontName) {
         super(text, skin, fontName, "white");
         setVisible(false);
-        setFillParent(true);
-        setAlignment(Align.center);
         this.skin = skin;
     }
 

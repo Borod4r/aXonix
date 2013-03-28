@@ -26,6 +26,7 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.esotericsoftware.tablelayout.Cell;
 import net.ivang.axonix.main.AxonixGame;
 import net.ivang.axonix.main.screen.BaseScreen;
@@ -57,6 +58,7 @@ public class GameScreen extends BaseScreen {
     private StatusBar statusBar;
     private Cell levelCell;
     private Cell statusCell;
+    private NotificationLabel pointsLabel;
     private NotificationLabel notificationLabel;
     private NotificationWindow notificationWindow;
     private Background background;
@@ -86,14 +88,23 @@ public class GameScreen extends BaseScreen {
         rootTable.row();
         // level cell
         levelCell = rootTable.add();
+
         // background
         background = new Background(skin);
+        // floating notification
+        pointsLabel = new NotificationLabel(null, skin, style.toString());
+        //notification label
         notificationLabel = new NotificationLabel(null, skin, style.toString());
+        notificationLabel.setFillParent(true);
+        notificationLabel.setAlignment(Align.center);
+        // notification window
         notificationWindow = new NotificationWindow(null, skin, style.toString());
+        // debug bar
         DebugBar debugBar = new DebugBar(skin, Style.SMALL.toString());
 
         stage.addActor(background);
         stage.addActor(rootTable);
+        stage.addActor(pointsLabel);
         stage.addActor(notificationLabel);
         stage.addActor(notificationWindow);
         stage.addActor(debugBar);
@@ -130,6 +141,7 @@ public class GameScreen extends BaseScreen {
 
         statusCell.height(font.getLineHeight());
         statusBar.setFont(font);
+        pointsLabel.setFont(font);
         notificationLabel.setFont(font);
         notificationWindow.setStyle(style.toString());
     }
@@ -283,5 +295,13 @@ public class GameScreen extends BaseScreen {
 
     public void setTotalScore(long totalScore) {
         this.totalScore = totalScore;
+    }
+
+    public NotificationLabel getPointsLabel() {
+        return pointsLabel;
+    }
+
+    public void setPointsLabel(NotificationLabel pointsLabel) {
+        this.pointsLabel = pointsLabel;
     }
 }
