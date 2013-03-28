@@ -83,12 +83,18 @@ public abstract class BaseScreen implements Screen {
     protected enum Style {
         SMALL("small"),
         NORMAL("normal"),
-        LARGE("large");
+        LARGE("large"),
+        XLARGE("xlarge");
 
         private final String styleName;
 
         private Style(String styleName) {
             this.styleName = styleName;
+        }
+
+        public Style getNext() {
+            int next = (ordinal() + 1) % values().length;
+            return values()[next];
         }
 
         public String toString() {

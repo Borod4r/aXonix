@@ -23,7 +23,6 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.ParallelAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import net.ivang.axonix.main.screen.game.GameScreen;
 
@@ -283,9 +282,9 @@ public class Level extends Group {
         return blocks;
     }
 
-    private void showObtainedPoints(int obtainedPoints) {
-        Label pointsLabel = gameScreen.getPointsLabel();
-        pointsLabel.setText(Integer.toString(obtainedPoints));
+    private void showObtainedPoints(int points) {
+        NotificationLabel pointsLabel = (points <= 200) ? gameScreen.getPointsLabel(): gameScreen.getBigPointsLabel();
+        pointsLabel.setText(Integer.toString(points));
         // calculate new position for label
         float protX = protagonist.getX();
         float protY = protagonist.getY();

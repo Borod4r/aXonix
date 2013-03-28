@@ -59,6 +59,7 @@ public class GameScreen extends BaseScreen {
     private Cell levelCell;
     private Cell statusCell;
     private NotificationLabel pointsLabel;
+    private NotificationLabel bigPointsLabel;
     private NotificationLabel notificationLabel;
     private NotificationWindow notificationWindow;
     private Background background;
@@ -91,8 +92,9 @@ public class GameScreen extends BaseScreen {
 
         // background
         background = new Background(skin);
-        // floating notification
+        // floating notifications
         pointsLabel = new NotificationLabel(null, skin, style.toString());
+        bigPointsLabel = new NotificationLabel(null, skin, style.getNext().toString());
         //notification label
         notificationLabel = new NotificationLabel(null, skin, style.toString());
         notificationLabel.setFillParent(true);
@@ -105,6 +107,7 @@ public class GameScreen extends BaseScreen {
         stage.addActor(background);
         stage.addActor(rootTable);
         stage.addActor(pointsLabel);
+        stage.addActor(bigPointsLabel);
         stage.addActor(notificationLabel);
         stage.addActor(notificationWindow);
         stage.addActor(debugBar);
@@ -142,6 +145,7 @@ public class GameScreen extends BaseScreen {
         statusCell.height(font.getLineHeight());
         statusBar.setFont(font);
         pointsLabel.setFont(font);
+        bigPointsLabel.setFont(style.getNext().toString());
         notificationLabel.setFont(font);
         notificationWindow.setStyle(style.toString());
     }
@@ -304,4 +308,13 @@ public class GameScreen extends BaseScreen {
     public void setPointsLabel(NotificationLabel pointsLabel) {
         this.pointsLabel = pointsLabel;
     }
+
+    public NotificationLabel getBigPointsLabel() {
+        return bigPointsLabel;
+    }
+
+    public void setBigPointsLabel(NotificationLabel bigPointsLabel) {
+        this.bigPointsLabel = bigPointsLabel;
+    }
+
 }
