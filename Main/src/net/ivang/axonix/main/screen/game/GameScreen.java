@@ -18,7 +18,6 @@ package net.ivang.axonix.main.screen.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -31,6 +30,8 @@ import com.esotericsoftware.tablelayout.Cell;
 import net.ivang.axonix.main.AxonixGame;
 import net.ivang.axonix.main.screen.BaseScreen;
 import net.ivang.axonix.main.screen.game.actor.*;
+import net.ivang.axonix.main.screen.game.input.AxonixGameGestureListener;
+import net.ivang.axonix.main.screen.game.input.GameScreenInputProcessor;
 
 import static java.lang.Math.min;
 
@@ -115,7 +116,7 @@ public class GameScreen extends BaseScreen {
 
     public void setLevel(int index) {
         this.levelIndex = index;
-        Pixmap pixmap = new Pixmap(game.getLevelsFiles().get(index));
+        Pixmap pixmap = new Pixmap(game.getLevelsFiles().get(index - 1));
         level = new Level(this, pixmap, skin);
         float scale = calculateScaling(stage, level, statusCell.getMaxHeight());
         level.setScale(scale);
@@ -125,10 +126,8 @@ public class GameScreen extends BaseScreen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-        act(delta);
-        stage.draw();
+        this.act(delta);
+        super.render(delta);
     }
 
     @Override
@@ -171,7 +170,6 @@ public class GameScreen extends BaseScreen {
     private void act(float delta) {
         check();
         showNotifications();
-        stage.act();
     }
 
     private void check() {

@@ -14,10 +14,11 @@
  * the License.
  */
 
-package net.ivang.axonix.main.screen.game;
+package net.ivang.axonix.main.screen.game.input;
 
 import com.badlogic.gdx.input.GestureDetector;
 import net.ivang.axonix.main.AxonixGame;
+import net.ivang.axonix.main.screen.game.GameScreen;
 
 /**
  * @author Ivan Gadzhega

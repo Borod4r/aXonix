@@ -16,7 +16,9 @@
 
 package net.ivang.axonix.main.screen;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import net.ivang.axonix.main.AxonixGame;
 
@@ -36,6 +38,10 @@ public abstract class BaseScreen implements Screen {
 
     @Override
     public void render(float delta) {
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+        stage.act();
+        stage.draw();
     }
 
     @Override
@@ -74,6 +80,19 @@ public abstract class BaseScreen implements Screen {
         } else {
             return Style.LARGE;
         }
+    }
+
+    protected float getScaleByStyle(Style style) {
+        float scale = 1f;
+        switch (style) {
+            case SMALL:
+                scale = 0.44f; // 320/720
+                break;
+            case NORMAL:
+                scale = 0.67f; // 480/720
+                break;
+        }
+        return scale;
     }
 
     //---------------------------------------------------------------------

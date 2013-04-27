@@ -17,14 +17,13 @@
 package net.ivang.axonix.main.screen;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.esotericsoftware.tablelayout.Cell;
 import net.ivang.axonix.main.AxonixGame;
-import net.ivang.axonix.main.screen.game.GameScreen;
+import net.ivang.axonix.main.screen.levels.LevelsScreen;
 
 /**
  * @author Ivan Gadzhega
@@ -57,9 +56,7 @@ public class StartScreen extends BaseScreen {
         startButton = new TextButton("Start", skin, style.toString());
         startButton.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
-                GameScreen gameScreen = new GameScreen(game);
-                gameScreen.setLevel(0);
-                game.setScreen(gameScreen);
+                game.setScreen(new LevelsScreen(game));
             }
         });
         startButtonCell = rootTable.add(startButton);
@@ -69,13 +66,6 @@ public class StartScreen extends BaseScreen {
         optionsButtonCell = rootTable.add(optionsButton);
         // stage
         stage.addActor(rootTable);
-    }
-
-    @Override
-    public void render(float delta) {
-        Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-        stage.act(delta);
-        stage.draw();
     }
 
     @Override
@@ -120,19 +110,6 @@ public class StartScreen extends BaseScreen {
         // options button
         optionsButton.setStyle(buttonStyle);
         optionsButtonCell.width(buttonWidth).height(buttonHeight).pad(padding);
-    }
-
-    private float getScaleByStyle(Style style) {
-        float scale = 1f;
-        switch (style) {
-            case SMALL:
-                scale = 0.44f; // 320/720
-                break;
-            case NORMAL:
-                scale = 0.67f; // 480/720
-                break;
-        }
-        return scale;
     }
 
 }
