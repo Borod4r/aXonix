@@ -51,7 +51,7 @@ public class AxonixGameGestureListener extends GestureDetector.GestureAdapter {
                 break;
             case LEVEL_COMPLETED:
                 int nextIndex = gameScreen.getLevelIndex() + 1;
-                if (nextIndex < game.getLevelsFiles().size()) {
+                if (nextIndex <= game.getLevelsFiles().size()) {
                     gameScreen.setLevel(nextIndex);
                 } else {
                     gameScreen.setState(GameScreen.State.WIN);

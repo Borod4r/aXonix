@@ -1,28 +1,51 @@
 
-game_screen.png
+axonix_atlas.png
 format: RGBA8888
 filter: MipMapLinearNearest,Nearest
 repeat: none
-block
+logo
   rotate: false
   xy: 1, 4
+  size: 512, 120
+  orig: 512, 120
+  offset: 0, 0
+  index: -1
+block
+  rotate: false
+  xy: 515, 60
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 circular_flare
   rotate: false
-  xy: 67, 4
+  xy: 581, 60
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 window_bg
   rotate: false
-  xy: 133, 6
+  xy: 647, 62
   size: 19, 62
   split: 9, 9, 9, 9
   orig: 19, 62
+  offset: 0, 0
+  index: -1
+button
+  rotate: false
+  xy: 515, 28
+  size: 13, 30
+  split: 6, 6, 6, 6
+  orig: 13, 30
+  offset: 0, 0
+  index: -1
+button_over
+  rotate: false
+  xy: 668, 94
+  size: 13, 30
+  split: 6, 6, 6, 6
+  orig: 13, 30
   offset: 0, 0
   index: -1
 window_bg_stage

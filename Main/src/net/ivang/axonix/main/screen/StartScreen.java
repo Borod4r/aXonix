@@ -17,7 +17,6 @@
 package net.ivang.axonix.main.screen;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -31,8 +30,6 @@ import net.ivang.axonix.main.screen.levels.LevelsScreen;
  */
 public class StartScreen extends BaseScreen {
 
-    private Skin skin;
-    private Image logo;
     private Button startButton;
     private Button optionsButton;
     private Cell logoCell;
@@ -41,14 +38,11 @@ public class StartScreen extends BaseScreen {
 
     public StartScreen(final AxonixGame game) {
         super(game);
-        // atlas and skin
-        TextureAtlas atlas = new TextureAtlas("data/atlas/start_screen.atlas");
-        skin = new Skin(Gdx.files.internal("data/skin/start_screen.json"), atlas);
         // root table
         Table rootTable = new Table();
         rootTable.setFillParent(true);
         // logo
-        logo = new Image(skin, "logo");
+        Image logo = new Image(skin, "logo");
         logoCell = rootTable.add(logo);
         rootTable.row();
         // start button

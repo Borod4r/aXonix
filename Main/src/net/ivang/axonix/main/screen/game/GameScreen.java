@@ -21,10 +21,8 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.esotericsoftware.tablelayout.Cell;
@@ -55,8 +53,6 @@ public class GameScreen extends BaseScreen {
     private int levelIndex;
     Level level;
 
-    private Skin skin;
-
     private StatusBar statusBar;
     private Cell levelCell;
     private Cell statusCell;
@@ -77,13 +73,10 @@ public class GameScreen extends BaseScreen {
         inputMultiplexer.addProcessor(new GestureDetector(new AxonixGameGestureListener(game, this)));
         inputMultiplexer.addProcessor(stage);
 
-        // Look & feel
-        TextureAtlas atlas = new TextureAtlas("data/atlas/game_screen.atlas");
-        skin = new Skin(Gdx.files.internal("data/skin/game_screen.json"), atlas);
-        Style style = getStyleByHeight(Gdx.graphics.getHeight());
-
         Table rootTable = new Table();
         rootTable.setFillParent(true);
+        // style
+        Style style = getStyleByHeight(Gdx.graphics.getHeight());
         // status bar
         statusBar = new StatusBar(this, skin, style.toString());
         statusCell = rootTable.add(statusBar);
@@ -286,14 +279,6 @@ public class GameScreen extends BaseScreen {
 
     public void setLevel(Level level) {
         this.level = level;
-    }
-
-    public Skin getSkin() {
-        return skin;
-    }
-
-    public void setSkin(Skin skin) {
-        this.skin = skin;
     }
 
     public long getTotalScore() {

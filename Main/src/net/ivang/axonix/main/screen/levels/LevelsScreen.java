@@ -18,9 +18,7 @@ package net.ivang.axonix.main.screen.levels;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.esotericsoftware.tablelayout.Cell;
@@ -36,18 +34,14 @@ public class LevelsScreen extends BaseScreen {
 
     private final static int LEVELS_TABLE_COLS = 6;
 
-    private Skin skin;
     private Table levelsTable;
 
     public LevelsScreen(final AxonixGame game) {
         super(game);
 
-        TextureAtlas atlas = new TextureAtlas("data/atlas/start_screen.atlas");
-        skin = new Skin(Gdx.files.internal("data/skin/start_screen.json"), atlas);
-        Style style = getStyleByHeight(Gdx.graphics.getHeight());
-
         levelsTable = new Table();
         Preferences prefs = Gdx.app.getPreferences(AxonixGame.PREFS_NAME);
+        Style style = getStyleByHeight(Gdx.graphics.getHeight());
 
         for (int levelNumber = 1; levelNumber <= game.getLevelsFiles().size(); levelNumber++) {
             LevelButton button = new LevelButton(Integer.toString(levelNumber), skin, style.toString(), game, levelNumber);

@@ -20,6 +20,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import net.ivang.axonix.main.AxonixGame;
 
 /**
@@ -30,10 +31,12 @@ public abstract class BaseScreen implements Screen {
 
     protected AxonixGame game;
     protected Stage stage;
+    protected Skin skin;
 
     public BaseScreen(AxonixGame game) {
         this.game = game;
         this.stage = new Stage();
+        this.skin = game.getSkin();
     }
 
     @Override
