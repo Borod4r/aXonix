@@ -17,6 +17,7 @@
 package net.ivang.axonix.main.screen.levels;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -46,9 +47,15 @@ public class LevelsScreen extends BaseScreen {
         Style style = getStyleByHeight(Gdx.graphics.getHeight());
 
         levelsTable = new Table();
+        Preferences prefs = Gdx.app.getPreferences(AxonixGame.PREFS_NAME);
 
         for (int levelNumber = 1; levelNumber <= game.getLevelsFiles().size(); levelNumber++) {
             LevelButton button = new LevelButton(Integer.toString(levelNumber), skin, style.toString(), game, levelNumber);
+            // disable button if current level isn't first and there is no prefs for previous levels
+            if (levelNumber > 1 && !prefs.contains(AxonixGame.PREF_KEY_LEVEL + (levelNumber - 1))) {
+                button.setColor(1f, 1f, 1f, 0.35f);
+                button.setDisabled(true);
+            }
             levelsTable.add(button);
             if (levelNumber % LEVELS_TABLE_COLS == 0) {
                 levelsTable.row();

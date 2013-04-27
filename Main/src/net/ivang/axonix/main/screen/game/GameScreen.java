@@ -18,6 +18,7 @@ package net.ivang.axonix.main.screen.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -217,6 +218,10 @@ public class GameScreen extends BaseScreen {
     private void onStateChanged() {
         switch (state) {
             case LEVEL_COMPLETED:
+                // save the level score to preferences
+                Preferences prefs = Gdx.app.getPreferences(AxonixGame.PREFS_NAME);
+                prefs.putInteger(AxonixGame.PREF_KEY_LEVEL + getLevelIndex(), level.getLevelScore());
+                prefs.flush();
             case GAME_OVER:
                 setTotalScore(getTotalScore() + level.getLevelScore());
                 break;

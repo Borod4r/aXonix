@@ -31,6 +31,9 @@ import java.util.List;
  */
 public class AxonixGame extends Game {
 
+    public static final String PREFS_NAME = "aXonix";
+    public static final String PREF_KEY_LEVEL = "level_";
+
     private Screen startScreen;
 
     private List<FileHandle> levelsFiles;

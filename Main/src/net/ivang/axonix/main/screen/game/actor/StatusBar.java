@@ -74,7 +74,7 @@ public class StatusBar extends Table {
         String score = Integer.toString(gameScreen.getLevel().getLevelScore());
         scoreValue.setText(score);
         // level
-        String level = Integer.toString(gameScreen.getLevelIndex() + 1);
+        String level = Integer.toString(gameScreen.getLevelIndex());
         String percent = Byte.toString(gameScreen.getLevel().getPercentComplete());
         levelValue.setText(level + " (" + percent + "/80%)");
     }
