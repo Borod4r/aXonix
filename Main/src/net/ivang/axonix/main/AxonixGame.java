@@ -23,6 +23,8 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import net.ivang.axonix.main.screen.StartScreen;
+import net.ivang.axonix.main.screen.game.GameScreen;
+import net.ivang.axonix.main.screen.levels.LevelsScreen;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +39,8 @@ public class AxonixGame extends Game {
     public static final String PREF_KEY_LEVEL = "level_";
 
     private Screen startScreen;
+    private Screen levelsScreen;
+    private GameScreen gameScreen;
     private Skin skin;
     private List<FileHandle> levelsFiles;
 
@@ -56,6 +60,21 @@ public class AxonixGame extends Game {
             startScreen = new StartScreen(this);
         }
         setScreen(startScreen);
+    }
+
+    public void setLevelsScreen() {
+        if (levelsScreen == null) {
+            levelsScreen = new LevelsScreen(this);
+        }
+        setScreen(levelsScreen);
+    }
+
+    public void setGameScreen(int levelNumber) {
+        if (gameScreen == null) {
+            gameScreen = new GameScreen(this);
+        }
+        gameScreen.setLevel(levelNumber);
+        setScreen(gameScreen);
     }
 
     //---------------------------------------------------------------------

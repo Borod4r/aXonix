@@ -14,12 +14,13 @@
  * the License.
  */
 
-package net.ivang.axonix.main.screen.game.actor;
+package net.ivang.axonix.main.screen.game.actor.dialog;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -32,7 +33,7 @@ import static com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class NotificationWindow extends Table {
+public class AlertDialog extends Table {
 
     private Skin skin;
     private Style style;
@@ -41,8 +42,9 @@ public class NotificationWindow extends Table {
     private Label title;
     private Label levelScoreLabel, levelScoreValue;
     private Label totalScoreLabel, totalScoreValue;
+    private DialogActionsGroup actionsGroup;
 
-    public NotificationWindow(String titleText, Skin skin, String styleName) {
+    public AlertDialog(String titleText, Skin skin, String styleName) {
         super();
         this.skin = skin;
         setFillParent(true);
@@ -72,6 +74,27 @@ public class NotificationWindow extends Table {
         window.add(totalScoreValue).left();
 
         add(window);
+        row();
+
+        actionsGroup = new DialogActionsGroup(style.actionsGroupStyle);
+        add(actionsGroup).center();
+    }
+
+    public void setTitle(String text) {
+        title.setText(text);
+    }
+
+    public void setLevelScore(int score) {
+        levelScoreValue.setText(Integer.toString(score));
+    }
+
+    public void setTotalScore(long score) {
+        totalScoreValue.setText(Long.toString(score));
+    }
+
+    public void setScores(int levelScore, long totalScore) {
+        setLevelScore(levelScore);
+        setTotalScore(totalScore);
     }
 
     public void setStyle(String styleName) {
@@ -96,25 +119,15 @@ public class NotificationWindow extends Table {
         if (levelScoreValue != null) levelScoreValue.setStyle(valueStyle);
         if (totalScoreLabel != null) totalScoreLabel.setStyle(labelStyle);
         if (totalScoreValue != null) totalScoreValue.setStyle(valueStyle);
+
+        if (actionsGroup != null) actionsGroup.setStyle(style.actionsGroupStyle);
     }
 
-    public void setTitle(String text) {
-        title.setText(text);
+    public boolean addButtonListener(int whichButton , EventListener listener) {
+        return actionsGroup.addButtonListener(whichButton, listener);
     }
 
-    public void setLevelScore(int score) {
-        levelScoreValue.setText(Integer.toString(score));
-    }
-
-    public void setTotalScore(long score) {
-        totalScoreValue.setText(Long.toString(score));
-    }
-
-    public void setScores(int levelScore, long totalScore) {
-        setLevelScore(levelScore);
-        setTotalScore(totalScore);
-    }
-
+    @Override
     protected void drawBackground (SpriteBatch batch, float parentAlpha) {
         if (style.stageBackground != null) {
             Color color = getColor();
@@ -141,6 +154,7 @@ public class NotificationWindow extends Table {
         public Color titleColor = new Color(1, 1, 1, 1);
         public Color labelsColor = new Color(1, 1, 1, 1);
         public Color valuesColor = new Color(1, 1, 1, 1);
+        public DialogActionsGroup.Style actionsGroupStyle;
     }
 
 }

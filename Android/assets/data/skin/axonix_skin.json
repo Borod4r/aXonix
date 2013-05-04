@@ -38,7 +38,88 @@
         }
     },
 
-    "net.ivang.axonix.main.screen.game.actor.NotificationWindow$Style": {
+    "com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle": {
+        "levels_small":{
+            "up": "button",
+            "down": "button_over",
+            "over": "button_over",
+            "imageUp": "ic_levels_small"
+        },
+        "levels_normal":{
+            "up": "button",
+            "down": "button_over",
+            "over": "button_over",
+            "imageUp": "ic_levels_normal"
+        },
+        "levels_large":{
+            "up": "button",
+            "down": "button_over",
+            "over": "button_over",
+            "imageUp": "ic_levels_large"
+        },
+        "repeat_small":{
+            "up": "button",
+            "down": "button_over",
+            "over": "button_over",
+            "imageUp": "ic_repeat_small"
+        },
+        "repeat_normal":{
+            "up": "button",
+            "down": "button_over",
+            "over": "button_over",
+            "imageUp": "ic_repeat_normal"
+        },
+        "repeat_large":{
+            "up": "button",
+            "down": "button_over",
+            "over": "button_over",
+            "imageUp": "ic_repeat_large"
+        },
+        "forward_small":{
+            "up": "button",
+            "down": "button_over",
+            "over": "button_over",
+            "imageUp": "ic_forward_small"
+        },
+        "forward_normal":{
+            "up": "button",
+            "down": "button_over",
+            "over": "button_over",
+            "imageUp": "ic_forward_normal"
+        },
+        "forward_large":{
+            "up": "button",
+            "down": "button_over",
+            "over": "button_over",
+            "imageUp": "ic_forward_large"
+        }
+    },
+
+    "net.ivang.axonix.main.screen.game.actor.dialog.DialogActionsGroup$Style": {
+        "small": {
+            "button1": "levels_small",
+            "button2": "repeat_small",
+            "button3": "forward_small",
+            "buttonSize": 32,
+            "padding": 5
+        },
+        "normal": {
+            "button1": "levels_normal",
+            "button2": "repeat_normal",
+            "button3": "forward_normal",
+            "buttonSize": 48,
+            "padding": 7
+        },
+        "large": {
+            "button1": "levels_large",
+            "button2": "repeat_large",
+            "button3": "forward_large",
+            "buttonSize": 64,
+            "padding": 10
+        }
+    },
+
+    "net.ivang.axonix.main.screen.game.actor.dialog.AlertDialog$Style": {
         "small": {
             "background": "window_bg",
             "stageBackground": "window_bg_stage",
@@ -46,7 +127,8 @@
             "vPad": 12,
             "titleFont": "normal",
             "labelsValuesFont": "small",
-            "valuesColor": "yellow"
+            "valuesColor": "yellow",
+            "actionsGroupStyle": "small"
         },
         "normal": {
             "background": "window_bg",
@@ -55,7 +137,8 @@
             "vPad": 18,
             "titleFont": "large",
             "labelsValuesFont": "normal",
-            "valuesColor": "yellow"
+            "valuesColor": "yellow",
+            "actionsGroupStyle": "normal"
         },
         "large": {
             "background": "window_bg",
@@ -64,7 +147,8 @@
             "vPad": 28,
             "titleFont": "xlarge",
             "labelsValuesFont": "large",
-            "valuesColor": "yellow"
+            "valuesColor": "yellow",
+            "actionsGroupStyle": "large"
         }
 
     }

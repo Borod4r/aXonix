@@ -18,11 +18,13 @@ package net.ivang.axonix.main.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.esotericsoftware.tablelayout.Cell;
 import net.ivang.axonix.main.AxonixGame;
-import net.ivang.axonix.main.screen.levels.LevelsScreen;
 
 /**
  * @author Ivan Gadzhega
@@ -50,7 +52,7 @@ public class StartScreen extends BaseScreen {
         startButton = new TextButton("Start", skin, style.toString());
         startButton.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
-                game.setScreen(new LevelsScreen(game));
+                game.setLevelsScreen();
             }
         });
         startButtonCell = rootTable.add(startButton);

@@ -21,15 +21,20 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.esotericsoftware.tablelayout.Cell;
 import net.ivang.axonix.main.AxonixGame;
 import net.ivang.axonix.main.screen.BaseScreen;
-import net.ivang.axonix.main.screen.game.actor.*;
-import net.ivang.axonix.main.screen.game.input.AxonixGameGestureListener;
+import net.ivang.axonix.main.screen.game.actor.Level;
+import net.ivang.axonix.main.screen.game.actor.background.Background;
+import net.ivang.axonix.main.screen.game.actor.bar.DebugBar;
+import net.ivang.axonix.main.screen.game.actor.bar.StatusBar;
+import net.ivang.axonix.main.screen.game.actor.dialog.AlertDialog;
+import net.ivang.axonix.main.screen.game.actor.notification.NotificationLabel;
 import net.ivang.axonix.main.screen.game.input.GameScreenInputProcessor;
 
 import static java.lang.Math.min;
@@ -59,52 +64,32 @@ public class GameScreen extends BaseScreen {
     private NotificationLabel pointsLabel;
     private NotificationLabel bigPointsLabel;
     private NotificationLabel notificationLabel;
-    private NotificationWindow notificationWindow;
+    private AlertDialog alertDialog;
     private Background background;
 
-    public GameScreen(AxonixGame game) {
+    public GameScreen(final AxonixGame game) {
         super(game);
         setState(State.PAUSED);
         setLives(3);
-
         // Input event handling
         inputMultiplexer = new InputMultiplexer();
         inputMultiplexer.addProcessor(new GameScreenInputProcessor(game, this));
-        inputMultiplexer.addProcessor(new GestureDetector(new AxonixGameGestureListener(game, this)));
         inputMultiplexer.addProcessor(stage);
-
-        Table rootTable = new Table();
-        rootTable.setFillParent(true);
-        // style
+        // init subcomponents
         Style style = getStyleByHeight(Gdx.graphics.getHeight());
-        // status bar
-        statusBar = new StatusBar(this, skin, style.toString());
-        statusCell = rootTable.add(statusBar);
-        statusCell.height(skin.getFont(style.toString()).getLineHeight()).left();
-        rootTable.row();
-        // level cell
-        levelCell = rootTable.add();
-
-        // background
-        background = new Background(skin);
-        // floating notifications
-        pointsLabel = new NotificationLabel(null, skin, style.toString());
-        bigPointsLabel = new NotificationLabel(null, skin, style.getNext().toString());
-        //notification label
-        notificationLabel = new NotificationLabel(null, skin, style.toString());
-        notificationLabel.setFillParent(true);
-        notificationLabel.setAlignment(Align.center);
-        // notification window
-        notificationWindow = new NotificationWindow(null, skin, style.toString());
-        // debug bar
-        DebugBar debugBar = new DebugBar(skin, Style.SMALL.toString());
-
+        Table rootTable = initRootTable(style);
+        DebugBar debugBar = initDebugBar();
+        initBackground();
+        initPointsLabels(style);
+        initNotificationLabel(style);
+        initAlertDialog(style);
+        // add subcomponents to stage
         stage.addActor(background);
         stage.addActor(rootTable);
         stage.addActor(pointsLabel);
         stage.addActor(bigPointsLabel);
         stage.addActor(notificationLabel);
-        stage.addActor(notificationWindow);
+        stage.addActor(alertDialog);
         stage.addActor(debugBar);
     }
 
@@ -140,7 +125,7 @@ public class GameScreen extends BaseScreen {
         pointsLabel.setFont(font);
         bigPointsLabel.setFont(style.getNext().toString());
         notificationLabel.setFont(font);
-        notificationWindow.setStyle(style.toString());
+        alertDialog.setStyle(style.toString());
     }
 
     @Override
@@ -161,6 +146,79 @@ public class GameScreen extends BaseScreen {
     // Helper methods
     //---------------------------------------------------------------------
 
+    private void initBackground() {
+        background = new Background(skin);
+    }
+
+    private Table initRootTable(Style style) {
+        Table rootTable = new Table();
+        rootTable.setFillParent(true);
+        // status bar
+        statusBar = new StatusBar(this, skin, style.toString());
+        statusCell = rootTable.add(statusBar);
+        statusCell.height(skin.getFont(style.toString()).getLineHeight()).left();
+        rootTable.row();
+        // level cell
+        levelCell = rootTable.add();
+        return  rootTable;
+    }
+
+    private void initPointsLabels(Style style) {
+        pointsLabel = new NotificationLabel(null, skin, style.toString());
+        bigPointsLabel = new NotificationLabel(null, skin, style.getNext().toString());
+    }
+
+    private void initNotificationLabel(Style style) {
+        notificationLabel = new NotificationLabel(null, skin, style.toString());
+        notificationLabel.setFillParent(true);
+        notificationLabel.setAlignment(Align.center);
+    }
+
+    private void initAlertDialog(Style style) {
+        alertDialog = new AlertDialog(null, skin, style.toString());
+        // levels button listener
+        alertDialog.addButtonListener(1, new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.setLevelsScreen();
+            }
+        });
+        // replay button listener
+        alertDialog.addButtonListener(2, new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.setGameScreen(levelIndex);
+            }
+        });
+        // forward button listener
+        alertDialog.addButtonListener(3, new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                switch (getState()) {
+                    case PAUSED:
+                        setState(GameScreen.State.PLAYING);
+                        break;
+                    case LEVEL_COMPLETED:
+                        int nextIndex = getLevelIndex() + 1;
+                        if (nextIndex <= game.getLevelsFiles().size()) {
+                            setLevel(nextIndex);
+                        } else {
+                            setState(GameScreen.State.WIN);
+                        }
+                        break;
+                    case GAME_OVER:
+                    case WIN:
+                        game.setStartScreen();
+                        break;
+                }
+            }
+        });
+    }
+
+    private DebugBar initDebugBar() {
+        return new DebugBar(skin, Style.SMALL.toString());
+    }
+
     private void act(float delta) {
         check();
         showNotifications();
@@ -177,33 +235,33 @@ public class GameScreen extends BaseScreen {
         switch (state) {
             case PLAYING:
                 // hide notifications
-                if (notificationLabel.getActions().size == 0 || notificationWindow.isVisible()) {
+                if (notificationLabel.getActions().size == 0 || alertDialog.isVisible()) {
                     notificationLabel.clearActions();
                     notificationLabel.setVisible(false);
                 }
-                if (notificationWindow.getActions().size == 0) {
-                    notificationWindow.setVisible(false);
+                if (alertDialog.getActions().size == 0) {
+                    alertDialog.setVisible(false);
                 }
                 break;
             case PAUSED:
-                notificationWindow.setTitle("PAUSE");
-                notificationWindow.setScores(getLevel().getLevelScore(), getTotalScore() + getLevel().getLevelScore());
-                notificationWindow.setVisible(true);
+                alertDialog.setTitle("PAUSE");
+                alertDialog.setScores(getLevel().getLevelScore(), getTotalScore() + getLevel().getLevelScore());
+                alertDialog.setVisible(true);
                 break;
             case LEVEL_COMPLETED:
-                notificationWindow.setTitle("LEVEL COMPLETED");
-                notificationWindow.setScores(getLevel().getLevelScore(), getTotalScore());
-                notificationWindow.setVisible(true);
+                alertDialog.setTitle("LEVEL COMPLETED");
+                alertDialog.setScores(getLevel().getLevelScore(), getTotalScore());
+                alertDialog.setVisible(true);
                 break;
             case GAME_OVER:
-                notificationWindow.setTitle("GAME OVER");
-                notificationWindow.setScores(getLevel().getLevelScore(), getTotalScore());
-                notificationWindow.setVisible(true);
+                alertDialog.setTitle("GAME OVER");
+                alertDialog.setScores(getLevel().getLevelScore(), getTotalScore());
+                alertDialog.setVisible(true);
                 break;
             case WIN:
-                notificationWindow.setTitle("YOU WIN!");
-                notificationWindow.setScores(getLevel().getLevelScore(), getTotalScore());
-                notificationWindow.setVisible(true);
+                alertDialog.setTitle("YOU WIN!");
+                alertDialog.setScores(getLevel().getLevelScore(), getTotalScore());
+                alertDialog.setVisible(true);
                 break;
         }
     }

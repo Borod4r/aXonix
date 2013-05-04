@@ -24,17 +24,80 @@ circular_flare
   orig: 64, 64
   offset: 0, 0
   index: -1
+ic_forward_large
+  rotate: false
+  xy: 647, 60
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+ic_levels_large
+  rotate: false
+  xy: 713, 60
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+ic_repeat_large
+  rotate: false
+  xy: 779, 60
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+ic_forward_normal
+  rotate: false
+  xy: 515, 10
+  size: 48, 48
+  orig: 48, 48
+  offset: 0, 0
+  index: -1
+ic_levels_normal
+  rotate: false
+  xy: 845, 76
+  size: 48, 48
+  orig: 48, 48
+  offset: 0, 0
+  index: -1
+ic_repeat_normal
+  rotate: false
+  xy: 565, 10
+  size: 48, 48
+  orig: 48, 48
+  offset: 0, 0
+  index: -1
 window_bg
   rotate: false
-  xy: 647, 62
+  xy: 895, 62
   size: 19, 62
   split: 9, 9, 9, 9
   orig: 19, 62
   offset: 0, 0
   index: -1
+ic_forward_small
+  rotate: false
+  xy: 615, 26
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+ic_levels_small
+  rotate: false
+  xy: 916, 92
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+ic_repeat_small
+  rotate: false
+  xy: 649, 26
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
 button
   rotate: false
-  xy: 515, 28
+  xy: 950, 94
   size: 13, 30
   split: 6, 6, 6, 6
   orig: 13, 30
@@ -42,7 +105,7 @@ button
   index: -1
 button_over
   rotate: false
-  xy: 668, 94
+  xy: 683, 28
   size: 13, 30
   split: 6, 6, 6, 6
   orig: 13, 30

@@ -14,7 +14,7 @@
  * the License.
  */
 
-package net.ivang.axonix.main.screen.game.actor;
+package net.ivang.axonix.main.screen.game.actor.background;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;

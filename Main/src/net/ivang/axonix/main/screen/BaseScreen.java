@@ -29,11 +29,11 @@ import net.ivang.axonix.main.AxonixGame;
  */
 public abstract class BaseScreen implements Screen {
 
-    protected AxonixGame game;
+    protected final AxonixGame game;
     protected Stage stage;
     protected Skin skin;
 
-    public BaseScreen(AxonixGame game) {
+    public BaseScreen(final AxonixGame game) {
         this.game = game;
         this.stage = new Stage();
         this.skin = game.getSkin();

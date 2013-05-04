@@ -25,6 +25,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.ParallelAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import net.ivang.axonix.main.screen.game.GameScreen;
+import net.ivang.axonix.main.screen.game.actor.notification.NotificationLabel;
 
 import java.util.*;
 

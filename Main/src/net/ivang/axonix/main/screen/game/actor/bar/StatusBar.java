@@ -14,7 +14,7 @@
  * the License.
  */
 
-package net.ivang.axonix.main.screen.game.actor;
+package net.ivang.axonix.main.screen.game.actor.bar;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;

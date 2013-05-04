@@ -35,21 +35,18 @@ public class LevelsScreen extends BaseScreen {
     private final static int LEVELS_TABLE_COLS = 6;
 
     private Table levelsTable;
+    private Preferences preferences;
 
     public LevelsScreen(final AxonixGame game) {
         super(game);
+        preferences = Gdx.app.getPreferences(AxonixGame.PREFS_NAME);
 
         levelsTable = new Table();
-        Preferences prefs = Gdx.app.getPreferences(AxonixGame.PREFS_NAME);
         Style style = getStyleByHeight(Gdx.graphics.getHeight());
 
         for (int levelNumber = 1; levelNumber <= game.getLevelsFiles().size(); levelNumber++) {
-            LevelButton button = new LevelButton(Integer.toString(levelNumber), skin, style.toString(), game, levelNumber);
-            // disable button if current level isn't first and there is no prefs for previous levels
-            if (levelNumber > 1 && !prefs.contains(AxonixGame.PREF_KEY_LEVEL + (levelNumber - 1))) {
-                button.setColor(1f, 1f, 1f, 0.35f);
-                button.setDisabled(true);
-            }
+            LevelButton button = new LevelButton(levelNumber, skin, style.toString(), game);
+            updateButtonState(button);
             levelsTable.add(button);
             if (levelNumber % LEVELS_TABLE_COLS == 0) {
                 levelsTable.row();
@@ -83,6 +80,25 @@ public class LevelsScreen extends BaseScreen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
+        for(Cell cell : levelsTable.getCells()) {
+            updateButtonState((LevelButton) cell.getWidget());
+        }
+    }
+
+    //---------------------------------------------------------------------
+    // Helper methods
+    //---------------------------------------------------------------------
+
+    private void updateButtonState(LevelButton button) {
+        int levelNumber = button.getLevelNumber();
+        // disable button if its level number isn't first and there is no prefs for previous levels
+        if (levelNumber == 1 || preferences.contains(AxonixGame.PREF_KEY_LEVEL + (levelNumber - 1))) {
+            button.setColor(1f, 1f, 1f, 1f);
+            button.setDisabled(false);
+        } else {
+            button.setColor(1f, 1f, 1f, 0.35f);
+            button.setDisabled(true);
+        }
     }
 
 }
