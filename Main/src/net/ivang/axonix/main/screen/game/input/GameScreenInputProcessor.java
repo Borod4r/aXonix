@@ -51,14 +51,12 @@ public class GameScreenInputProcessor extends InputAdapter {
                     case LEVEL_COMPLETED:
                         int nextIndex = gameScreen.getLevelIndex() + 1;
                         if (nextIndex <= game.getLevelsFiles().size()) {
-                            gameScreen.setLevel(nextIndex);
+                            gameScreen.nextLevel();
                         } else {
                             gameScreen.setState(State.WIN);
                         }
                         break;
                     case GAME_OVER:
-                        game.setStartScreen();
-                        break;
                     case WIN:
                         game.setStartScreen();
                         break;

@@ -35,12 +35,9 @@ public class LevelsScreen extends BaseScreen {
     private final static int LEVELS_TABLE_COLS = 6;
 
     private Table levelsTable;
-    private Preferences preferences;
 
     public LevelsScreen(final AxonixGame game) {
         super(game);
-        preferences = Gdx.app.getPreferences(AxonixGame.PREFS_NAME);
-
         levelsTable = new Table();
         Style style = getStyleByHeight(Gdx.graphics.getHeight());
 
@@ -92,7 +89,9 @@ public class LevelsScreen extends BaseScreen {
     private void updateButtonState(LevelButton button) {
         int levelNumber = button.getLevelNumber();
         // disable button if its level number isn't first and there is no prefs for previous levels
-        if (levelNumber == 1 || preferences.contains(AxonixGame.PREF_KEY_LEVEL + (levelNumber - 1))) {
+        Preferences prefs = game.getPreferences();
+//        String prevLevelPrefix = AxonixGame.PREF_KEY_PR_LEVEL + (levelNumber - 1);
+        if (levelNumber == 1 || prefs.contains(AxonixGame.PREF_KEY_LIVES + (levelNumber - 1))) {
             button.setColor(1f, 1f, 1f, 1f);
             button.setDisabled(false);
         } else {

@@ -18,6 +18,7 @@ package net.ivang.axonix.main;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -36,13 +37,16 @@ import java.util.List;
 public class AxonixGame extends Game {
 
     public static final String PREFS_NAME = "aXonix";
-    public static final String PREF_KEY_LEVEL = "level_";
+    public static final String PREF_KEY_LIVES = "lives_";
+    public static final String PREF_KEY_LVL_SCORE = "level_score_";
+    public static final String PREF_KEY_TTL_SCORE = "total_score";
 
     private Screen startScreen;
     private Screen levelsScreen;
     private GameScreen gameScreen;
     private Skin skin;
     private List<FileHandle> levelsFiles;
+    private Preferences preferences;
 
     @Override
     public void create() {
@@ -53,6 +57,8 @@ public class AxonixGame extends Game {
         FileHandle dirHandle = Gdx.files.internal("data/levels");
         levelsFiles = Arrays.asList(dirHandle.list());
         setStartScreen();
+        // init preferences
+        preferences = Gdx.app.getPreferences(AxonixGame.PREFS_NAME);
     }
 
     public void setStartScreen() {
@@ -73,7 +79,7 @@ public class AxonixGame extends Game {
         if (gameScreen == null) {
             gameScreen = new GameScreen(this);
         }
-        gameScreen.setLevel(levelNumber);
+        gameScreen.loadLevel(levelNumber);
         setScreen(gameScreen);
     }
 
@@ -89,4 +95,7 @@ public class AxonixGame extends Game {
         return skin;
     }
 
+    public Preferences getPreferences() {
+        return preferences;
+    }
 }

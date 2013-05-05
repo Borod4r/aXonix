@@ -54,7 +54,7 @@ public class GameScreen extends BaseScreen {
     private State state;
 
     private int lives;
-    private long totalScore;
+    private int totalScore;
     private int levelIndex;
     Level level;
 
@@ -70,7 +70,6 @@ public class GameScreen extends BaseScreen {
     public GameScreen(final AxonixGame game) {
         super(game);
         setState(State.PAUSED);
-        setLives(3);
         // Input event handling
         inputMultiplexer = new InputMultiplexer();
         inputMultiplexer.addProcessor(new GameScreenInputProcessor(game, this));
@@ -93,14 +92,12 @@ public class GameScreen extends BaseScreen {
         stage.addActor(debugBar);
     }
 
-    public void setLevel(int index) {
-        this.levelIndex = index;
-        Pixmap pixmap = new Pixmap(game.getLevelsFiles().get(index - 1));
-        level = new Level(this, pixmap, skin);
-        float scale = calculateScaling(stage, level, statusCell.getMaxHeight());
-        level.setScale(scale);
-        levelCell.setWidget(level).width(level.getWidth() * scale).height(level.getHeight() * scale);
-        setState(State.PLAYING);
+    public void nextLevel() {
+        setLevel(levelIndex + 1, false);
+    }
+
+    public void loadLevel(int index) {
+        setLevel(index, true);
     }
 
     @Override
@@ -201,7 +198,7 @@ public class GameScreen extends BaseScreen {
                     case LEVEL_COMPLETED:
                         int nextIndex = getLevelIndex() + 1;
                         if (nextIndex <= game.getLevelsFiles().size()) {
-                            setLevel(nextIndex);
+                            nextLevel();
                         } else {
                             setState(GameScreen.State.WIN);
                         }
@@ -269,13 +266,78 @@ public class GameScreen extends BaseScreen {
     private void onStateChanged() {
         switch (state) {
             case LEVEL_COMPLETED:
-                // save the level score to preferences
-                Preferences prefs = Gdx.app.getPreferences(AxonixGame.PREFS_NAME);
-                prefs.putInteger(AxonixGame.PREF_KEY_LEVEL + getLevelIndex(), level.getLevelScore());
-                prefs.flush();
-            case GAME_OVER:
                 setTotalScore(getTotalScore() + level.getLevelScore());
+                saveLevelInfoToPrefs();
                 break;
+            case GAME_OVER:
+            case WIN:
+                setTotalScore(getTotalScore() + level.getLevelScore());
+                saveGameInfoToPrefs();
+                break;
+        }
+    }
+
+    private void setLevel(int index, boolean loadFromPrefs) {
+        this.levelIndex = index;
+        // init level structure from pixmap
+        Pixmap pixmap = new Pixmap(game.getLevelsFiles().get(index - 1));
+        level = new Level(this, pixmap, skin);
+        // set widget size
+        float scale = calculateScaling(stage, level, statusCell.getMaxHeight());
+        level.setScale(scale);
+        levelCell.setWidget(level).width(level.getWidth() * scale).height(level.getHeight() * scale);
+        // get level info from preferences
+        if (loadFromPrefs) {
+            loadLevelInfoFromPrefs(index - 1);
+            setTotalScore(0);
+        }
+        // go play
+        setState(State.PLAYING);
+    }
+
+    private void loadLevelInfoFromPrefs(int levelNumber) {
+        Preferences prefs = game.getPreferences();
+        if (levelNumber == 0) {
+            setLives(3);
+        } else if (prefs.contains(AxonixGame.PREF_KEY_LIVES + levelNumber)) {
+            int savedLivesNumber = prefs.getInteger(AxonixGame.PREF_KEY_LIVES + levelNumber);
+            setLives(savedLivesNumber);
+        } else {
+            throw new IllegalArgumentException("Preferences do not contain values for index:" + levelNumber);
+        }
+    }
+
+    private void saveLevelInfoToPrefs() {
+        Preferences prefs = game.getPreferences();
+        boolean prefsChanged = false;
+
+        int savedLivesNumber = prefs.getInteger(AxonixGame.PREF_KEY_LIVES + levelIndex);
+        int savedLevelScore = prefs.getInteger(AxonixGame.PREF_KEY_LVL_SCORE + levelIndex);
+
+        int newLivesNumber = getLives();
+        int newLevelScore = level.getLevelScore();
+
+        if (newLivesNumber > savedLivesNumber) {
+            prefs.putInteger(AxonixGame.PREF_KEY_LIVES + levelIndex, newLivesNumber);
+            prefsChanged = true;
+        }
+        if (newLevelScore > savedLevelScore) {
+            prefs.putInteger(AxonixGame.PREF_KEY_LVL_SCORE + levelIndex, newLevelScore);
+            prefsChanged = true;
+        }
+
+        if (prefsChanged) {
+            prefs.flush();
+        }
+    }
+
+    private void saveGameInfoToPrefs() {
+        Preferences prefs = game.getPreferences();
+        int savedTotalScore = prefs.getInteger(AxonixGame.PREF_KEY_TTL_SCORE);
+        int newTotalScore = getTotalScore();
+        if (newTotalScore > savedTotalScore) {
+            prefs.putInteger(AxonixGame.PREF_KEY_TTL_SCORE, newTotalScore);
+            prefs.flush();
         }
     }
 
@@ -339,11 +401,11 @@ public class GameScreen extends BaseScreen {
         this.level = level;
     }
 
-    public long getTotalScore() {
+    public int getTotalScore() {
         return totalScore;
     }
 
-    public void setTotalScore(long totalScore) {
+    public void setTotalScore(int totalScore) {
         this.totalScore = totalScore;
     }
 

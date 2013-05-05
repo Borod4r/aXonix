@@ -88,11 +88,11 @@ public class AlertDialog extends Table {
         levelScoreValue.setText(Integer.toString(score));
     }
 
-    public void setTotalScore(long score) {
-        totalScoreValue.setText(Long.toString(score));
+    public void setTotalScore(int score) {
+        totalScoreValue.setText(Integer.toString(score));
     }
 
-    public void setScores(int levelScore, long totalScore) {
+    public void setScores(int levelScore, int totalScore) {
         setLevelScore(levelScore);
         setTotalScore(totalScore);
     }
