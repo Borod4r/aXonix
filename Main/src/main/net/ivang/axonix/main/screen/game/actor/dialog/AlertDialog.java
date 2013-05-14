@@ -142,6 +142,19 @@ public class AlertDialog extends Table {
     }
 
     //---------------------------------------------------------------------
+    // Getters & Setters
+    //---------------------------------------------------------------------
+
+
+    public Label getTitle() {
+        return title;
+    }
+
+    public DialogActionsGroup getActionsGroup() {
+        return actionsGroup;
+    }
+
+    //---------------------------------------------------------------------
     // Nested Classes
     //---------------------------------------------------------------------
 

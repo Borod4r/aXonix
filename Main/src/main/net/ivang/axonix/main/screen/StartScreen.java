@@ -48,7 +48,7 @@ public class StartScreen extends BaseScreen {
         logoCell = rootTable.add(logo);
         rootTable.row();
         // start button
-        Style style = getStyleByHeight(Gdx.graphics.getHeight());
+        Style style = getStyleByHeight();
         startButton = new TextButton("Start", skin, style.toString());
         startButton.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {

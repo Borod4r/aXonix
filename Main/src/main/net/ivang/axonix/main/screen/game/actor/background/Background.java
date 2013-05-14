@@ -30,15 +30,16 @@ import java.util.Random;
  */
 public class Background extends Group {
 
-    private final byte ACTORS_NUM = 50;
-    private final int MAX_HEIGHT = 1080;
+    private final static String TEXTURE_FLARE = "circular_flare";
+    private final static byte ACTORS_NUM = 50;
+    private final static int MAX_HEIGHT = 1080;
 
     private Random random;
 
     public Background(Skin skin) {
         this.random = new Random();
         // init flares
-        TextureRegion texture = skin.getRegion("circular_flare");
+        TextureRegion texture = skin.getRegion(TEXTURE_FLARE);
         Color color = new Color(1, 1, 1, 0.2f);
         int x = -texture.getRegionWidth() - 1;
         int y = -texture.getRegionHeight() - 1;

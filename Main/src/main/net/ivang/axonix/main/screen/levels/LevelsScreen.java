@@ -39,7 +39,7 @@ public class LevelsScreen extends BaseScreen {
     public LevelsScreen(final AxonixGame game) {
         super(game);
         levelsTable = new Table();
-        Style style = getStyleByHeight(Gdx.graphics.getHeight());
+        Style style = getStyleByHeight();
 
         for (int levelNumber = 1; levelNumber <= game.getLevelsFiles().size(); levelNumber++) {
             LevelButton button = new LevelButton(levelNumber, skin, style.toString(), game);

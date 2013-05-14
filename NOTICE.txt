@@ -9,6 +9,7 @@ THIRD PARTY COMPONENTS
 -------------------------------
 This software includes third party software subject to the associated copyrights, as follows:
 - Libgdx (Apache 2.0) - http://libgdx.badlogicgames.com/
+- FEST Fluent Assertions 2.x (Apache 2.0) - https://github.com/alexruiz/fest-assert-2.x
 - Russo One Font (SIL Open Font License, 1.1) - http://www.jovanny.ru/
 
 The text of licenses for the above software is included in the /licenses folder.

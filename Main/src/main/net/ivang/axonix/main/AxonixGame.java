@@ -16,10 +16,7 @@
 
 package net.ivang.axonix.main;
 
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Preferences;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -41,8 +38,8 @@ public class AxonixGame extends Game {
     public static final String PREF_KEY_LVL_SCORE = "level_score_";
     public static final String PREF_KEY_TTL_SCORE = "total_score";
 
-    private Screen startScreen;
-    private Screen levelsScreen;
+    private StartScreen startScreen;
+    private LevelsScreen levelsScreen;
     private GameScreen gameScreen;
     private Skin skin;
     private List<FileHandle> levelsFiles;
@@ -50,15 +47,10 @@ public class AxonixGame extends Game {
 
     @Override
     public void create() {
-        // atlas and skin
-        TextureAtlas atlas = new TextureAtlas("data/atlas/axonix_atlas.atlas");
-        skin = new Skin(Gdx.files.internal("data/skin/axonix_skin.json"), atlas);
-        // init list of levels files
-        FileHandle dirHandle = Gdx.files.internal("data/levels");
-        levelsFiles = Arrays.asList(dirHandle.list());
+        initSkin();
+        initLevels();
+        initPreferences();
         setStartScreen();
-        // init preferences
-        preferences = Gdx.app.getPreferences(AxonixGame.PREFS_NAME);
     }
 
     public void setStartScreen() {
@@ -84,6 +76,24 @@ public class AxonixGame extends Game {
     }
 
     //---------------------------------------------------------------------
+    // Helper methods
+    //---------------------------------------------------------------------
+
+    private void initSkin() {
+        TextureAtlas atlas = new TextureAtlas("data/atlas/axonix_atlas.atlas");
+        skin = new Skin(Gdx.files.internal("data/skin/axonix_skin.json"), atlas);
+    }
+
+    private void initLevels() {
+        FileHandle dirHandle = Gdx.files.internal("data/levels");
+        levelsFiles = Arrays.asList(dirHandle.list());
+    }
+
+    private void initPreferences() {
+        preferences = Gdx.app.getPreferences(AxonixGame.PREFS_NAME);
+    }
+
+    //---------------------------------------------------------------------
     // Getters & Setters
     //---------------------------------------------------------------------
 
@@ -97,5 +107,17 @@ public class AxonixGame extends Game {
 
     public Preferences getPreferences() {
         return preferences;
+    }
+
+    public StartScreen getStartScreen() {
+        return startScreen;
+    }
+
+    public LevelsScreen getLevelsScreen() {
+        return levelsScreen;
+    }
+
+    public GameScreen getGameScreen() {
+        return gameScreen;
     }
 }

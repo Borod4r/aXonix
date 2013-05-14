@@ -85,6 +85,23 @@ public class DialogActionsGroup extends Table {
     }
 
     //---------------------------------------------------------------------
+    // Getters & Setters
+    //---------------------------------------------------------------------
+
+    public ImageButton getButton1() {
+        return button1;
+    }
+
+    public ImageButton getButton2() {
+        return button2;
+    }
+
+    public ImageButton getButton3() {
+        return button3;
+    }
+
+
+    //---------------------------------------------------------------------
     // Nested Classes
     //---------------------------------------------------------------------
 

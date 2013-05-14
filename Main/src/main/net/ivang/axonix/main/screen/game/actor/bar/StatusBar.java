@@ -71,7 +71,7 @@ public class StatusBar extends Table {
         String lives = Integer.toString(gameScreen.getLives());
         livesValue.setText(lives);
         // level score
-        String score = Integer.toString(gameScreen.getLevel().getLevelScore());
+        String score = Integer.toString(gameScreen.getLevel().getScore());
         scoreValue.setText(score);
         // level
         String level = Integer.toString(gameScreen.getLevelIndex());

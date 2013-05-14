@@ -46,7 +46,7 @@ public class Level extends Group {
     private int height;
     private byte[][] levelMap;
 
-    private int levelScore;
+    private int score;
     private byte percentComplete;
     private int filledBlocks;
 
@@ -123,7 +123,7 @@ public class Level extends Group {
                             // update level score
                             float bonus = 1 + newBlocks / 200f;
                             int obtainedPoints = (int) (newBlocks * bonus);
-                            levelScore += obtainedPoints;
+                            score += obtainedPoints;
                             // show obtained points
                             showObtainedPoints(obtainedPoints);
                             // update percentage
@@ -363,12 +363,12 @@ public class Level extends Group {
         this.levelMap = levelMap;
     }
 
-    public int getLevelScore() {
-        return levelScore;
+    public int getScore() {
+        return score;
     }
 
-    public void setLevelScore(int levelScore) {
-        this.levelScore = levelScore;
+    public void setScore(int score) {
+        this.score = score;
     }
 
     public byte getPercentComplete() {

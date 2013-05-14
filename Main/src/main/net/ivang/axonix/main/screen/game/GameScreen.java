@@ -75,7 +75,7 @@ public class GameScreen extends BaseScreen {
         inputMultiplexer.addProcessor(new GameScreenInputProcessor(game, this));
         inputMultiplexer.addProcessor(stage);
         // init subcomponents
-        Style style = getStyleByHeight(Gdx.graphics.getHeight());
+        Style style = getStyleByHeight();
         Table rootTable = initRootTable(style);
         DebugBar debugBar = initDebugBar();
         initBackground();
@@ -242,22 +242,22 @@ public class GameScreen extends BaseScreen {
                 break;
             case PAUSED:
                 alertDialog.setTitle("PAUSE");
-                alertDialog.setScores(getLevel().getLevelScore(), getTotalScore() + getLevel().getLevelScore());
+                alertDialog.setScores(getLevel().getScore(), getTotalScore() + getLevel().getScore());
                 alertDialog.setVisible(true);
                 break;
             case LEVEL_COMPLETED:
                 alertDialog.setTitle("LEVEL COMPLETED");
-                alertDialog.setScores(getLevel().getLevelScore(), getTotalScore());
+                alertDialog.setScores(getLevel().getScore(), getTotalScore());
                 alertDialog.setVisible(true);
                 break;
             case GAME_OVER:
                 alertDialog.setTitle("GAME OVER");
-                alertDialog.setScores(getLevel().getLevelScore(), getTotalScore());
+                alertDialog.setScores(getLevel().getScore(), getTotalScore());
                 alertDialog.setVisible(true);
                 break;
             case WIN:
                 alertDialog.setTitle("YOU WIN!");
-                alertDialog.setScores(getLevel().getLevelScore(), getTotalScore());
+                alertDialog.setScores(getLevel().getScore(), getTotalScore());
                 alertDialog.setVisible(true);
                 break;
         }
@@ -266,12 +266,12 @@ public class GameScreen extends BaseScreen {
     private void onStateChanged() {
         switch (state) {
             case LEVEL_COMPLETED:
-                setTotalScore(getTotalScore() + level.getLevelScore());
+                setTotalScore(getTotalScore() + getLevel().getScore());
                 saveLevelInfoToPrefs();
                 break;
             case GAME_OVER:
             case WIN:
-                setTotalScore(getTotalScore() + level.getLevelScore());
+                setTotalScore(getTotalScore() + getLevel().getScore());
                 saveGameInfoToPrefs();
                 break;
         }
@@ -315,7 +315,7 @@ public class GameScreen extends BaseScreen {
         int savedLevelScore = prefs.getInteger(AxonixGame.PREF_KEY_LVL_SCORE + levelIndex);
 
         int newLivesNumber = getLives();
-        int newLevelScore = level.getLevelScore();
+        int newLevelScore = level.getScore();
 
         if (newLivesNumber > savedLivesNumber) {
             prefs.putInteger(AxonixGame.PREF_KEY_LIVES + levelIndex, newLivesNumber);
@@ -365,10 +365,6 @@ public class GameScreen extends BaseScreen {
         return levelIndex;
     }
 
-    public void setLevelIndex(int levelIndex) {
-        this.levelIndex = levelIndex;
-    }
-
     public int getLives() {
         return lives;
     }
@@ -381,24 +377,12 @@ public class GameScreen extends BaseScreen {
         return notificationLabel;
     }
 
-    public void setNotificationLabel(NotificationLabel notificationLabel) {
-        this.notificationLabel = notificationLabel;
-    }
-
     public StatusBar getStatusBar() {
         return statusBar;
     }
 
-    public void setStatusBar(StatusBar statusBar) {
-        this.statusBar = statusBar;
-    }
-
     public Level getLevel() {
         return level;
-    }
-
-    public void setLevel(Level level) {
-        this.level = level;
     }
 
     public int getTotalScore() {
@@ -413,16 +397,11 @@ public class GameScreen extends BaseScreen {
         return pointsLabel;
     }
 
-    public void setPointsLabel(NotificationLabel pointsLabel) {
-        this.pointsLabel = pointsLabel;
-    }
-
     public NotificationLabel getBigPointsLabel() {
         return bigPointsLabel;
     }
 
-    public void setBigPointsLabel(NotificationLabel bigPointsLabel) {
-        this.bigPointsLabel = bigPointsLabel;
+    public AlertDialog getAlertDialog() {
+        return alertDialog;
     }
-
 }

@@ -75,6 +75,10 @@ public abstract class BaseScreen implements Screen {
     // Helper methods
     //---------------------------------------------------------------------
 
+    protected Style getStyleByHeight() {
+        return getStyleByHeight(Gdx.graphics.getHeight());
+    }
+
     protected Style getStyleByHeight(int height) {
         if (height < 480) {
             return Style.SMALL;
