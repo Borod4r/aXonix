@@ -270,8 +270,8 @@ public class GameScreen extends BaseScreen {
                 saveLevelInfoToPrefs();
                 break;
             case GAME_OVER:
-            case WIN:
                 setTotalScore(getTotalScore() + getLevel().getScore());
+            case WIN:
                 saveGameInfoToPrefs();
                 break;
         }

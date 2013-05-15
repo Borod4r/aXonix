@@ -246,7 +246,9 @@ public class TestAxonixGame extends AxonixGame {
     }
 
     private void subTest_actionButtonForward_levelCompleted() {
+        initPreferencesWithSampleData();
         // when level completed
+        setGameScreen(1);
         getGameScreen().getLevel().setScore(654);
         getGameScreen().setTotalScore(5432);
         getGameScreen().setState(GameScreen.State.LEVEL_COMPLETED);
@@ -264,8 +266,7 @@ public class TestAxonixGame extends AxonixGame {
     }
 
     private void subTest_actionButtonForward_win() {
-        clearPreferences();
-        getGameScreen().setState(GameScreen.State.LEVEL_COMPLETED);
+        initPreferencesWithSampleData();
         // when game completed
         setGameScreen(3);
         getGameScreen().getLevel().setScore(654);
@@ -277,9 +278,9 @@ public class TestAxonixGame extends AxonixGame {
 
         getForwardButton().fire(new ChangeListener.ChangeEvent());
         super.render(); saveScreenshot("actionButtons/forward/lvl_completed_last_click");
+        assertThat(getGameScreen().getState()).isEqualTo(GameScreen.State.WIN);
         assertThat(getGameScreen().getLevel().getScore()).isEqualTo(654);
-        // TODO: Fix this bug with total score
-//        assertThat(gameScreen.getTotalScore()).isEqualTo(5432 + 654);
+        assertThat(getGameScreen().getTotalScore()).isEqualTo(5432 + 654);
     }
 
     //---------------------------------------------------------------------
