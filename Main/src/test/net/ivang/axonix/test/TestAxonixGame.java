@@ -53,11 +53,11 @@ public class TestAxonixGame extends AxonixGame {
     //---------------------------------------------------------------------
 
     private void test_Preferences() {
-        clearPreferences();
-
         subTest_saveLevelInfo();
-        subTest_saveGameInfo();
-        subTest_loadLevelInfo();
+        subTest_saveGameInfo_win();
+        subTest_saveGameInfo_gameOver();
+        subTest_loadLevelInfo_firstLevel();
+        subTest_loadLevelInfo_someLevel();
     }
 
     private void test_alertDialog() {
@@ -86,45 +86,73 @@ public class TestAxonixGame extends AxonixGame {
     /* Preferences */
 
     private void subTest_saveLevelInfo() {
-        final int[] livesNumber = {2, 1, 1};
-        final int[] levelScore = {1500, 2222, 2750};
+        clearPreferences();
+
+        int[] livesNumbers = SampleData.livesNumbers;
+        int[] levelScores = SampleData.levelScores;
 
         for (int levelIndex = 1; levelIndex <= 3; levelIndex++) {
             setGameScreen(levelIndex);
 
-            getGameScreen().setLives(livesNumber[levelIndex-1]);
-            getGameScreen().getLevel().setScore(levelScore[levelIndex - 1]);
+            getGameScreen().setLives(livesNumbers[levelIndex-1]);
+            getGameScreen().getLevel().setScore(levelScores[levelIndex - 1]);
             getGameScreen().setState(GameScreen.State.LEVEL_COMPLETED);
             super.render();
 
             int savedLivesNumber = getPreferences().getInteger(AxonixGame.PREF_KEY_LIVES + levelIndex);
-            assertThat(savedLivesNumber).isEqualTo(livesNumber[levelIndex-1]);
+            assertThat(savedLivesNumber).isEqualTo(livesNumbers[levelIndex-1]);
 
             int savedLevelScore = getPreferences().getInteger(AxonixGame.PREF_KEY_LVL_SCORE + levelIndex);
-            assertThat(savedLevelScore).isEqualTo(levelScore[levelIndex-1]);
+            assertThat(savedLevelScore).isEqualTo(levelScores[levelIndex-1]);
         }
     }
 
-    private void subTest_saveGameInfo() {
-        final int totalScore = 55555;
+    private void subTest_saveGameInfo_win() {
+        clearPreferences();
 
-        getGameScreen().setTotalScore(totalScore);
+        setGameScreen(1);
+        getGameScreen().getLevel().setScore(123);
+        getGameScreen().setTotalScore(1595);
+
         getGameScreen().setState(GameScreen.State.WIN);
         super.render();
 
         int savedTotalScore = getPreferences().getInteger(AxonixGame.PREF_KEY_TTL_SCORE);
-        assertThat(savedTotalScore).isEqualTo(totalScore + getGameScreen().getLevel().getScore());
+        assertThat(savedTotalScore).isEqualTo(1595);
     }
 
-    private void subTest_loadLevelInfo() {
-        final int[] livesNumber = {3, 2, 1};
-        for (int levelIndex = 1; levelIndex <= 3; levelIndex++) {
-            setGameScreen(levelIndex);
-            super.render();
-            assertThat(getGameScreen().getLives()).isEqualTo(livesNumber[levelIndex-1]);
-            assertThat(getGameScreen().getLevel().getScore()).isZero();
-            assertThat(getGameScreen().getTotalScore()).isZero();
-        }
+    private void subTest_saveGameInfo_gameOver() {
+        clearPreferences();
+
+        setGameScreen(1);
+        getGameScreen().getLevel().setScore(123);
+        getGameScreen().setTotalScore(1595);
+
+        getGameScreen().setState(GameScreen.State.GAME_OVER);
+        super.render();
+
+        int savedTotalScore = getPreferences().getInteger(AxonixGame.PREF_KEY_TTL_SCORE);
+        assertThat(savedTotalScore).isEqualTo(1595 + 123);
+    }
+
+    private void subTest_loadLevelInfo_firstLevel() {
+        initPreferencesWithSampleData();
+
+        setGameScreen(1);
+        super.render();
+        assertThat(getGameScreen().getLives()).isEqualTo(3);
+        assertThat(getGameScreen().getLevel().getScore()).isZero();
+        assertThat(getGameScreen().getTotalScore()).isZero();
+    }
+
+    private void subTest_loadLevelInfo_someLevel() {
+        initPreferencesWithSampleData();
+
+        setGameScreen(2);
+        super.render();
+        assertThat(getGameScreen().getLives()).isEqualTo(SampleData.livesNumbers[0]);
+        assertThat(getGameScreen().getLevel().getScore()).isZero();
+        assertThat(getGameScreen().getTotalScore()).isZero();
     }
 
     /* Alert Dialog */
@@ -263,6 +291,20 @@ public class TestAxonixGame extends AxonixGame {
         getPreferences().flush();
     }
 
+    private void initPreferencesWithSampleData() {
+        clearPreferences();
+        int[] livesNumbers = SampleData.livesNumbers;
+        int[] levelScores = SampleData.levelScores;
+        // level info
+        for (int levelIndex = 1; levelIndex <= 3; levelIndex++) {
+            getPreferences().putInteger(AxonixGame.PREF_KEY_LIVES + levelIndex, livesNumbers[levelIndex-1]);
+            getPreferences().putInteger(AxonixGame.PREF_KEY_LVL_SCORE + levelIndex, levelScores[levelIndex-1]);
+        }
+        // game info
+        getPreferences().putInteger(AxonixGame.PREF_KEY_TTL_SCORE, SampleData.totalScore);
+        getPreferences().flush();
+    }
+
     private void deleteScreenshots() {
         Gdx.files.external(DIR_SCREENSHOTS).deleteDirectory();
     }
@@ -289,6 +331,22 @@ public class TestAxonixGame extends AxonixGame {
 
     private Button getForwardButton() {
         return getAlertDialog().getActionsGroup().getButton3();
+    }
+
+    //---------------------------------------------------------------------
+    // Nested Classes
+    //---------------------------------------------------------------------
+
+    private static class SampleData {
+        final static int[] livesNumbers = {2, 1, 1};
+        final static int[] levelScores = {1500, 2222, 2750};
+        final static int totalScore = arraySum(levelScores);
+
+        private static int arraySum(int[] array) {
+            int sum = 0;
+            for (int i : array) sum += i;
+            return sum;
+        }
     }
 
 }
