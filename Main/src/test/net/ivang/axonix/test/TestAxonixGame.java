@@ -44,6 +44,7 @@ public class TestAxonixGame extends AxonixGame {
         test_Preferences();
         test_alertDialog();
         test_actionButtons();
+        test_notificationLabel();
 
         Gdx.app.exit();
     }
@@ -77,6 +78,11 @@ public class TestAxonixGame extends AxonixGame {
         subTest_actionButtonForward_paused();
         subTest_actionButtonForward_levelCompleted();
         subTest_actionButtonForward_win();
+    }
+
+    private void test_notificationLabel() {
+        subTest_notificationLabel_go();
+        subTest_notificationLabel_lifeLeft();
     }
 
     //---------------------------------------------------------------------
@@ -281,6 +287,28 @@ public class TestAxonixGame extends AxonixGame {
         assertThat(getGameScreen().getState()).isEqualTo(GameScreen.State.WIN);
         assertThat(getGameScreen().getLevel().getScore()).isEqualTo(654);
         assertThat(getGameScreen().getTotalScore()).isEqualTo(5432 + 654);
+    }
+
+    /* Notification Label */
+
+    private void subTest_notificationLabel_go() {
+        setGameScreen(1);
+        assertThat(getGameScreen().getNotificationLabel().getText().toString()).endsWith("Go-go-go!");
+        assertThat(getGameScreen().getNotificationLabel().getActions()).isNotEmpty();
+        getGameScreen().setState(GameScreen.State.LEVEL_COMPLETED);
+        super.render();
+        getGameScreen().nextLevel();
+        super.render();
+        assertThat(getGameScreen().getNotificationLabel().getText().toString()).endsWith("Go-go-go!");
+        assertThat(getGameScreen().getNotificationLabel().getActions()).isNotEmpty();
+    }
+
+    private void subTest_notificationLabel_lifeLeft() {
+        setGameScreen(1);
+        getGameScreen().getLevel().killProtagonist();
+        super.render();
+        assertThat(getGameScreen().getNotificationLabel().getText().toString()).isEqualTo("LIFE LEFT!");
+        assertThat(getGameScreen().getNotificationLabel().getActions()).isNotEmpty();
     }
 
     //---------------------------------------------------------------------

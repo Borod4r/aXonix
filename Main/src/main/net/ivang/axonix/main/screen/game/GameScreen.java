@@ -74,7 +74,7 @@ public class GameScreen extends BaseScreen {
         inputMultiplexer = new InputMultiplexer();
         inputMultiplexer.addProcessor(new GameScreenInputProcessor(game, this));
         inputMultiplexer.addProcessor(stage);
-        // init subcomponents
+        // init sub-components
         Style style = getStyleByHeight();
         Table rootTable = initRootTable(style);
         DebugBar debugBar = initDebugBar();
@@ -82,7 +82,7 @@ public class GameScreen extends BaseScreen {
         initPointsLabels(style);
         initNotificationLabel(style);
         initAlertDialog(style);
-        // add subcomponents to stage
+        // add sub-components to stage
         stage.addActor(background);
         stage.addActor(rootTable);
         stage.addActor(pointsLabel);
@@ -218,7 +218,7 @@ public class GameScreen extends BaseScreen {
 
     private void act(float delta) {
         check();
-        showNotifications();
+        showAlertDialog();
     }
 
     private void check() {
@@ -228,14 +228,10 @@ public class GameScreen extends BaseScreen {
         }
     }
 
-    private void showNotifications() {
+    private void showAlertDialog() {
         switch (state) {
             case PLAYING:
-                // hide notifications
-                if (notificationLabel.getActions().size == 0 || alertDialog.isVisible()) {
-                    notificationLabel.clearActions();
-                    notificationLabel.setVisible(false);
-                }
+                // hide dialog
                 if (alertDialog.getActions().size == 0) {
                     alertDialog.setVisible(false);
                 }

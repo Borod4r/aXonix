@@ -20,7 +20,6 @@ import java.util.Random;
 
 /**
  * @author Ivan Gadzhega
- * @version $Id$
  * @since 0.1
  */
 public enum Move {

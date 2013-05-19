@@ -65,7 +65,7 @@ public class Level extends Group {
 
         initFromPixmap(pixmap);
 
-        String levelIndex = Integer.toString(gameScreen.getLevelIndex() + 1);
+        String levelIndex = Integer.toString(gameScreen.getLevelIndex());
         showNotification("Level " + levelIndex + ". Go-go-go!", 0.25f, 1.5f);
     }
 
@@ -117,7 +117,7 @@ public class Level extends Group {
                         killProtagonist();
                         break;
                     case BS_BLUE:
-                        if (getBlockState(protagonist.getPx(), protagonist.getPy()) == Level.BS_TAIL) {
+                        if (getBlockState(protagonist.getPrevX(), protagonist.getPrevY()) == Level.BS_TAIL) {
                             // fill areas
                             int newBlocks = fillAreas();
                             // update level score
@@ -160,6 +160,21 @@ public class Level extends Group {
         super.draw(batch, parentAlpha);
     }
 
+    public void killProtagonist() {
+        protagonist.setState(Protagonist.State.DEAD);
+
+        for(int i = 1; i < getWidth() - 1; i++) {
+            for(int j = 1; j < getHeight() - 1; j++) {
+                if (getBlockState(i, j) == Level.BS_TAIL) {
+                    setBlockState(i, j, Level.BS_EMPTY);
+                }
+            }
+        }
+
+        gameScreen.setLives(gameScreen.getLives() - 1);
+        showNotification("LIFE LEFT!", 0, 1);
+    }
+
     //---------------------------------------------------------------------
     // Helper methods
     //---------------------------------------------------------------------
@@ -176,23 +191,6 @@ public class Level extends Group {
                 break;
             }
         }
-    }
-
-    private void killProtagonist() {
-        removeActor(protagonist);
-        protagonist = new Protagonist(protStartPos.x, protStartPos.y, this, skin);
-        addActor(protagonist);
-
-        for(int i = 1; i < getWidth() - 1; i++) {
-            for(int j = 1; j < getHeight() - 1; j++) {
-                if (getBlockState(i, j) == Level.BS_TAIL) {
-                    setBlockState(i, j, Level.BS_EMPTY);
-                }
-            }
-        }
-
-        gameScreen.setLives(gameScreen.getLives() - 1);
-        showNotification("LIFE LEFT!", 0, 1);
     }
 
     /**

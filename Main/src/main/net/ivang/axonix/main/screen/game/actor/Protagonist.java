@@ -30,22 +30,32 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
  */
 public class Protagonist extends Actor {
 
-    private float px, py;
+    public enum State {
+        ALIVE, DEAD
+    }
+
+    private State state;
+
+    private float spawnX, spawnY;
+    private float prevX, prevY;
     private float speed;
     private Move move;
 
     private Level level;
 
     private TextureRegion region;
-    ParticleEffect particleEffect;
+    private ParticleEffect particleEffect;
 
     public Protagonist(float x, float y, Level level, Skin skin) {
+        this.state = State.ALIVE;
         this.speed = 8;
         this.move = Move.IDLE;
         this.level = level;
         this.region = skin.getRegion("circular_flare");
+
         setX(x); setY(y);
-        setPx(x); setPy(y);
+        setSpawnX(x); setSpawnY(y);
+        setPrevX(x); setPrevY(y);
 
         setWidth(1.5f);
         setHeight(1.5f);
@@ -60,9 +70,20 @@ public class Protagonist extends Actor {
     @Override
     public void act(float delta) {
         super.act(delta);
-        processKeys();
-        updatePosition(delta);
-        particleEffect.update(delta);
+        switch (state) {
+            case ALIVE:
+                processKeys();
+                updatePosition(delta);
+                particleEffect.update(delta);
+                break;
+            case DEAD:
+                this.move = Move.IDLE;
+                setX(spawnX); setY(spawnY);
+                setPrevX(spawnX); setPrevY(spawnY);
+                particleEffect.setPosition(spawnX, spawnY);
+                this.setState(State.ALIVE);
+                break;
+        }
     }
 
     @Override
@@ -78,7 +99,7 @@ public class Protagonist extends Actor {
     }
 
     public boolean isOnNewBlock() {
-        return ((int) getX() - (int) getPx() != 0) || ((int) getY() - (int) getPy() != 0);
+        return ((int) getX() - (int) getPrevX() != 0) || ((int) getY() - (int) getPrevY() != 0);
     }
 
     //---------------------------------------------------------------------
@@ -187,8 +208,8 @@ public class Protagonist extends Actor {
 
         // update previous coords
         if (move != Move.IDLE) {
-            px = getX();
-            py = getY();
+            prevX = getX();
+            prevY = getY();
         }
 
         setX(x); setY(y);
@@ -198,19 +219,43 @@ public class Protagonist extends Actor {
     // Getters & Setters
     //---------------------------------------------------------------------
 
-    public float getPx() {
-        return px;
+    public float getPrevX() {
+        return prevX;
     }
 
-    public void setPx(float px) {
-        this.px = px;
+    public void setPrevX(float prevX) {
+        this.prevX = prevX;
     }
 
-    public float getPy() {
-        return py;
+    public float getPrevY() {
+        return prevY;
     }
 
-    public void setPy(float py) {
-        this.py = py;
+    public void setPrevY(float prevY) {
+        this.prevY = prevY;
+    }
+
+    public float getSpawnX() {
+        return spawnX;
+    }
+
+    public void setSpawnX(float spawnX) {
+        this.spawnX = spawnX;
+    }
+
+    public float getSpawnY() {
+        return spawnY;
+    }
+
+    public void setSpawnY(float spawnY) {
+        this.spawnY = spawnY;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
     }
 }
