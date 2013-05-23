@@ -20,6 +20,7 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.google.inject.Inject;
 import net.ivang.axonix.main.screen.StartScreen;
 import net.ivang.axonix.main.screen.game.GameScreen;
 import net.ivang.axonix.main.screen.levels.LevelsScreen;
@@ -38,39 +39,35 @@ public class AxonixGame extends Game {
     public static final String PREF_KEY_LVL_SCORE = "level_score_";
     public static final String PREF_KEY_TTL_SCORE = "total_score";
 
-    private StartScreen startScreen;
-    private LevelsScreen levelsScreen;
-    private GameScreen gameScreen;
+    @Inject private StartScreen startScreen;
+    @Inject private LevelsScreen levelsScreen;
+    @Inject private GameScreen gameScreen;
+
     private Skin skin;
     private List<FileHandle> levelsFiles;
     private Preferences preferences;
 
-    @Override
-    public void create() {
+
+    @Inject private AxonixGame() {
         initSkin();
         initLevels();
         initPreferences();
+    }
+
+    @Override
+    public void create() {
         setStartScreen();
     }
 
     public void setStartScreen() {
-        if (startScreen == null) {
-            startScreen = new StartScreen(this);
-        }
         setScreen(startScreen);
     }
 
     public void setLevelsScreen() {
-        if (levelsScreen == null) {
-            levelsScreen = new LevelsScreen(this);
-        }
         setScreen(levelsScreen);
     }
 
     public void setGameScreen(int levelNumber) {
-        if (gameScreen == null) {
-            gameScreen = new GameScreen(this);
-        }
         gameScreen.loadLevel(levelNumber);
         setScreen(gameScreen);
     }

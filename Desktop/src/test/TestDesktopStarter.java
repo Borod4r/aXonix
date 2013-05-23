@@ -16,7 +16,7 @@
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import net.ivang.axonix.test.TestAxonixGame;
+import net.ivang.axonix.test.TestAxonixGameWrapper;
 
 /**
  * @author Ivan Gadzhega
@@ -31,7 +31,7 @@ public class TestDesktopStarter {
         cfg.useGL20 = true;
         cfg.width = 800;
         cfg.height = 480;
-        new LwjglApplication(new TestAxonixGame(), cfg);
+        new LwjglApplication(new TestAxonixGameWrapper(), cfg);
     }
 
 }

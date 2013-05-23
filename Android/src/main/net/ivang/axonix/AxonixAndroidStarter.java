@@ -19,7 +19,7 @@ package net.ivang.axonix;
 import android.os.Bundle;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import net.ivang.axonix.main.AxonixGame;
+import net.ivang.axonix.main.AxonixGameWrapper;
 
 public class AxonixAndroidStarter extends AndroidApplication {
 
@@ -32,6 +32,6 @@ public class AxonixAndroidStarter extends AndroidApplication {
         cfg.useCompass = false;
         cfg.useWakelock = false;
         cfg.useGL20 = true;
-        initialize(new AxonixGame(), cfg);
+        initialize(new AxonixGameWrapper(), cfg);
     }
 }

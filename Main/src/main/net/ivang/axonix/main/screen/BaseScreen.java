@@ -33,7 +33,7 @@ public abstract class BaseScreen implements Screen {
     protected Stage stage;
     protected Skin skin;
 
-    public BaseScreen(final AxonixGame game) {
+    protected BaseScreen(final AxonixGame game) {
         this.game = game;
         this.stage = new Stage();
         this.skin = game.getSkin();

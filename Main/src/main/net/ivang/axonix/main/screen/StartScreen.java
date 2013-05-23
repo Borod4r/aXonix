@@ -24,6 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.esotericsoftware.tablelayout.Cell;
+import com.google.inject.Inject;
 import net.ivang.axonix.main.AxonixGame;
 
 /**
@@ -38,7 +39,8 @@ public class StartScreen extends BaseScreen {
     private Cell startButtonCell;
     private Cell optionsButtonCell;
 
-    public StartScreen(final AxonixGame game) {
+    @Inject
+    private StartScreen(final AxonixGame game) {
         super(game);
         // root table
         Table rootTable = new Table();

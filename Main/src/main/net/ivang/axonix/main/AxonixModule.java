@@ -14,26 +14,26 @@
  * the License.
  */
 
-package net.ivang.axonix.desktop;
+package net.ivang.axonix.main;
 
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import net.ivang.axonix.main.AxonixGameWrapper;
+import com.google.inject.AbstractModule;
+import com.google.inject.Singleton;
+import net.ivang.axonix.main.screen.StartScreen;
+import net.ivang.axonix.main.screen.game.GameScreen;
+import net.ivang.axonix.main.screen.levels.LevelsScreen;
 
 /**
  * @author Ivan Gadzhega
- * @version $Id$
  * @since 0.1
  */
-public class DesktopStarter {
+public class AxonixModule extends AbstractModule {
 
-    public static void main(String[] args) {
-        LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
-        cfg.title = "aXonix";
-        cfg.useGL20 = true;
-        cfg.width = 800;
-        cfg.height = 480;
-        new LwjglApplication(new AxonixGameWrapper(), cfg);
+    @Override
+    protected void configure() {
+        bind(AxonixGame.class).in(Singleton.class);
+        bind(StartScreen.class).in(Singleton.class);
+        bind(LevelsScreen.class).in(Singleton.class);
+        bind(GameScreen.class).in(Singleton.class);
     }
 
 }

@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.esotericsoftware.tablelayout.Cell;
+import com.google.inject.Inject;
 import net.ivang.axonix.main.AxonixGame;
 import net.ivang.axonix.main.screen.BaseScreen;
 import net.ivang.axonix.main.screen.levels.actor.LevelButton;
@@ -36,7 +37,8 @@ public class LevelsScreen extends BaseScreen {
 
     private Table levelsTable;
 
-    public LevelsScreen(final AxonixGame game) {
+    @Inject
+    private LevelsScreen(final AxonixGame game) {
         super(game);
         levelsTable = new Table();
         Style style = getStyleByHeight();

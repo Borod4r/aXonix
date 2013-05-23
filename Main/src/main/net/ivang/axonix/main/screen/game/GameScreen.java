@@ -27,6 +27,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.esotericsoftware.tablelayout.Cell;
+import com.google.inject.Inject;
 import net.ivang.axonix.main.AxonixGame;
 import net.ivang.axonix.main.screen.BaseScreen;
 import net.ivang.axonix.main.screen.game.actor.Level;
@@ -67,7 +68,8 @@ public class GameScreen extends BaseScreen {
     private AlertDialog alertDialog;
     private Background background;
 
-    public GameScreen(final AxonixGame game) {
+    @Inject
+    private GameScreen(final AxonixGame game) {
         super(game);
         setState(State.PAUSED);
         // Input event handling
