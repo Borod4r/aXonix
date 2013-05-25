@@ -21,12 +21,18 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.ParallelAction;
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.esotericsoftware.tablelayout.Cell;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.AxonixGame;
 import net.ivang.axonix.main.screen.BaseScreen;
@@ -36,6 +42,9 @@ import net.ivang.axonix.main.screen.game.actor.bar.DebugBar;
 import net.ivang.axonix.main.screen.game.actor.bar.StatusBar;
 import net.ivang.axonix.main.screen.game.actor.dialog.AlertDialog;
 import net.ivang.axonix.main.screen.game.actor.notification.NotificationLabel;
+import net.ivang.axonix.main.screen.game.event.LivesDeltaEvent;
+import net.ivang.axonix.main.screen.game.event.NotificationEvent;
+import net.ivang.axonix.main.screen.game.event.ObtainedPointsEvent;
 import net.ivang.axonix.main.screen.game.input.GameScreenInputProcessor;
 
 import static java.lang.Math.min;
@@ -53,6 +62,7 @@ public class GameScreen extends BaseScreen {
     private InputMultiplexer inputMultiplexer;
 
     private State state;
+    private EventBus eventBus;
 
     private int lives;
     private int totalScore;
@@ -69,8 +79,11 @@ public class GameScreen extends BaseScreen {
     private Background background;
 
     @Inject
-    private GameScreen(final AxonixGame game) {
+    private GameScreen(final AxonixGame game, EventBus eventBus) {
         super(game);
+        // register with the event bus
+        this.eventBus = eventBus;
+        eventBus.register(this);
         setState(State.PAUSED);
         // Input event handling
         inputMultiplexer = new InputMultiplexer();
@@ -137,8 +150,73 @@ public class GameScreen extends BaseScreen {
         setState(State.PAUSED);
     }
 
-    public boolean isInState(State state) {
-        return this.state == state;
+    //---------------------------------------------------------------------
+    // Subscribers
+    //---------------------------------------------------------------------
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onStateChanged(State state) {
+        switch (state) {
+            case LEVEL_COMPLETED:
+                setTotalScore(getTotalScore() + getLevel().getScore());
+                saveLevelInfoToPrefs();
+                break;
+            case GAME_OVER:
+                setTotalScore(getTotalScore() + getLevel().getScore());
+            case WIN:
+                saveGameInfoToPrefs();
+                break;
+        }
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onLevelStateChanged(Level.State levelState) {
+        switch (levelState) {
+            case LEVEL_COMPLETED:
+                setState(State.LEVEL_COMPLETED);
+                break;
+        }
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void changeLivesNumber(LivesDeltaEvent event) {
+        setLives(getLives() + event.getLivesDelta());
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void showNotification(NotificationEvent event) {
+        Action action = Actions.sequence(Actions.delay(event.getShowDelay()),
+                                         Actions.show(),
+                                         Actions.delay(event.getHideDelay()),
+                                         Actions.hide());
+        getNotificationLabel().setText(event.getMessage());
+        getNotificationLabel().addAction(action);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void changeLivesNumber(ObtainedPointsEvent event) {
+        // text
+        int points = event.getPoints();
+        NotificationLabel label = (points <= 200) ? getPointsLabel(): getBigPointsLabel();
+        label.setText(Integer.toString(points));
+        // position
+        float x = event.getX();
+        float y = event.getY();
+        if (event.isSubtractBounds()) {
+            x -= label.getTextBounds().width;
+        }
+        label.setPosition(x, y);
+        // actions
+        SequenceAction fadeInFadeOut = Actions.sequence(Actions.visible(true), Actions.fadeIn(0.2f), Actions.delay(1f),
+                Actions.fadeOut(0.3f), Actions.visible(false));
+        ParallelAction fadeAndMove = Actions.parallel(Actions.moveTo(x, y + event.getDeltaY(), 1.5f), fadeInFadeOut);
+        label.clearActions();
+        label.addAction(fadeAndMove);
     }
 
     //---------------------------------------------------------------------
@@ -261,25 +339,11 @@ public class GameScreen extends BaseScreen {
         }
     }
 
-    private void onStateChanged() {
-        switch (state) {
-            case LEVEL_COMPLETED:
-                setTotalScore(getTotalScore() + getLevel().getScore());
-                saveLevelInfoToPrefs();
-                break;
-            case GAME_OVER:
-                setTotalScore(getTotalScore() + getLevel().getScore());
-            case WIN:
-                saveGameInfoToPrefs();
-                break;
-        }
-    }
-
     private void setLevel(int index, boolean loadFromPrefs) {
         this.levelIndex = index;
         // init level structure from pixmap
         Pixmap pixmap = new Pixmap(game.getLevelsFiles().get(index - 1));
-        level = new Level(this, pixmap, skin);
+        level = new Level(index, pixmap, skin, eventBus);
         // set widget size
         float scale = calculateScaling(stage, level, statusCell.getMaxHeight());
         level.setScale(scale);
@@ -346,6 +410,10 @@ public class GameScreen extends BaseScreen {
         return min(wScaling, hScaling);
     }
 
+    private boolean isInState(State state) {
+        return this.state == state;
+    }
+
     //---------------------------------------------------------------------
     // Getters & Setters
     //---------------------------------------------------------------------
@@ -356,7 +424,7 @@ public class GameScreen extends BaseScreen {
 
     public void setState(State state) {
         this.state = state;
-        onStateChanged();
+        eventBus.post(state);
     }
 
     public int getLevelIndex() {
