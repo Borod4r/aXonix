@@ -16,10 +16,16 @@
 
 package net.ivang.axonix.main;
 
-import com.badlogic.gdx.*;
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Logger;
+import com.google.common.eventbus.DeadEvent;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.screen.StartScreen;
 import net.ivang.axonix.main.screen.game.GameScreen;
@@ -48,10 +54,11 @@ public class AxonixGame extends Game {
     private Preferences preferences;
 
 
-    @Inject private AxonixGame() {
+    @Inject private AxonixGame(EventBus eventBus) {
         initSkin();
         initLevels();
         initPreferences();
+        eventBus.register(this);
     }
 
     @Override
@@ -70,6 +77,17 @@ public class AxonixGame extends Game {
     public void setGameScreen(int levelNumber) {
         gameScreen.loadLevel(levelNumber);
         setScreen(gameScreen);
+    }
+
+    //---------------------------------------------------------------------
+    // Subscribers
+    //---------------------------------------------------------------------
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void catchDeadEvent(DeadEvent event) {
+        Logger logger = new Logger("aXonix");
+        logger.error("Dead event - " + event.getSource().getClass().toString());
     }
 
     //---------------------------------------------------------------------

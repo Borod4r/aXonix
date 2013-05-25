@@ -16,6 +16,7 @@
 
 package net.ivang.axonix.main;
 
+import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import net.ivang.axonix.main.screen.StartScreen;
@@ -30,10 +31,14 @@ public class AxonixModule extends AbstractModule {
 
     @Override
     protected void configure() {
+        // Game
         bind(AxonixGame.class).in(Singleton.class);
+        // Screens
         bind(StartScreen.class).in(Singleton.class);
         bind(LevelsScreen.class).in(Singleton.class);
         bind(GameScreen.class).in(Singleton.class);
+        // Event Bus
+        bind(EventBus.class).in(Singleton.class);
     }
 
 }

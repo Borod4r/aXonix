@@ -20,12 +20,14 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.actions.ParallelAction;
-import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
 import net.ivang.axonix.main.screen.game.GameScreen;
-import net.ivang.axonix.main.screen.game.actor.notification.NotificationLabel;
+import net.ivang.axonix.main.screen.game.event.LivesDeltaEvent;
+import net.ivang.axonix.main.screen.game.event.NotificationEvent;
+import net.ivang.axonix.main.screen.game.event.ObtainedPointsEvent;
 
 import java.util.*;
 
@@ -35,12 +37,18 @@ import java.util.*;
  */
 public class Level extends Group {
 
+    public enum State {
+        PLAYING, PAUSED, LEVEL_COMPLETED
+    }
+
+    // TODO: enum is better
     public static final byte BS_EMPTY = 0;
     public static final byte BS_BLUE = 1;
     public static final byte BS_GREEN = 2;
     public static final byte BS_TAIL = 3;
 
-    private GameScreen gameScreen;
+    private State state;
+    private EventBus eventBus;
 
     private int width;
     private int height;
@@ -56,17 +64,21 @@ public class Level extends Group {
 
     private Skin skin;
 
-    public Level(GameScreen gameScreen, Pixmap pixmap, Skin skin) {
+    @Inject
+    public Level(int levelIndex, Pixmap pixmap, Skin skin, EventBus eventBus) {
+        // register with the event bus
+        this.eventBus = eventBus;
+        eventBus.register(this);
+
         this.width = pixmap.getWidth();
         this.height = pixmap.getHeight();
         this.levelMap = new byte[width][height];
-        this.gameScreen = gameScreen;
         this.skin = skin;
 
         initFromPixmap(pixmap);
 
-        String levelIndex = Integer.toString(gameScreen.getLevelIndex());
-        showNotification("Level " + levelIndex + ". Go-go-go!", 0.25f, 1.5f);
+        String level = Integer.toString(levelIndex);
+        showNotification("Level " + level + ". Go-go-go!", 0.25f, 1.5f);
     }
 
     private void initFromPixmap(Pixmap pixmap) {
@@ -104,7 +116,7 @@ public class Level extends Group {
 
     @Override
     public void act(float delta) {
-        if (gameScreen.isInState(GameScreen.State.PLAYING)) {
+        if (isInState(State.PLAYING)) {
             check();
             super.act(delta);
             // change blocks states
@@ -171,8 +183,25 @@ public class Level extends Group {
             }
         }
 
-        gameScreen.setLives(gameScreen.getLives() - 1);
+        eventBus.post(new LivesDeltaEvent(-1));
         showNotification("LIFE LEFT!", 0, 1);
+    }
+
+    //---------------------------------------------------------------------
+    // Subscribers
+    //---------------------------------------------------------------------
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onGameScreenStateChanged(final GameScreen.State gameScreenState) {
+        switch (gameScreenState) {
+            case PLAYING:
+                setState(State.PLAYING);
+                break;
+            case PAUSED:
+                setState(State.PAUSED);
+                break;
+        }
     }
 
     //---------------------------------------------------------------------
@@ -182,7 +211,7 @@ public class Level extends Group {
     private void check() {
         // check percent
         if (percentComplete > 80) {
-            gameScreen.setState(GameScreen.State.LEVEL_COMPLETED);
+            setState(State.LEVEL_COMPLETED);
         }
         // check collisions
         for (Enemy enemy : enemies) {
@@ -282,27 +311,17 @@ public class Level extends Group {
     }
 
     private void showObtainedPoints(int points) {
-        NotificationLabel pointsLabel = (points <= 200) ? gameScreen.getPointsLabel(): gameScreen.getBigPointsLabel();
-        pointsLabel.setText(Integer.toString(points));
         // calculate new position for label
         float protX = protagonist.getX();
         float protY = protagonist.getY();
         float labelX = (protX) * getScaleX() + this.getX();
         float labelY = (protY) * getScaleY() + this.getY();
-        // correct position if is on the right side
-        if (protX > getWidth()/2) {
-            labelX -= pointsLabel.getTextBounds().width;
-        }
         // movement distance and direction
         float moveY = ((protY > getHeight()/2) ? -3 : 3) * getScaleY();
-        // update position
-        pointsLabel.setPosition(labelX, labelY);
-        // add actions
-        SequenceAction fadeInFadeOut = Actions.sequence(Actions.visible(true), Actions.fadeIn(0.2f), Actions.delay(1f),
-                Actions.fadeOut(0.3f), Actions.visible(false));
-        ParallelAction fadeAndMove = Actions.parallel(Actions.moveTo(labelX, labelY + moveY, 1.5f), fadeInFadeOut);
-        pointsLabel.clearActions();
-        pointsLabel.addAction(fadeAndMove);
+        // correct position if is on the right side
+        boolean subtractBounds = protX > getWidth()/2;
+        // post event
+        eventBus.post(new ObtainedPointsEvent(points, labelX, labelY, moveY, subtractBounds));
     }
 
     //---------------------------------------------------------------------
@@ -310,9 +329,11 @@ public class Level extends Group {
     //---------------------------------------------------------------------
 
     private void showNotification(String text, float showDelay, float hideDelay) {
-        gameScreen.getNotificationLabel().setText(text);
-        gameScreen.getNotificationLabel().addAction(Actions.sequence(Actions.delay(showDelay), Actions.show(),
-                Actions.delay(hideDelay), Actions.hide()));
+        eventBus.post(new NotificationEvent(text, showDelay, hideDelay));
+    }
+
+    private boolean isInState(State state) {
+        return this.state == state;
     }
 
     //---------------------------------------------------------------------
@@ -375,5 +396,14 @@ public class Level extends Group {
 
     public void setPercentComplete(byte percentComplete) {
         this.percentComplete = percentComplete;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+        eventBus.post(state);
     }
 }
