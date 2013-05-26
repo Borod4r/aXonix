@@ -42,9 +42,7 @@ import net.ivang.axonix.main.screen.game.actor.bar.DebugBar;
 import net.ivang.axonix.main.screen.game.actor.bar.StatusBar;
 import net.ivang.axonix.main.screen.game.actor.dialog.AlertDialog;
 import net.ivang.axonix.main.screen.game.actor.notification.NotificationLabel;
-import net.ivang.axonix.main.screen.game.event.LivesDeltaEvent;
-import net.ivang.axonix.main.screen.game.event.NotificationEvent;
-import net.ivang.axonix.main.screen.game.event.ObtainedPointsEvent;
+import net.ivang.axonix.main.screen.game.event.*;
 import net.ivang.axonix.main.screen.game.input.GameScreenInputProcessor;
 
 import static java.lang.Math.min;
@@ -156,14 +154,12 @@ public class GameScreen extends BaseScreen {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onStateChanged(State state) {
+    public void onStateChange(State state) {
         switch (state) {
             case LEVEL_COMPLETED:
-                setTotalScore(getTotalScore() + getLevel().getScore());
                 saveLevelInfoToPrefs();
                 break;
             case GAME_OVER:
-                setTotalScore(getTotalScore() + getLevel().getScore());
             case WIN:
                 saveGameInfoToPrefs();
                 break;
@@ -172,12 +168,30 @@ public class GameScreen extends BaseScreen {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onLevelStateChanged(Level.State levelState) {
+    public void onLevelStateChange(Level.State levelState) {
         switch (levelState) {
             case LEVEL_COMPLETED:
                 setState(State.LEVEL_COMPLETED);
                 break;
         }
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onLevelScoreChange(LevelScoreEvent event) {
+        alertDialog.setLevelScore(event.getScore());
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onLevelScoreChange(LevelScoreDeltaEvent event) {
+        setTotalScore(getTotalScore() + event.getScoreDelta());
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onTotalScoreChange(TotalScoreEvent event) {
+        alertDialog.setTotalScore(event.getScore());
     }
 
     @Subscribe
@@ -199,7 +213,7 @@ public class GameScreen extends BaseScreen {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void changeLivesNumber(ObtainedPointsEvent event) {
+    public void showObtainedPoints(ObtainedPointsEvent event) {
         // text
         int points = event.getPoints();
         NotificationLabel label = (points <= 200) ? getPointsLabel(): getBigPointsLabel();
@@ -231,7 +245,7 @@ public class GameScreen extends BaseScreen {
         Table rootTable = new Table();
         rootTable.setFillParent(true);
         // status bar
-        statusBar = new StatusBar(this, skin, style.toString());
+        statusBar = new StatusBar(this, eventBus, skin, style.toString());
         statusCell = rootTable.add(statusBar);
         statusCell.height(skin.getFont(style.toString()).getLineHeight()).left();
         rootTable.row();
@@ -318,32 +332,29 @@ public class GameScreen extends BaseScreen {
                 break;
             case PAUSED:
                 alertDialog.setTitle("PAUSE");
-                alertDialog.setScores(getLevel().getScore(), getTotalScore() + getLevel().getScore());
                 alertDialog.setVisible(true);
                 break;
             case LEVEL_COMPLETED:
                 alertDialog.setTitle("LEVEL COMPLETED");
-                alertDialog.setScores(getLevel().getScore(), getTotalScore());
                 alertDialog.setVisible(true);
                 break;
             case GAME_OVER:
                 alertDialog.setTitle("GAME OVER");
-                alertDialog.setScores(getLevel().getScore(), getTotalScore());
                 alertDialog.setVisible(true);
                 break;
             case WIN:
                 alertDialog.setTitle("YOU WIN!");
-                alertDialog.setScores(getLevel().getScore(), getTotalScore());
                 alertDialog.setVisible(true);
                 break;
         }
     }
 
     private void setLevel(int index, boolean loadFromPrefs) {
-        this.levelIndex = index;
+        if (level != null) eventBus.unregister(level);
         // init level structure from pixmap
         Pixmap pixmap = new Pixmap(game.getLevelsFiles().get(index - 1));
         level = new Level(index, pixmap, skin, eventBus);
+        levelIndex = index;
         // set widget size
         float scale = calculateScaling(stage, level, statusCell.getMaxHeight());
         level.setScale(scale);
@@ -457,6 +468,7 @@ public class GameScreen extends BaseScreen {
 
     public void setTotalScore(int totalScore) {
         this.totalScore = totalScore;
+        eventBus.post(new TotalScoreEvent(totalScore));
     }
 
     public NotificationLabel getPointsLabel() {

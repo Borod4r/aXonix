@@ -25,9 +25,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.screen.game.GameScreen;
-import net.ivang.axonix.main.screen.game.event.LivesDeltaEvent;
-import net.ivang.axonix.main.screen.game.event.NotificationEvent;
-import net.ivang.axonix.main.screen.game.event.ObtainedPointsEvent;
+import net.ivang.axonix.main.screen.game.event.*;
 
 import java.util.*;
 
@@ -76,6 +74,8 @@ public class Level extends Group {
         this.skin = skin;
 
         initFromPixmap(pixmap);
+
+        setScore(0);
 
         String level = Integer.toString(levelIndex);
         showNotification("Level " + level + ". Go-go-go!", 0.25f, 1.5f);
@@ -135,9 +135,7 @@ public class Level extends Group {
                             // update level score
                             float bonus = 1 + newBlocks / 200f;
                             int obtainedPoints = (int) (newBlocks * bonus);
-                            score += obtainedPoints;
-                            // show obtained points
-                            showObtainedPoints(obtainedPoints);
+                            eventBus.post(new LevelScoreDeltaEvent(obtainedPoints));
                             // update percentage
                             filledBlocks += newBlocks;
                             percentComplete = (byte) (((float) filledBlocks / ((width - 2) * (height - 2))) * 100) ;
@@ -193,7 +191,7 @@ public class Level extends Group {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onGameScreenStateChanged(final GameScreen.State gameScreenState) {
+    public void onGameScreenStateChange(GameScreen.State gameScreenState) {
         switch (gameScreenState) {
             case PLAYING:
                 setState(State.PLAYING);
@@ -202,6 +200,14 @@ public class Level extends Group {
                 setState(State.PAUSED);
                 break;
         }
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onScoreChange(LevelScoreDeltaEvent event) {
+        int scoreDelta = event.getScoreDelta();
+        setScore(score + scoreDelta);
+        showObtainedPoints(scoreDelta);
     }
 
     //---------------------------------------------------------------------
@@ -388,6 +394,7 @@ public class Level extends Group {
 
     public void setScore(int score) {
         this.score = score;
+        eventBus.post(new LevelScoreEvent(score));
     }
 
     public byte getPercentComplete() {

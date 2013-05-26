@@ -20,7 +20,10 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import net.ivang.axonix.main.screen.game.GameScreen;
+import net.ivang.axonix.main.screen.game.event.LevelScoreEvent;
 
 /**
  * @author Ivan Gadzhega
@@ -41,7 +44,8 @@ public class StatusBar extends Table {
 
     private Skin skin;
 
-    public StatusBar(GameScreen gameScreen, Skin skin, String fontName) {
+    public StatusBar(GameScreen gameScreen, EventBus eventBus, Skin skin, String fontName) {
+        eventBus.register(this);
         this.gameScreen = gameScreen;
         this.skin = skin;
 
@@ -70,9 +74,6 @@ public class StatusBar extends Table {
         // lives
         String lives = Integer.toString(gameScreen.getLives());
         livesValue.setText(lives);
-        // level score
-        String score = Integer.toString(gameScreen.getLevel().getScore());
-        scoreValue.setText(score);
         // level
         String level = Integer.toString(gameScreen.getLevelIndex());
         String percent = Byte.toString(gameScreen.getLevel().getPercentComplete());
@@ -92,4 +93,16 @@ public class StatusBar extends Table {
         levelLabel.setStyle(new Label.LabelStyle(font, skin.getColor("white")));
         levelValue.setStyle(new Label.LabelStyle(font, skin.getColor("yellow")));
     }
+
+    //---------------------------------------------------------------------
+    // Subscribers
+    //---------------------------------------------------------------------
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onLevelScoreChange(LevelScoreEvent event) {
+        String score = Integer.toString(event.getScore());
+        scoreValue.setText(score);
+    }
+
 }

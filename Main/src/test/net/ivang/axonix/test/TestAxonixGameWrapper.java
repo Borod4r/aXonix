@@ -118,28 +118,26 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
         clearPreferences();
 
         game.setGameScreen(1);
-        game.getGameScreen().getLevel().setScore(123);
-        game.getGameScreen().setTotalScore(1595);
+        game.getGameScreen().setTotalScore(1533);
 
         game.getGameScreen().setState(GameScreen.State.WIN);
         super.render();
 
         int savedTotalScore = game.getPreferences().getInteger(AxonixGame.PREF_KEY_TTL_SCORE);
-        assertThat(savedTotalScore).isEqualTo(1595);
+        assertThat(savedTotalScore).isEqualTo(1533);
     }
 
     private void subTest_saveGameInfo_gameOver() {
         clearPreferences();
 
         game.setGameScreen(1);
-        game.getGameScreen().getLevel().setScore(123);
         game.getGameScreen().setTotalScore(1595);
 
         game.getGameScreen().setState(GameScreen.State.GAME_OVER);
         super.render();
 
         int savedTotalScore = game.getPreferences().getInteger(AxonixGame.PREF_KEY_TTL_SCORE);
-        assertThat(savedTotalScore).isEqualTo(1595 + 123);
+        assertThat(savedTotalScore).isEqualTo(1595);
     }
 
     private void subTest_loadLevelInfo_firstLevel() {
@@ -261,7 +259,7 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
         game.getGameScreen().setState(GameScreen.State.LEVEL_COMPLETED);
         super.render(); saveScreenshot("actionButtons/forward/completed");
         assertThat(game.getGameScreen().getLevel().getScore()).isEqualTo(654);
-        assertThat(game.getGameScreen().getTotalScore()).isEqualTo(5432 + 654);
+        assertThat(game.getGameScreen().getTotalScore()).isEqualTo(5432);
 
         getForwardButton().fire(new ChangeListener.ChangeEvent());
         super.render(); saveScreenshot("actionButtons/forward/completed_click");
@@ -269,7 +267,7 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
         assertThat(game.getGameScreen().getLevelIndex()).isEqualTo(2);
         assertThat(game.getGameScreen().getLives()).isEqualTo(3);
         assertThat(game.getGameScreen().getLevel().getScore()).isZero();
-        assertThat(game.getGameScreen().getTotalScore()).isEqualTo(5432 + 654);
+        assertThat(game.getGameScreen().getTotalScore()).isEqualTo(5432);
     }
 
     private void subTest_actionButtonForward_win() {
@@ -281,13 +279,13 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
         game.getGameScreen().setState(GameScreen.State.LEVEL_COMPLETED);
         super.render(); saveScreenshot("actionButtons/forward/lvl_completed_last");
         assertThat(game.getGameScreen().getLevel().getScore()).isEqualTo(654);
-        assertThat(game.getGameScreen().getTotalScore()).isEqualTo(5432 + 654);
+        assertThat(game.getGameScreen().getTotalScore()).isEqualTo(5432);
 
         getForwardButton().fire(new ChangeListener.ChangeEvent());
         super.render(); saveScreenshot("actionButtons/forward/lvl_completed_last_click");
         assertThat(game.getGameScreen().getState()).isEqualTo(GameScreen.State.WIN);
         assertThat(game.getGameScreen().getLevel().getScore()).isEqualTo(654);
-        assertThat(game.getGameScreen().getTotalScore()).isEqualTo(5432 + 654);
+        assertThat(game.getGameScreen().getTotalScore()).isEqualTo(5432);
     }
 
     /* Notification Label */
