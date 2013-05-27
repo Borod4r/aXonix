@@ -24,8 +24,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.esotericsoftware.tablelayout.Cell;
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.AxonixGame;
+import net.ivang.axonix.main.screen.game.event.ScreenEvent;
+
+import static net.ivang.axonix.main.screen.game.event.ScreenEvent.Screen;
 
 /**
  * @author Ivan Gadzhega
@@ -40,7 +44,7 @@ public class StartScreen extends BaseScreen {
     private Cell optionsButtonCell;
 
     @Inject
-    private StartScreen(final AxonixGame game) {
+    private StartScreen(final AxonixGame game, final EventBus eventBus) {
         super(game);
         // root table
         Table rootTable = new Table();
@@ -54,7 +58,7 @@ public class StartScreen extends BaseScreen {
         startButton = new TextButton("Start", skin, style.toString());
         startButton.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
-                game.setLevelsScreen();
+                eventBus.post(new ScreenEvent(Screen.LEVELS));
             }
         });
         startButtonCell = rootTable.add(startButton);

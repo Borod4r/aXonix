@@ -20,7 +20,11 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import net.ivang.axonix.main.AxonixGame;
+import com.google.common.eventbus.EventBus;
+import net.ivang.axonix.main.screen.game.event.LoadLevelAction;
+import net.ivang.axonix.main.screen.game.event.ScreenEvent;
+
+import static net.ivang.axonix.main.screen.game.event.ScreenEvent.Screen;
 
 /**
  * @author Ivan Gadzhega
@@ -30,12 +34,13 @@ public class LevelButton extends TextButton {
 
     private final int levelNumber;
 
-    public LevelButton(final int levelNumber, Skin skin, String styleName, final AxonixGame game) {
+    public LevelButton(final int levelNumber, Skin skin, String styleName, final EventBus eventBus) {
         super(Integer.toString(levelNumber), skin, styleName);
         this.levelNumber = levelNumber;
         addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
-                game.setGameScreen(levelNumber);
+                eventBus.post(new LoadLevelAction(levelNumber));
+                eventBus.post(new ScreenEvent(Screen.GAME));
             }
         });
     }

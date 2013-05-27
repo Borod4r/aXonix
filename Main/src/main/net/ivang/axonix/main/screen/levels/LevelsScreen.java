@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.esotericsoftware.tablelayout.Cell;
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.AxonixGame;
 import net.ivang.axonix.main.screen.BaseScreen;
@@ -38,13 +39,13 @@ public class LevelsScreen extends BaseScreen {
     private Table levelsTable;
 
     @Inject
-    private LevelsScreen(final AxonixGame game) {
+    private LevelsScreen(final AxonixGame game, EventBus eventBus) {
         super(game);
         levelsTable = new Table();
         Style style = getStyleByHeight();
 
         for (int levelNumber = 1; levelNumber <= game.getLevelsFiles().size(); levelNumber++) {
-            LevelButton button = new LevelButton(levelNumber, skin, style.toString(), game);
+            LevelButton button = new LevelButton(levelNumber, skin, style.toString(), eventBus);
             updateButtonState(button);
             levelsTable.add(button);
             if (levelNumber % LEVELS_TABLE_COLS == 0) {

@@ -29,6 +29,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.screen.StartScreen;
 import net.ivang.axonix.main.screen.game.GameScreen;
+import net.ivang.axonix.main.screen.game.event.ScreenEvent;
 import net.ivang.axonix.main.screen.levels.LevelsScreen;
 
 import java.util.Arrays;
@@ -63,7 +64,7 @@ public class AxonixGame extends Game {
 
     @Override
     public void create() {
-        setStartScreen();
+        setScreen(startScreen);
     }
 
     public void setStartScreen() {
@@ -85,9 +86,25 @@ public class AxonixGame extends Game {
 
     @Subscribe
     @SuppressWarnings("unused")
+    public void changeScreen(ScreenEvent event) {
+        switch (event.getScreen()) {
+            case START:
+                setScreen(startScreen);
+                break;
+            case LEVELS:
+                setScreen(levelsScreen);
+                break;
+            case GAME:
+                setScreen(gameScreen);
+                break;
+        }
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
     public void catchDeadEvent(DeadEvent event) {
         Logger logger = new Logger("aXonix");
-        logger.error("Dead event - " + event.getSource().getClass().toString());
+        logger.error("Dead event - " + event.getEvent().getClass().toString());
     }
 
     //---------------------------------------------------------------------

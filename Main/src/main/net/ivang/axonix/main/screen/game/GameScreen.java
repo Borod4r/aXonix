@@ -168,6 +168,12 @@ public class GameScreen extends BaseScreen {
 
     @Subscribe
     @SuppressWarnings("unused")
+    public void loadLevel(LoadLevelAction event) {
+        loadLevel(event.getLevelIndex());
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
     public void onLevelStateChange(Level.State levelState) {
         switch (levelState) {
             case LEVEL_COMPLETED:
