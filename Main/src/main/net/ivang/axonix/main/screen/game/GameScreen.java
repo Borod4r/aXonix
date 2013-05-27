@@ -22,14 +22,12 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Action;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.ParallelAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.esotericsoftware.tablelayout.Cell;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -41,11 +39,13 @@ import net.ivang.axonix.main.screen.game.actor.background.Background;
 import net.ivang.axonix.main.screen.game.actor.bar.DebugBar;
 import net.ivang.axonix.main.screen.game.actor.bar.StatusBar;
 import net.ivang.axonix.main.screen.game.actor.dialog.AlertDialog;
+import net.ivang.axonix.main.screen.game.actor.dialog.ScreenStateDialog;
 import net.ivang.axonix.main.screen.game.actor.notification.NotificationLabel;
 import net.ivang.axonix.main.screen.game.event.*;
 import net.ivang.axonix.main.screen.game.input.GameScreenInputProcessor;
 
 import static java.lang.Math.min;
+import static net.ivang.axonix.main.screen.game.event.ScreenEvent.Screen;
 
 /**
  * @author Ivan Gadzhega
@@ -73,7 +73,7 @@ public class GameScreen extends BaseScreen {
     private NotificationLabel pointsLabel;
     private NotificationLabel bigPointsLabel;
     private NotificationLabel notificationLabel;
-    private AlertDialog alertDialog;
+    private AlertDialog stateDialog;
     private Background background;
 
     @Inject
@@ -85,7 +85,7 @@ public class GameScreen extends BaseScreen {
         setState(State.PAUSED);
         // Input event handling
         inputMultiplexer = new InputMultiplexer();
-        inputMultiplexer.addProcessor(new GameScreenInputProcessor(game, this));
+        inputMultiplexer.addProcessor(new GameScreenInputProcessor(eventBus));
         inputMultiplexer.addProcessor(stage);
         // init sub-components
         Style style = getStyleByHeight();
@@ -94,14 +94,14 @@ public class GameScreen extends BaseScreen {
         initBackground();
         initPointsLabels(style);
         initNotificationLabel(style);
-        initAlertDialog(style);
+        initStateDialog(style);
         // add sub-components to stage
         stage.addActor(background);
         stage.addActor(rootTable);
         stage.addActor(pointsLabel);
         stage.addActor(bigPointsLabel);
         stage.addActor(notificationLabel);
-        stage.addActor(alertDialog);
+        stage.addActor(stateDialog);
         stage.addActor(debugBar);
     }
 
@@ -122,9 +122,11 @@ public class GameScreen extends BaseScreen {
     @Override
     public void resize(int width, int height) {
         stage.setViewport(width, height, false);
-        float scale = calculateScaling(stage, level, statusCell.getMaxHeight());
-        level.setScale(scale);
-        levelCell.width(level.getWidth() * scale).height(level.getHeight() * scale);
+        if (level != null) {
+            float scale = calculateScaling(stage, level, statusCell.getMaxHeight());
+            level.setScale(scale);
+            levelCell.width(level.getWidth() * scale).height(level.getHeight() * scale);
+        }
         background.update(true);
 
         Style style = getStyleByHeight(height);
@@ -135,7 +137,7 @@ public class GameScreen extends BaseScreen {
         pointsLabel.setFont(font);
         bigPointsLabel.setFont(style.getNext().toString());
         notificationLabel.setFont(font);
-        alertDialog.setStyle(style.toString());
+        stateDialog.setStyle(style.toString());
     }
 
     @Override
@@ -174,6 +176,12 @@ public class GameScreen extends BaseScreen {
 
     @Subscribe
     @SuppressWarnings("unused")
+    public void replayLevel(ReplayLevelAction event) {
+        loadLevel(levelIndex);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
     public void onLevelStateChange(Level.State levelState) {
         switch (levelState) {
             case LEVEL_COMPLETED:
@@ -184,20 +192,8 @@ public class GameScreen extends BaseScreen {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onLevelScoreChange(LevelScoreEvent event) {
-        alertDialog.setLevelScore(event.getScore());
-    }
-
-    @Subscribe
-    @SuppressWarnings("unused")
     public void onLevelScoreChange(LevelScoreDeltaEvent event) {
         setTotalScore(getTotalScore() + event.getScoreDelta());
-    }
-
-    @Subscribe
-    @SuppressWarnings("unused")
-    public void onTotalScoreChange(TotalScoreEvent event) {
-        alertDialog.setTotalScore(event.getScore());
     }
 
     @Subscribe
@@ -239,6 +235,31 @@ public class GameScreen extends BaseScreen {
         label.addAction(fadeAndMove);
     }
 
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void doDefaultAction(DefaultAction event) {
+        switch (getState()) {
+            case PLAYING:
+                setState(State.PAUSED);
+                break;
+            case PAUSED:
+                setState(State.PLAYING);
+                break;
+            case LEVEL_COMPLETED:
+                int nextIndex = getLevelIndex() + 1;
+                if (nextIndex <= game.getLevelsFiles().size()) {
+                    nextLevel();
+                } else {
+                    setState(GameScreen.State.WIN);
+                }
+                break;
+            case GAME_OVER:
+            case WIN:
+                eventBus.post(new ScreenEvent(Screen.START));
+                break;
+        }
+    }
+
     //---------------------------------------------------------------------
     // Helper methods
     //---------------------------------------------------------------------
@@ -271,45 +292,8 @@ public class GameScreen extends BaseScreen {
         notificationLabel.setAlignment(Align.center);
     }
 
-    private void initAlertDialog(Style style) {
-        alertDialog = new AlertDialog(null, skin, style.toString());
-        // levels button listener
-        alertDialog.addButtonListener(1, new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                game.setLevelsScreen();
-            }
-        });
-        // replay button listener
-        alertDialog.addButtonListener(2, new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                game.setGameScreen(levelIndex);
-            }
-        });
-        // forward button listener
-        alertDialog.addButtonListener(3, new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                switch (getState()) {
-                    case PAUSED:
-                        setState(GameScreen.State.PLAYING);
-                        break;
-                    case LEVEL_COMPLETED:
-                        int nextIndex = getLevelIndex() + 1;
-                        if (nextIndex <= game.getLevelsFiles().size()) {
-                            nextLevel();
-                        } else {
-                            setState(GameScreen.State.WIN);
-                        }
-                        break;
-                    case GAME_OVER:
-                    case WIN:
-                        game.setStartScreen();
-                        break;
-                }
-            }
-        });
+    private void initStateDialog(Style style) {
+        stateDialog = new ScreenStateDialog(null, skin, style.toString(), eventBus);
     }
 
     private DebugBar initDebugBar() {
@@ -317,41 +301,13 @@ public class GameScreen extends BaseScreen {
     }
 
     private void act(float delta) {
-        check();
-        showAlertDialog();
+        check(); // TODO: move to subscriber
     }
 
     private void check() {
         // check lives
         if (lives <= 0 && !isInState(State.GAME_OVER)) {
             setState(State.GAME_OVER);
-        }
-    }
-
-    private void showAlertDialog() {
-        switch (state) {
-            case PLAYING:
-                // hide dialog
-                if (alertDialog.getActions().size == 0) {
-                    alertDialog.setVisible(false);
-                }
-                break;
-            case PAUSED:
-                alertDialog.setTitle("PAUSE");
-                alertDialog.setVisible(true);
-                break;
-            case LEVEL_COMPLETED:
-                alertDialog.setTitle("LEVEL COMPLETED");
-                alertDialog.setVisible(true);
-                break;
-            case GAME_OVER:
-                alertDialog.setTitle("GAME OVER");
-                alertDialog.setVisible(true);
-                break;
-            case WIN:
-                alertDialog.setTitle("YOU WIN!");
-                alertDialog.setVisible(true);
-                break;
         }
     }
 
@@ -485,7 +441,7 @@ public class GameScreen extends BaseScreen {
         return bigPointsLabel;
     }
 
-    public AlertDialog getAlertDialog() {
-        return alertDialog;
+    public AlertDialog getStateDialog() {
+        return stateDialog;
     }
 }

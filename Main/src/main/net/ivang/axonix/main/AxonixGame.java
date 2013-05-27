@@ -67,19 +67,6 @@ public class AxonixGame extends Game {
         setScreen(startScreen);
     }
 
-    public void setStartScreen() {
-        setScreen(startScreen);
-    }
-
-    public void setLevelsScreen() {
-        setScreen(levelsScreen);
-    }
-
-    public void setGameScreen(int levelNumber) {
-        gameScreen.loadLevel(levelNumber);
-        setScreen(gameScreen);
-    }
-
     //---------------------------------------------------------------------
     // Subscribers
     //---------------------------------------------------------------------

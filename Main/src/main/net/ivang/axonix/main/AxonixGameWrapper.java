@@ -17,6 +17,7 @@
 package net.ivang.axonix.main;
 
 import com.badlogic.gdx.ApplicationListener;
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -27,11 +28,13 @@ import com.google.inject.Injector;
 public class AxonixGameWrapper implements ApplicationListener {
 
     protected AxonixGame game;
+    protected EventBus eventBus;
 
     @Override
     public void create() {
         Injector injector = Guice.createInjector(new AxonixModule());
         game = injector.getInstance(AxonixGame.class);
+        eventBus = injector.getInstance(EventBus.class);
         game.create();
     }
 

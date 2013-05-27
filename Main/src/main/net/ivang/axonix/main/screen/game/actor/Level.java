@@ -197,6 +197,7 @@ public class Level extends Group {
                 setState(State.PLAYING);
                 break;
             case PAUSED:
+            case GAME_OVER:
                 setState(State.PAUSED);
                 break;
         }

@@ -39,8 +39,8 @@ public class LevelButton extends TextButton {
         this.levelNumber = levelNumber;
         addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
-                eventBus.post(new LoadLevelAction(levelNumber));
                 eventBus.post(new ScreenEvent(Screen.GAME));
+                eventBus.post(new LoadLevelAction(levelNumber));
             }
         });
     }

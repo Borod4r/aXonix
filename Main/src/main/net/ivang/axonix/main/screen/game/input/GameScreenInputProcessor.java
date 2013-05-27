@@ -17,11 +17,12 @@
 package net.ivang.axonix.main.screen.game.input;
 
 import com.badlogic.gdx.InputAdapter;
-import net.ivang.axonix.main.AxonixGame;
-import net.ivang.axonix.main.screen.game.GameScreen;
-import net.ivang.axonix.main.screen.game.GameScreen.State;
+import com.google.common.eventbus.EventBus;
+import net.ivang.axonix.main.screen.game.event.DefaultAction;
+import net.ivang.axonix.main.screen.game.event.ScreenEvent;
 
 import static com.badlogic.gdx.Input.Keys;
+import static net.ivang.axonix.main.screen.game.event.ScreenEvent.Screen;
 
 /**
  * @author Ivan Gadzhega
@@ -29,42 +30,21 @@ import static com.badlogic.gdx.Input.Keys;
  */
 public class GameScreenInputProcessor extends InputAdapter {
 
-    private AxonixGame game;
-    private GameScreen gameScreen;
+    private EventBus eventBus;
 
-    public  GameScreenInputProcessor(AxonixGame game, GameScreen gameScreen) {
-        this.game = game;
-        this.gameScreen = gameScreen;
+    public  GameScreenInputProcessor(EventBus eventBus) {
+        this.eventBus = eventBus;
     }
 
     @Override
     public boolean keyDown(int keycode) {
         switch (keycode) {
             case Keys.SPACE:
-                switch (gameScreen.getState()) {
-                    case PLAYING:
-                        gameScreen.setState(State.PAUSED);
-                        break;
-                    case PAUSED:
-                        gameScreen.setState(State.PLAYING);
-                        break;
-                    case LEVEL_COMPLETED:
-                        int nextIndex = gameScreen.getLevelIndex() + 1;
-                        if (nextIndex <= game.getLevelsFiles().size()) {
-                            gameScreen.nextLevel();
-                        } else {
-                            gameScreen.setState(State.WIN);
-                        }
-                        break;
-                    case GAME_OVER:
-                    case WIN:
-                        game.setStartScreen();
-                        break;
-                }
+                eventBus.post(new DefaultAction());
                 return true;
             case Keys.ESCAPE:
-                //TODO: only for testing
-                game.setStartScreen();
+                //TODO: only for testing purposes
+                eventBus.post(new ScreenEvent(Screen.START));
                 return true;
         }
         return false;

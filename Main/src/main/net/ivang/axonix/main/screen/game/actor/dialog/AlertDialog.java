@@ -33,7 +33,7 @@ import static com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class AlertDialog extends Table {
+public abstract class AlertDialog extends Table {
 
     private Skin skin;
     private Style style;
@@ -90,11 +90,6 @@ public class AlertDialog extends Table {
 
     public void setTotalScore(int score) {
         totalScoreValue.setText(Integer.toString(score));
-    }
-
-    public void setScores(int levelScore, int totalScore) {
-        setLevelScore(levelScore);
-        setTotalScore(totalScore);
     }
 
     public void setStyle(String styleName) {
