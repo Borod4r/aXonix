@@ -23,7 +23,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import net.ivang.axonix.main.screen.game.GameScreen;
-import net.ivang.axonix.main.screen.game.event.LevelScoreEvent;
+import net.ivang.axonix.main.screen.game.events.facts.LevelScoreFact;
 
 /**
  * @author Ivan Gadzhega
@@ -100,7 +100,7 @@ public class StatusBar extends Table {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onLevelScoreChange(LevelScoreEvent event) {
+    public void onLevelScoreChange(LevelScoreFact event) {
         String score = Integer.toString(event.getScore());
         scoreValue.setText(score);
     }

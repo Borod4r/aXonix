@@ -14,22 +14,10 @@
  * the License.
  */
 
-package net.ivang.axonix.main.screen.game.event;
+package net.ivang.axonix.main.screen.game.events.intents;
 
 /**
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class LivesDeltaEvent {
-
-    private int livesDelta;
-
-    public LivesDeltaEvent(int livesDelta) {
-        this.livesDelta = livesDelta;
-    }
-
-    public int getLivesDelta() {
-        return livesDelta;
-    }
-
-}
+public class ReplayLevelIntent {}

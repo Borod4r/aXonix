@@ -34,6 +34,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.AxonixGame;
 import net.ivang.axonix.main.screen.BaseScreen;
+import net.ivang.axonix.main.screen.game.events.intents.*;
 import net.ivang.axonix.main.screen.game.actor.Level;
 import net.ivang.axonix.main.screen.game.actor.background.Background;
 import net.ivang.axonix.main.screen.game.actor.bar.DebugBar;
@@ -41,11 +42,11 @@ import net.ivang.axonix.main.screen.game.actor.bar.StatusBar;
 import net.ivang.axonix.main.screen.game.actor.dialog.AlertDialog;
 import net.ivang.axonix.main.screen.game.actor.dialog.ScreenStateDialog;
 import net.ivang.axonix.main.screen.game.actor.notification.NotificationLabel;
-import net.ivang.axonix.main.screen.game.event.*;
+import net.ivang.axonix.main.screen.game.events.facts.*;
 import net.ivang.axonix.main.screen.game.input.GameScreenInputProcessor;
 
 import static java.lang.Math.min;
-import static net.ivang.axonix.main.screen.game.event.ScreenEvent.Screen;
+import static net.ivang.axonix.main.screen.game.events.intents.ScreenIntent.Screen;
 
 /**
  * @author Ivan Gadzhega
@@ -170,13 +171,13 @@ public class GameScreen extends BaseScreen {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void loadLevel(LoadLevelAction event) {
-        loadLevel(event.getLevelIndex());
+    public void loadLevel(LoadLevelIntent intent) {
+        loadLevel(intent.getLevelIndex());
     }
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void replayLevel(ReplayLevelAction event) {
+    public void replayLevel(ReplayLevelIntent intent) {
         loadLevel(levelIndex);
     }
 
@@ -192,52 +193,52 @@ public class GameScreen extends BaseScreen {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onLevelScoreChange(LevelScoreDeltaEvent event) {
-        setTotalScore(getTotalScore() + event.getScoreDelta());
+    public void onLevelScoreChange(LevelScoreIntent intent) {
+        setTotalScore(getTotalScore() + intent.getScoreDelta());
     }
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void changeLivesNumber(LivesDeltaEvent event) {
-        setLives(getLives() + event.getLivesDelta());
+    public void changeLivesNumber(LivesIntent intent) {
+        setLives(getLives() + intent.getLivesDelta());
     }
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void showNotification(NotificationEvent event) {
-        Action action = Actions.sequence(Actions.delay(event.getShowDelay()),
+    public void showNotification(NotificationIntent intent) {
+        Action action = Actions.sequence(Actions.delay(intent.getShowDelay()),
                                          Actions.show(),
-                                         Actions.delay(event.getHideDelay()),
+                                         Actions.delay(intent.getHideDelay()),
                                          Actions.hide());
-        getNotificationLabel().setText(event.getMessage());
+        getNotificationLabel().setText(intent.getMessage());
         getNotificationLabel().addAction(action);
     }
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void showObtainedPoints(ObtainedPointsEvent event) {
+    public void showObtainedPoints(ObtainedPointsFact fact) {
         // text
-        int points = event.getPoints();
+        int points = fact.getPoints();
         NotificationLabel label = (points <= 200) ? getPointsLabel(): getBigPointsLabel();
         label.setText(Integer.toString(points));
         // position
-        float x = event.getX();
-        float y = event.getY();
-        if (event.isSubtractBounds()) {
+        float x = fact.getX();
+        float y = fact.getY();
+        if (fact.isSubtractBounds()) {
             x -= label.getTextBounds().width;
         }
         label.setPosition(x, y);
-        // actions
+        // events
         SequenceAction fadeInFadeOut = Actions.sequence(Actions.visible(true), Actions.fadeIn(0.2f), Actions.delay(1f),
                 Actions.fadeOut(0.3f), Actions.visible(false));
-        ParallelAction fadeAndMove = Actions.parallel(Actions.moveTo(x, y + event.getDeltaY(), 1.5f), fadeInFadeOut);
+        ParallelAction fadeAndMove = Actions.parallel(Actions.moveTo(x, y + fact.getDeltaY(), 1.5f), fadeInFadeOut);
         label.clearActions();
         label.addAction(fadeAndMove);
     }
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void doDefaultAction(DefaultAction event) {
+    public void doDefaultAction(DefaultIntent intent) {
         switch (getState()) {
             case PLAYING:
                 setState(State.PAUSED);
@@ -255,7 +256,7 @@ public class GameScreen extends BaseScreen {
                 break;
             case GAME_OVER:
             case WIN:
-                eventBus.post(new ScreenEvent(Screen.START));
+                eventBus.post(new ScreenIntent(Screen.START));
                 break;
         }
     }
@@ -430,7 +431,7 @@ public class GameScreen extends BaseScreen {
 
     public void setTotalScore(int totalScore) {
         this.totalScore = totalScore;
-        eventBus.post(new TotalScoreEvent(totalScore));
+        eventBus.post(new TotalScoreFact(totalScore));
     }
 
     public NotificationLabel getPointsLabel() {

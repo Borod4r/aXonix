@@ -14,22 +14,22 @@
  * the License.
  */
 
-package net.ivang.axonix.main.screen.game.event;
+package net.ivang.axonix.main.screen.game.events.facts;
 
 /**
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class LevelScoreDeltaEvent {
+public class TotalScoreFact {
 
-    private int scoreDelta;
+    private int score;
 
-    public LevelScoreDeltaEvent(int scoreDelta) {
-        this.scoreDelta = scoreDelta;
+    public TotalScoreFact(int score) {
+        this.score = score;
     }
 
-    public int getScoreDelta() {
-        return scoreDelta;
+    public int getScore() {
+        return score;
     }
 
 }

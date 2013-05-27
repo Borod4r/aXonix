@@ -14,10 +14,22 @@
  * the License.
  */
 
-package net.ivang.axonix.main.screen.game.event;
+package net.ivang.axonix.main.screen.game.events.intents;
 
 /**
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class ReplayLevelAction {}
+public class LevelScoreIntent {
+
+    private int scoreDelta;
+
+    public LevelScoreIntent(int scoreDelta) {
+        this.scoreDelta = scoreDelta;
+    }
+
+    public int getScoreDelta() {
+        return scoreDelta;
+    }
+
+}

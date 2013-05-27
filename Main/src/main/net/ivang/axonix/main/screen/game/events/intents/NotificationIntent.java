@@ -14,26 +14,36 @@
  * the License.
  */
 
-package net.ivang.axonix.main.screen.game.event;
+package net.ivang.axonix.main.screen.game.events.intents;
 
 /**
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class ScreenEvent {
+public class NotificationIntent {
 
-    public enum Screen {
-        START, LEVELS, GAME
+    private CharSequence message;
+    private float showDelay;
+    private float hideDelay;
+
+
+
+    public NotificationIntent(CharSequence message, float showDelay, float hideDelay) {
+        this.message = message;
+        this.showDelay = showDelay;
+        this.hideDelay = hideDelay;
     }
 
-    private Screen screen;
-
-    public ScreenEvent(Screen screen) {
-        this.screen = screen;
+    public CharSequence getMessage() {
+        return message;
     }
 
-    public Screen getScreen() {
-        return screen;
+    public float getShowDelay() {
+        return showDelay;
+    }
+
+    public float getHideDelay() {
+        return hideDelay;
     }
 
 }

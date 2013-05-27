@@ -29,7 +29,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.screen.StartScreen;
 import net.ivang.axonix.main.screen.game.GameScreen;
-import net.ivang.axonix.main.screen.game.event.ScreenEvent;
+import net.ivang.axonix.main.screen.game.events.intents.ScreenIntent;
 import net.ivang.axonix.main.screen.levels.LevelsScreen;
 
 import java.util.Arrays;
@@ -73,8 +73,8 @@ public class AxonixGame extends Game {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void changeScreen(ScreenEvent event) {
-        switch (event.getScreen()) {
+    public void changeScreen(ScreenIntent intent) {
+        switch (intent.getScreen()) {
             case START:
                 setScreen(startScreen);
                 break;

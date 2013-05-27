@@ -14,17 +14,17 @@
  * the License.
  */
 
-package net.ivang.axonix.main.screen.game.event;
+package net.ivang.axonix.main.screen.game.events.intents;
 
 /**
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class LoadLevelAction {
+public class LoadLevelIntent {
 
     private int levelIndex;
 
-    public LoadLevelAction(int levelIndex) {
+    public LoadLevelIntent(int levelIndex) {
         this.levelIndex = levelIndex;
     }
 

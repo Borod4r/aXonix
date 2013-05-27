@@ -14,10 +14,26 @@
  * the License.
  */
 
-package net.ivang.axonix.main.screen.game.event;
+package net.ivang.axonix.main.screen.game.events.intents;
 
 /**
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class DefaultAction {}
+public class ScreenIntent {
+
+    public enum Screen {
+        START, LEVELS, GAME
+    }
+
+    private Screen screen;
+
+    public ScreenIntent(Screen screen) {
+        this.screen = screen;
+    }
+
+    public Screen getScreen() {
+        return screen;
+    }
+
+}

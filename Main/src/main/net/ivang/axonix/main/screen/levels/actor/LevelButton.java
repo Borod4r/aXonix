@@ -21,10 +21,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.google.common.eventbus.EventBus;
-import net.ivang.axonix.main.screen.game.event.LoadLevelAction;
-import net.ivang.axonix.main.screen.game.event.ScreenEvent;
+import net.ivang.axonix.main.screen.game.events.intents.LoadLevelIntent;
+import net.ivang.axonix.main.screen.game.events.intents.ScreenIntent;
 
-import static net.ivang.axonix.main.screen.game.event.ScreenEvent.Screen;
+import static net.ivang.axonix.main.screen.game.events.intents.ScreenIntent.Screen;
 
 /**
  * @author Ivan Gadzhega
@@ -39,8 +39,8 @@ public class LevelButton extends TextButton {
         this.levelNumber = levelNumber;
         addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
-                eventBus.post(new ScreenEvent(Screen.GAME));
-                eventBus.post(new LoadLevelAction(levelNumber));
+                eventBus.post(new ScreenIntent(Screen.GAME));
+                eventBus.post(new LoadLevelIntent(levelNumber));
             }
         });
     }

@@ -27,9 +27,9 @@ import com.esotericsoftware.tablelayout.Cell;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.AxonixGame;
-import net.ivang.axonix.main.screen.game.event.ScreenEvent;
+import net.ivang.axonix.main.screen.game.events.intents.ScreenIntent;
 
-import static net.ivang.axonix.main.screen.game.event.ScreenEvent.Screen;
+import static net.ivang.axonix.main.screen.game.events.intents.ScreenIntent.Screen;
 
 /**
  * @author Ivan Gadzhega
@@ -58,7 +58,7 @@ public class StartScreen extends BaseScreen {
         startButton = new TextButton("Start", skin, style.toString());
         startButton.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
-                eventBus.post(new ScreenEvent(Screen.LEVELS));
+                eventBus.post(new ScreenIntent(Screen.LEVELS));
             }
         });
         startButtonCell = rootTable.add(startButton);

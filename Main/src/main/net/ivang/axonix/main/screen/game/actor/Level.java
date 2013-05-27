@@ -25,7 +25,10 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.screen.game.GameScreen;
-import net.ivang.axonix.main.screen.game.event.*;
+import net.ivang.axonix.main.screen.game.events.intents.LevelScoreIntent;
+import net.ivang.axonix.main.screen.game.events.intents.LivesIntent;
+import net.ivang.axonix.main.screen.game.events.intents.NotificationIntent;
+import net.ivang.axonix.main.screen.game.events.facts.*;
 
 import java.util.*;
 
@@ -135,7 +138,7 @@ public class Level extends Group {
                             // update level score
                             float bonus = 1 + newBlocks / 200f;
                             int obtainedPoints = (int) (newBlocks * bonus);
-                            eventBus.post(new LevelScoreDeltaEvent(obtainedPoints));
+                            eventBus.post(new LevelScoreIntent(obtainedPoints));
                             // update percentage
                             filledBlocks += newBlocks;
                             percentComplete = (byte) (((float) filledBlocks / ((width - 2) * (height - 2))) * 100) ;
@@ -181,7 +184,7 @@ public class Level extends Group {
             }
         }
 
-        eventBus.post(new LivesDeltaEvent(-1));
+        eventBus.post(new LivesIntent(-1));
         showNotification("LIFE LEFT!", 0, 1);
     }
 
@@ -205,7 +208,7 @@ public class Level extends Group {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onScoreChange(LevelScoreDeltaEvent event) {
+    public void onScoreChange(LevelScoreIntent event) {
         int scoreDelta = event.getScoreDelta();
         setScore(score + scoreDelta);
         showObtainedPoints(scoreDelta);
@@ -328,7 +331,7 @@ public class Level extends Group {
         // correct position if is on the right side
         boolean subtractBounds = protX > getWidth()/2;
         // post event
-        eventBus.post(new ObtainedPointsEvent(points, labelX, labelY, moveY, subtractBounds));
+        eventBus.post(new ObtainedPointsFact(points, labelX, labelY, moveY, subtractBounds));
     }
 
     //---------------------------------------------------------------------
@@ -336,7 +339,7 @@ public class Level extends Group {
     //---------------------------------------------------------------------
 
     private void showNotification(String text, float showDelay, float hideDelay) {
-        eventBus.post(new NotificationEvent(text, showDelay, hideDelay));
+        eventBus.post(new NotificationIntent(text, showDelay, hideDelay));
     }
 
     private boolean isInState(State state) {
@@ -395,7 +398,7 @@ public class Level extends Group {
 
     public void setScore(int score) {
         this.score = score;
-        eventBus.post(new LevelScoreEvent(score));
+        eventBus.post(new LevelScoreFact(score));
     }
 
     public byte getPercentComplete() {

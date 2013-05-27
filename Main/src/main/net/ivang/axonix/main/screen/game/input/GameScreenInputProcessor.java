@@ -18,11 +18,11 @@ package net.ivang.axonix.main.screen.game.input;
 
 import com.badlogic.gdx.InputAdapter;
 import com.google.common.eventbus.EventBus;
-import net.ivang.axonix.main.screen.game.event.DefaultAction;
-import net.ivang.axonix.main.screen.game.event.ScreenEvent;
+import net.ivang.axonix.main.screen.game.events.intents.DefaultIntent;
+import net.ivang.axonix.main.screen.game.events.intents.ScreenIntent;
 
 import static com.badlogic.gdx.Input.Keys;
-import static net.ivang.axonix.main.screen.game.event.ScreenEvent.Screen;
+import static net.ivang.axonix.main.screen.game.events.intents.ScreenIntent.Screen;
 
 /**
  * @author Ivan Gadzhega
@@ -40,11 +40,11 @@ public class GameScreenInputProcessor extends InputAdapter {
     public boolean keyDown(int keycode) {
         switch (keycode) {
             case Keys.SPACE:
-                eventBus.post(new DefaultAction());
+                eventBus.post(new DefaultIntent());
                 return true;
             case Keys.ESCAPE:
                 //TODO: only for testing purposes
-                eventBus.post(new ScreenEvent(Screen.START));
+                eventBus.post(new ScreenIntent(Screen.START));
                 return true;
         }
         return false;

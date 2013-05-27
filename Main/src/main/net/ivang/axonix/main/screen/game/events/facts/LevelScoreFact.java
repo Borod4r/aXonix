@@ -14,17 +14,17 @@
  * the License.
  */
 
-package net.ivang.axonix.main.screen.game.event;
+package net.ivang.axonix.main.screen.game.events.facts;
 
 /**
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class TotalScoreEvent {
+public class LevelScoreFact {
 
     private int score;
 
-    public TotalScoreEvent(int score) {
+    public LevelScoreFact(int score) {
         this.score = score;
     }
 

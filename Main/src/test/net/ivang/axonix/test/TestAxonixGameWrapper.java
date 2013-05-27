@@ -23,10 +23,11 @@ import net.ivang.axonix.main.AxonixGame;
 import net.ivang.axonix.main.AxonixGameWrapper;
 import net.ivang.axonix.main.screen.game.GameScreen;
 import net.ivang.axonix.main.screen.game.actor.dialog.AlertDialog;
-import net.ivang.axonix.main.screen.game.event.LoadLevelAction;
-import net.ivang.axonix.main.screen.game.event.ScreenEvent;
+import net.ivang.axonix.main.screen.game.events.intents.LoadLevelIntent;
+import net.ivang.axonix.main.screen.game.events.intents.ScreenIntent;
 import net.ivang.axonix.test.util.Screenshot;
 
+import static net.ivang.axonix.main.screen.game.events.intents.ScreenIntent.Screen;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
@@ -100,10 +101,10 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
         int[] livesNumbers = SampleData.livesNumbers;
         int[] levelScores = SampleData.levelScores;
 
-        eventBus.post(new ScreenEvent(ScreenEvent.Screen.GAME));
+        eventBus.post(new ScreenIntent(Screen.GAME));
 
         for (int levelIndex = 1; levelIndex <= 3; levelIndex++) {
-            eventBus.post(new LoadLevelAction(levelIndex));
+            eventBus.post(new LoadLevelIntent(levelIndex));
 
             game.getGameScreen().setLives(livesNumbers[levelIndex-1]);
             game.getGameScreen().getLevel().setScore(levelScores[levelIndex - 1]);
@@ -121,7 +122,7 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
     private void subTest_saveGameInfo_win() {
         clearPreferences();
 
-        eventBus.post(new LoadLevelAction(1));
+        eventBus.post(new LoadLevelIntent(1));
 
         game.getGameScreen().setTotalScore(1533);
         game.getGameScreen().setState(GameScreen.State.WIN);
@@ -134,7 +135,7 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
     private void subTest_saveGameInfo_gameOver() {
         clearPreferences();
 
-        eventBus.post(new LoadLevelAction(1));
+        eventBus.post(new LoadLevelIntent(1));
 
         game.getGameScreen().setTotalScore(1595);
         game.getGameScreen().setState(GameScreen.State.GAME_OVER);
@@ -147,7 +148,7 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
     private void subTest_loadLevelInfo_firstLevel() {
         initPreferencesWithSampleData();
 
-        eventBus.post(new LoadLevelAction(1));
+        eventBus.post(new LoadLevelIntent(1));
         super.render();
         assertThat(game.getGameScreen().getLives()).isEqualTo(3);
         assertThat(game.getGameScreen().getLevel().getScore()).isZero();
@@ -157,7 +158,7 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
     private void subTest_loadLevelInfo_someLevel() {
         initPreferencesWithSampleData();
 
-        eventBus.post(new LoadLevelAction(2));
+        eventBus.post(new LoadLevelIntent(2));
         super.render();
         assertThat(game.getGameScreen().getLives()).isEqualTo(SampleData.livesNumbers[0]);
         assertThat(game.getGameScreen().getLevel().getScore()).isZero();
@@ -167,7 +168,7 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
     /* Alert Dialog */
 
     private void subTest_alertDialog_playing() {
-        eventBus.post(new LoadLevelAction(1));
+        eventBus.post(new LoadLevelIntent(1));
         game.getGameScreen().setState(GameScreen.State.PLAYING);
         super.render(); saveScreenshot("alertDialog/playing");
         assertThat(getAlertDialog().isVisible()).isFalse();
@@ -189,7 +190,7 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
     }
 
     private void subTest_alertDialog_win() {
-        eventBus.post(new LoadLevelAction(3));
+        eventBus.post(new LoadLevelIntent(3));
         game.getGameScreen().setState(GameScreen.State.WIN);
         super.render(); saveScreenshot("alertDialog/win");
         assertThat(getAlertDialog().isVisible()).isTrue();
@@ -199,7 +200,7 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
     /* Action Buttons */
 
     private void subTest_actionButtonLevels() {
-        eventBus.post(new LoadLevelAction(2));
+        eventBus.post(new LoadLevelIntent(2));
         game.getGameScreen().setState(GameScreen.State.PAUSED);
         super.render(); saveScreenshot("actionButtons/levels/paused");
         getLevelsButton().fire(new ChangeListener.ChangeEvent());
@@ -208,8 +209,8 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
     }
 
     private void subTest_actionButtonRepeat_firstLevel() {
-        eventBus.post(new ScreenEvent(ScreenEvent.Screen.GAME));
-        eventBus.post(new LoadLevelAction(1));
+        eventBus.post(new ScreenIntent(Screen.GAME));
+        eventBus.post(new LoadLevelIntent(1));
         game.getGameScreen().setLives(1);
         game.getGameScreen().getLevel().setScore(258);
         game.getGameScreen().setTotalScore(1595);
@@ -225,13 +226,13 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
 
     private void subTest_actionButtonRepeat_someLevel() {
         clearPreferences();
-        eventBus.post(new LoadLevelAction(1));
+        eventBus.post(new LoadLevelIntent(1));
         game.getGameScreen().setLives(1);
         game.getGameScreen().getLevel().setScore(423);
         game.getGameScreen().setTotalScore(7512);
         game.getGameScreen().setState(GameScreen.State.LEVEL_COMPLETED);
 
-        eventBus.post(new LoadLevelAction(2));
+        eventBus.post(new LoadLevelIntent(2));
         game.getGameScreen().setLives(1);
         game.getGameScreen().getLevel().setScore(258);
         game.getGameScreen().setTotalScore(1595);
@@ -247,7 +248,7 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
 
     private void subTest_actionButtonForward_paused() {
         // when paused
-        eventBus.post(new LoadLevelAction(1));
+        eventBus.post(new LoadLevelIntent(1));
         game.getGameScreen().setState(GameScreen.State.PAUSED);
         super.render(); saveScreenshot("actionButtons/forward/paused");
         getForwardButton().fire(new ChangeListener.ChangeEvent());
@@ -258,7 +259,7 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
     private void subTest_actionButtonForward_levelCompleted() {
         initPreferencesWithSampleData();
         // when level completed
-        eventBus.post(new LoadLevelAction(1));
+        eventBus.post(new LoadLevelIntent(1));
         game.getGameScreen().getLevel().setScore(654);
         game.getGameScreen().setTotalScore(5432);
         game.getGameScreen().setState(GameScreen.State.LEVEL_COMPLETED);
@@ -278,7 +279,7 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
     private void subTest_actionButtonForward_win() {
         initPreferencesWithSampleData();
         // when game completed
-        eventBus.post(new LoadLevelAction(3));
+        eventBus.post(new LoadLevelIntent(3));
         game.getGameScreen().getLevel().setScore(654);
         game.getGameScreen().setTotalScore(5432);
         game.getGameScreen().setState(GameScreen.State.LEVEL_COMPLETED);
@@ -296,7 +297,7 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
     /* Notification Label */
 
     private void subTest_notificationLabel_go() {
-        eventBus.post(new LoadLevelAction(1));
+        eventBus.post(new LoadLevelIntent(1));
         assertThat(game.getGameScreen().getNotificationLabel().getText().toString()).endsWith("Go-go-go!");
         assertThat(game.getGameScreen().getNotificationLabel().getActions()).isNotEmpty();
         game.getGameScreen().setState(GameScreen.State.LEVEL_COMPLETED);
@@ -308,7 +309,7 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
     }
 
     private void subTest_notificationLabel_lifeLeft() {
-        eventBus.post(new LoadLevelAction(1));
+        eventBus.post(new LoadLevelIntent(1));
         game.getGameScreen().getLevel().killProtagonist();
         super.render();
         assertThat(game.getGameScreen().getNotificationLabel().getText().toString()).isEqualTo("LIFE LEFT!");

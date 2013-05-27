@@ -14,22 +14,22 @@
  * the License.
  */
 
-package net.ivang.axonix.main.screen.game.event;
+package net.ivang.axonix.main.screen.game.events.intents;
 
 /**
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class LevelScoreEvent {
+public class LivesIntent {
 
-    private int score;
+    private int livesDelta;
 
-    public LevelScoreEvent(int score) {
-        this.score = score;
+    public LivesIntent(int livesDelta) {
+        this.livesDelta = livesDelta;
     }
 
-    public int getScore() {
-        return score;
+    public int getLivesDelta() {
+        return livesDelta;
     }
 
 }

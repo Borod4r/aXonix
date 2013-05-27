@@ -14,19 +14,19 @@
  * the License.
  */
 
-package net.ivang.axonix.main.screen.game.event;
+package net.ivang.axonix.main.screen.game.events.facts;
 
 /**
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class ObtainedPointsEvent {
+public class ObtainedPointsFact {
     private int points;
     private float x, y;
     private float deltaY;
     private boolean subtractBounds;
 
-    public ObtainedPointsEvent(int points, float x, float y, float deltaY, boolean subtractBounds) {
+    public ObtainedPointsFact(int points, float x, float y, float deltaY, boolean subtractBounds) {
         this.points = points;
         this.x = x;
         this.y = y;

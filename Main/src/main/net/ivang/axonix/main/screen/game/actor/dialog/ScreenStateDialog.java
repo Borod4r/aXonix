@@ -22,9 +22,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import net.ivang.axonix.main.screen.game.GameScreen;
-import net.ivang.axonix.main.screen.game.event.*;
+import net.ivang.axonix.main.screen.game.events.facts.LevelScoreFact;
+import net.ivang.axonix.main.screen.game.events.facts.TotalScoreFact;
+import net.ivang.axonix.main.screen.game.events.intents.DefaultIntent;
+import net.ivang.axonix.main.screen.game.events.intents.ReplayLevelIntent;
+import net.ivang.axonix.main.screen.game.events.intents.ScreenIntent;
 
-import static net.ivang.axonix.main.screen.game.event.ScreenEvent.Screen;
+import static net.ivang.axonix.main.screen.game.events.intents.ScreenIntent.Screen;
 
 /**
  * @author Ivan Gadzhega
@@ -39,21 +43,21 @@ public class ScreenStateDialog extends AlertDialog {
         addButtonListener(1, new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                eventBus.post(new ScreenEvent(Screen.LEVELS));
+                eventBus.post(new ScreenIntent(Screen.LEVELS));
             }
         });
         // replay button listener
         addButtonListener(2, new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                eventBus.post(new ReplayLevelAction());
+                eventBus.post(new ReplayLevelIntent());
             }
         });
         // forward button listener
         addButtonListener(3, new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                eventBus.post(new DefaultAction());
+                eventBus.post(new DefaultIntent());
             }
         });
     }
@@ -93,13 +97,13 @@ public class ScreenStateDialog extends AlertDialog {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onLevelScoreChange(LevelScoreEvent event) {
+    public void onLevelScoreChange(LevelScoreFact event) {
         setLevelScore(event.getScore());
     }
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onTotalScoreChange(TotalScoreEvent event) {
+    public void onTotalScoreChange(TotalScoreFact event) {
         setTotalScore(event.getScore());
     }
 

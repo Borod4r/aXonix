@@ -14,36 +14,10 @@
  * the License.
  */
 
-package net.ivang.axonix.main.screen.game.event;
+package net.ivang.axonix.main.screen.game.events.intents;
 
 /**
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class NotificationEvent {
-
-    private CharSequence message;
-    private float showDelay;
-    private float hideDelay;
-
-
-
-    public NotificationEvent(CharSequence message, float showDelay, float hideDelay) {
-        this.message = message;
-        this.showDelay = showDelay;
-        this.hideDelay = hideDelay;
-    }
-
-    public CharSequence getMessage() {
-        return message;
-    }
-
-    public float getShowDelay() {
-        return showDelay;
-    }
-
-    public float getHideDelay() {
-        return hideDelay;
-    }
-
-}
+public class DefaultIntent {}
