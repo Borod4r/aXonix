@@ -115,12 +115,6 @@ public class GameScreen extends BaseScreen {
     }
 
     @Override
-    public void render(float delta) {
-        this.act(delta);
-        super.render(delta);
-    }
-
-    @Override
     public void resize(int width, int height) {
         stage.setViewport(width, height, false);
         if (level != null) {
@@ -201,6 +195,14 @@ public class GameScreen extends BaseScreen {
     @SuppressWarnings("unused")
     public void changeLivesNumber(LivesIntent intent) {
         setLives(getLives() + intent.getLivesDelta());
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onLivesNumberChange(LivesNumberFact fact) {
+        if (lives <= 0 && !isInState(State.GAME_OVER)) {
+            setState(State.GAME_OVER);
+        }
     }
 
     @Subscribe
@@ -299,17 +301,6 @@ public class GameScreen extends BaseScreen {
 
     private DebugBar initDebugBar() {
         return new DebugBar(skin, Style.SMALL.toString());
-    }
-
-    private void act(float delta) {
-        check(); // TODO: move to subscriber
-    }
-
-    private void check() {
-        // check lives
-        if (lives <= 0 && !isInState(State.GAME_OVER)) {
-            setState(State.GAME_OVER);
-        }
     }
 
     private void setLevel(int index, boolean loadFromPrefs) {
