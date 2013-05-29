@@ -22,16 +22,18 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import net.ivang.axonix.main.screen.game.GameScreen;
+import net.ivang.axonix.main.screen.game.events.facts.LevelIndexFact;
+import net.ivang.axonix.main.screen.game.events.facts.LevelProgressFact;
 import net.ivang.axonix.main.screen.game.events.facts.LevelScoreFact;
+import net.ivang.axonix.main.screen.game.events.facts.LivesNumberFact;
+
+import static com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 
 /**
  * @author Ivan Gadzhega
  * @since 0.1
  */
 public class StatusBar extends Table {
-
-    private GameScreen gameScreen;
 
     private Label livesLabel;
     private Label livesValue;
@@ -42,11 +44,12 @@ public class StatusBar extends Table {
     private Label levelLabel;
     private Label levelValue;
 
+    private Label progress;
+
     private Skin skin;
 
-    public StatusBar(GameScreen gameScreen, EventBus eventBus, Skin skin, String fontName) {
+    public StatusBar(EventBus eventBus, Skin skin, String fontName) {
         eventBus.register(this);
-        this.gameScreen = gameScreen;
         this.skin = skin;
 
         livesLabel = new Label("Lives: ", skin, fontName, "white");
@@ -56,6 +59,7 @@ public class StatusBar extends Table {
         livesValue = new Label("n/a", skin, fontName, "yellow");
         scoreValue = new Label("n/a", skin, fontName, "yellow");
         levelValue = new Label("n/a", skin, fontName, "yellow");
+        progress = new Label("n/a", skin, fontName, "yellow");
 
         // lives
         add(livesLabel).padLeft(5);
@@ -66,18 +70,8 @@ public class StatusBar extends Table {
         // level
         add(levelLabel).padLeft(5);
         add(levelValue).padRight(5);
-    }
-
-    @Override
-    public void act(float delta) {
-        super.act(delta);
-        // lives
-        String lives = Integer.toString(gameScreen.getLives());
-        livesValue.setText(lives);
-        // level
-        String level = Integer.toString(gameScreen.getLevelIndex());
-        String percent = Byte.toString(gameScreen.getLevel().getPercentComplete());
-        levelValue.setText(level + " (" + percent + "/80%)");
+        // progress
+        add(progress).padLeft(5).padRight(5);
     }
 
     public void setFont(String fontName) {
@@ -86,12 +80,18 @@ public class StatusBar extends Table {
     }
 
     public void setFont(BitmapFont font) {
-        livesLabel.setStyle(new Label.LabelStyle(font, skin.getColor("white")));
-        livesValue.setStyle(new Label.LabelStyle(font, skin.getColor("yellow")));
-        scoreLabel.setStyle(new Label.LabelStyle(font, skin.getColor("white")));
-        scoreValue.setStyle(new Label.LabelStyle(font, skin.getColor("yellow")));
-        levelLabel.setStyle(new Label.LabelStyle(font, skin.getColor("white")));
-        levelValue.setStyle(new Label.LabelStyle(font, skin.getColor("yellow")));
+        LabelStyle whiteStyle = new LabelStyle(font, skin.getColor("white"));
+
+        livesLabel.setStyle(whiteStyle);
+        scoreLabel.setStyle(whiteStyle);
+        levelLabel.setStyle(whiteStyle);
+
+        LabelStyle yellowStyle = new LabelStyle(font, skin.getColor("yellow"));
+
+        livesValue.setStyle(yellowStyle);
+        scoreValue.setStyle(yellowStyle);
+        levelValue.setStyle(yellowStyle);
+        progress.setStyle(yellowStyle);
     }
 
     //---------------------------------------------------------------------
@@ -100,9 +100,30 @@ public class StatusBar extends Table {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onLevelScoreChange(LevelScoreFact event) {
-        String score = Integer.toString(event.getScore());
+    public void onLivesNumberChange(LivesNumberFact fact) {
+        String lives = Integer.toString(fact.getLivesNumber());
+        livesValue.setText(lives);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onLevelScoreChange(LevelScoreFact fact) {
+        String score = Integer.toString(fact.getScore());
         scoreValue.setText(score);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onLevelLoad(LevelIndexFact fact) {
+        String level = Integer.toString(fact.getLevelIndex());
+        levelValue.setText(level);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onLevelProgressChange(LevelProgressFact fact) {
+        String percent = Byte.toString(fact.getPercentComplete());
+        progress.setText("(" + percent + "/80%)");
     }
 
 }

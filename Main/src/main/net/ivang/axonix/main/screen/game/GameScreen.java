@@ -273,7 +273,7 @@ public class GameScreen extends BaseScreen {
         Table rootTable = new Table();
         rootTable.setFillParent(true);
         // status bar
-        statusBar = new StatusBar(this, eventBus, skin, style.toString());
+        statusBar = new StatusBar(eventBus, skin, style.toString());
         statusCell = rootTable.add(statusBar);
         statusCell.height(skin.getFont(style.toString()).getLineHeight()).left();
         rootTable.row();
@@ -329,6 +329,8 @@ public class GameScreen extends BaseScreen {
         }
         // go play
         setState(State.PLAYING);
+        // announce the fact
+        eventBus.post(new LevelIndexFact(index));
     }
 
     private void loadLevelInfoFromPrefs(int levelNumber) {
@@ -411,6 +413,7 @@ public class GameScreen extends BaseScreen {
 
     public void setLives(int lives) {
         this.lives = lives;
+        eventBus.post(new LivesNumberFact(lives));
     }
 
     public NotificationLabel getNotificationLabel() {

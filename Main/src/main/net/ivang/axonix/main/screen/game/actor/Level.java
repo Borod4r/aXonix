@@ -79,6 +79,7 @@ public class Level extends Group {
         initFromPixmap(pixmap);
 
         setScore(0);
+        setPercentComplete((byte) 0);
 
         String level = Integer.toString(levelIndex);
         showNotification("Level " + level + ". Go-go-go!", 0.25f, 1.5f);
@@ -141,7 +142,8 @@ public class Level extends Group {
                             eventBus.post(new LevelScoreIntent(obtainedPoints));
                             // update percentage
                             filledBlocks += newBlocks;
-                            percentComplete = (byte) (((float) filledBlocks / ((width - 2) * (height - 2))) * 100) ;
+                            byte percentComplete = (byte) (((float) filledBlocks / ((width - 2) * (height - 2))) * 100) ;
+                            setPercentComplete(percentComplete);
                         }
                         break;
                 }
@@ -407,6 +409,7 @@ public class Level extends Group {
 
     public void setPercentComplete(byte percentComplete) {
         this.percentComplete = percentComplete;
+        eventBus.post(new LevelProgressFact(percentComplete));
     }
 
     public State getState() {
