@@ -23,6 +23,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
+import static net.ivang.axonix.main.screen.game.actor.Level.Block;
+
 /**
  * @author Ivan Gadzhega
  * @since 0.1
@@ -63,52 +65,52 @@ public class Enemy extends Actor {
             case UP_LEFT:
                 x -= deltaPx;
                 y += deltaPx;
-                if (level.getBlockState(x, y + radius) == Level.BS_BLUE) {
-                    if (level.getBlockState(x - radius, y) == Level.BS_BLUE) {
+                if (level.getBlock(x, y + radius) == Block.BLUE) {
+                    if (level.getBlock(x - radius, y) == Block.BLUE) {
                         moveDirection = Move.DOWN_RIGHT;
                     } else {
                         moveDirection = Move.DOWN_LEFT;
                     }
-                } else if (level.getBlockState(x - radius, y) == Level.BS_BLUE) {
+                } else if (level.getBlock(x - radius, y) == Block.BLUE) {
                     moveDirection = Move.UP_RIGHT;
                 }
                 break;
             case UP_RIGHT:
                 x += deltaPx;
                 y += deltaPx;
-                if (level.getBlockState(x, y + radius) == Level.BS_BLUE) {
-                    if (level.getBlockState(x + radius, y) == Level.BS_BLUE) {
+                if (level.getBlock(x, y + radius) == Block.BLUE) {
+                    if (level.getBlock(x + radius, y) == Block.BLUE) {
                         moveDirection = Move.DOWN_LEFT;
                     } else {
                         moveDirection = Move.DOWN_RIGHT;
                     }
-                } else if (level.getBlockState(x + radius, y)== Level.BS_BLUE) {
+                } else if (level.getBlock(x + radius, y)== Block.BLUE) {
                     moveDirection = Move.UP_LEFT;
                 }
                 break;
             case DOWN_LEFT:
                 x -= deltaPx;
                 y -= deltaPx;
-                if (level.getBlockState(x, y - radius) == Level.BS_BLUE) {
-                    if (level.getBlockState(x - radius, y) == Level.BS_BLUE) {
+                if (level.getBlock(x, y - radius) == Block.BLUE) {
+                    if (level.getBlock(x - radius, y) == Block.BLUE) {
                         moveDirection = Move.UP_RIGHT;
                     } else {
                         moveDirection = Move.UP_LEFT;
                     }
-                } else if (level.getBlockState(x - radius, y) == Level.BS_BLUE) {
+                } else if (level.getBlock(x - radius, y) == Block.BLUE) {
                     moveDirection = Move.DOWN_RIGHT;
                 }
                 break;
             case DOWN_RIGHT:
                 x += deltaPx;
                 y -= deltaPx;
-                if (level.getBlockState(x, y - radius) == Level.BS_BLUE) {
-                    if (level.getBlockState(x + radius, y) == Level.BS_BLUE) {
+                if (level.getBlock(x, y - radius) == Block.BLUE) {
+                    if (level.getBlock(x + radius, y) == Block.BLUE) {
                         moveDirection = Move.UP_LEFT;
                     } else {
                         moveDirection = Move.UP_RIGHT;
                     }
-                } else if (level.getBlockState(x + radius, y) == Level.BS_BLUE) {
+                } else if (level.getBlock(x + radius, y) == Block.BLUE) {
                     moveDirection = Move.DOWN_LEFT;
                 }
                 break;

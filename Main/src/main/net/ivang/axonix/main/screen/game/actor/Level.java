@@ -38,22 +38,12 @@ import java.util.*;
  */
 public class Level extends Group {
 
-    public enum State {
-        PLAYING, PAUSED, LEVEL_COMPLETED
-    }
-
-    // TODO: enum is better
-    public static final byte BS_EMPTY = 0;
-    public static final byte BS_BLUE = 1;
-    public static final byte BS_GREEN = 2;
-    public static final byte BS_TAIL = 3;
-
     private State state;
     private EventBus eventBus;
 
     private int width;
     private int height;
-    private byte[][] levelMap;
+    private Block[][] levelMap;
 
     private int score;
     private byte percentComplete;
@@ -73,7 +63,7 @@ public class Level extends Group {
 
         this.width = pixmap.getWidth();
         this.height = pixmap.getHeight();
-        this.levelMap = new byte[width][height];
+        this.levelMap = new Block[width][height];
         this.skin = skin;
 
         initFromPixmap(pixmap);
@@ -92,22 +82,22 @@ public class Level extends Group {
 
         enemies = new ArrayList<Enemy>();
 
-        byte[][] levelMap = new byte[width][height];
+        Block[][] levelMap = new Block[width][height];
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 int pix = (pixmap.getPixel(x, height-y-1) >>> 8) & 0xffffff;
                 if(pix == EARTH) {
-                    levelMap[x][y] = Level.BS_BLUE;
+                    levelMap[x][y] = Block.BLUE;
                 }else if (pix == ENEMY) {
                     Enemy enemy = new Enemy(x + 0.5f, y + 0.5f, skin);
                     enemies.add(enemy);
                     addActor(enemy);
-                    levelMap[x][y] = Level.BS_EMPTY;
+                    levelMap[x][y] = Block.EMPTY;
                 } else if (pix == PROTAGONIST) {
                     protStartPos = new Vector2(x + 0.5f, y + 0.5f);
-                    levelMap[x][y] = Level.BS_BLUE;
+                    levelMap[x][y] = Block.BLUE;
                 } else {
-                    levelMap[x][y] = Level.BS_EMPTY;
+                    levelMap[x][y] = Block.EMPTY;
                 }
             }
         }
@@ -125,15 +115,15 @@ public class Level extends Group {
             super.act(delta);
             // change blocks states
             if(protagonist.isOnNewBlock()) {
-                switch (getBlockState(protagonist.getX(), protagonist.getY())) {
-                    case BS_EMPTY:
-                        setBlockState(protagonist.getX(), protagonist.getY(), Level.BS_TAIL);
+                switch (getBlock(protagonist.getX(), protagonist.getY())) {
+                    case EMPTY:
+                        setBlock(protagonist.getX(), protagonist.getY(), Block.TAIL);
                         break;
-                    case BS_TAIL:
+                    case TAIL:
                         killProtagonist();
                         break;
-                    case BS_BLUE:
-                        if (getBlockState(protagonist.getPrevX(), protagonist.getPrevY()) == Level.BS_TAIL) {
+                    case BLUE:
+                        if (getBlock(protagonist.getPrevX(), protagonist.getPrevY()) == Block.TAIL) {
                             // fill areas
                             int newBlocks = fillAreas();
                             // update level score
@@ -155,14 +145,14 @@ public class Level extends Group {
     public void draw(SpriteBatch batch, float parentAlpha) {
         for(int i = 0; i < getWidth(); i++) {
             for(int j = 0; j < getHeight(); j++) {
-                switch (getBlockState(i, j)) {
-                    case Level.BS_BLUE:
+                switch (getBlock(i, j)) {
+                    case BLUE:
                         batch.setColor(1, 1, 1, 1);
                         break;
-                    case Level.BS_GREEN:
+                    case GREEN:
                         batch.setColor(0, 1, 0.3f, 1);
                         break;
-                    case Level.BS_TAIL:
+                    case TAIL:
                         batch.setColor(0.3f, 0.3f, 1f, 1);
                         break;
                     default:
@@ -180,8 +170,8 @@ public class Level extends Group {
 
         for(int i = 1; i < getWidth() - 1; i++) {
             for(int j = 1; j < getHeight() - 1; j++) {
-                if (getBlockState(i, j) == Level.BS_TAIL) {
-                    setBlockState(i, j, Level.BS_EMPTY);
+                if (getBlock(i, j) == Block.TAIL) {
+                    setBlock(i, j, Block.EMPTY);
                 }
             }
         }
@@ -227,7 +217,7 @@ public class Level extends Group {
         }
         // check collisions
         for (Enemy enemy : enemies) {
-            if (getBlockState(enemy.getX(), enemy.getY()) == Level.BS_TAIL) {
+            if (getBlock(enemy.getX(), enemy.getY()) == Block.TAIL) {
                 killProtagonist();
                 break;
             }
@@ -248,8 +238,8 @@ public class Level extends Group {
         Map<Byte, List<Vector2>> spots = new HashMap<Byte, List<Vector2>>();
         for(int i = 1; i < width - 1; i++) {
             for(int j = 1; j < height - 1; j++) {
-                byte A = levelMap[i][j];
-                if (A == BS_EMPTY) {
+                Block A = levelMap[i][j];
+                if (A == Block.EMPTY) {
                     byte B = tmpState[i][j-1];
                     byte C = tmpState[i-1][j];
 
@@ -289,9 +279,9 @@ public class Level extends Group {
                             }
                         }
                     }
-                } else if(A == BS_TAIL) {
+                } else if(A == Block.TAIL) {
                     // turn tail to blue blocks
-                    setBlockState(i, j, BS_BLUE);
+                    setBlock(i, j, Block.BLUE);
                     blocks++;
 
                 }
@@ -313,7 +303,7 @@ public class Level extends Group {
 
         for(List<Vector2> spot : spots.values()) {
             for(Vector2 pos : spot) {
-                setBlockState(pos.x, pos.y, BS_GREEN);
+                setBlock(pos.x, pos.y, Block.GREEN);
                 blocks++;
             }
 
@@ -352,22 +342,22 @@ public class Level extends Group {
     // Getters & Setters
     //---------------------------------------------------------------------
 
-    public void setBlockState(int x, int y, byte value) {
+    public void setBlock(int x, int y, Block value) {
         if (x >= 0 && x < width && y >=0 && y < height) {
             levelMap[x][y] = value;
         }
     }
 
-    public void setBlockState(float x, float y, byte value) {
-        setBlockState((int) x, (int) y, value);
+    public void setBlock(float x, float y, Block block) {
+        setBlock((int) x, (int) y, block);
     }
 
-    public byte getBlockState(int x, int y) {
+    public Block getBlock(int x, int y) {
         return levelMap[x][y];
     }
 
-    public byte getBlockState(float x, float y) {
-        return getBlockState((int) x, (int) y);
+    public Block getBlock(float x, float y) {
+        return getBlock((int) x, (int) y);
     }
 
     public float getWidth() {
@@ -386,11 +376,11 @@ public class Level extends Group {
         this.height = height;
     }
 
-    public byte[][] getLevelMap() {
+    public Block[][] getLevelMap() {
         return levelMap;
     }
 
-    public void setLevelMap(byte[][] levelMap) {
+    public void setLevelMap(Block[][] levelMap) {
         this.levelMap = levelMap;
     }
 
@@ -419,5 +409,17 @@ public class Level extends Group {
     public void setState(State state) {
         this.state = state;
         eventBus.post(state);
+    }
+
+    //---------------------------------------------------------------------
+    // Nested Classes
+    //---------------------------------------------------------------------
+
+    public enum State {
+        PLAYING, PAUSED, LEVEL_COMPLETED
+    }
+
+    public enum Block {
+        EMPTY, BLUE, GREEN, TAIL
     }
 }

@@ -24,6 +24,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
+import static net.ivang.axonix.main.screen.game.actor.Level.Block;
+
 /**
  * @author Ivan Gadzhega
  * @since 0.1
@@ -116,8 +118,8 @@ public class Protagonist extends Actor {
         boolean isDraggedLeft = (Gdx.input.isTouched() && dx < 0 && diff > 0);
         boolean isDraggedRight = (Gdx.input.isTouched() && dx > 0 && diff >= 0);
 
-        byte blockState = level.getBlockState(getX(), getY());
-        boolean onFilledBlock = (blockState == Level.BS_BLUE) || ((blockState == Level.BS_GREEN));
+        Block block = level.getBlock(getX(), getY());
+        boolean onFilledBlock = (block == Block.BLUE) || ((block == Block.GREEN));
 
         if((onFilledBlock || move != Move.DOWN)
                 && (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S) || isDraggedUp)) {
