@@ -28,9 +28,9 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.screen.StartScreen;
-import net.ivang.axonix.main.screen.game.GameScreen;
-import net.ivang.axonix.main.screen.game.events.intents.ScreenIntent;
-import net.ivang.axonix.main.screen.levels.LevelsScreen;
+import net.ivang.axonix.main.screen.GameScreen;
+import net.ivang.axonix.main.events.intents.ScreenIntent;
+import net.ivang.axonix.main.screen.LevelsScreen;
 
 import java.util.Arrays;
 import java.util.List;

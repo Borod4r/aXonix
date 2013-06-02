@@ -20,8 +20,8 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import net.ivang.axonix.main.screen.StartScreen;
-import net.ivang.axonix.main.screen.game.GameScreen;
-import net.ivang.axonix.main.screen.levels.LevelsScreen;
+import net.ivang.axonix.main.screen.GameScreen;
+import net.ivang.axonix.main.screen.LevelsScreen;
 
 /**
  * @author Ivan Gadzhega

@@ -27,9 +27,9 @@ import com.esotericsoftware.tablelayout.Cell;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.AxonixGame;
-import net.ivang.axonix.main.screen.game.events.intents.ScreenIntent;
+import net.ivang.axonix.main.events.intents.ScreenIntent;
 
-import static net.ivang.axonix.main.screen.game.events.intents.ScreenIntent.Screen;
+import static net.ivang.axonix.main.events.intents.ScreenIntent.Screen;
 
 /**
  * @author Ivan Gadzhega

@@ -21,15 +21,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import net.ivang.axonix.main.AxonixGame;
 import net.ivang.axonix.main.AxonixGameWrapper;
-import net.ivang.axonix.main.screen.game.GameScreen;
-import net.ivang.axonix.main.screen.game.actor.Level;
-import net.ivang.axonix.main.screen.game.actor.Protagonist;
-import net.ivang.axonix.main.screen.game.actor.dialog.AlertDialog;
-import net.ivang.axonix.main.screen.game.events.intents.LoadLevelIntent;
-import net.ivang.axonix.main.screen.game.events.intents.ScreenIntent;
+import net.ivang.axonix.main.screen.GameScreen;
+import net.ivang.axonix.main.actors.game.Level;
+import net.ivang.axonix.main.actors.game.Protagonist;
+import net.ivang.axonix.main.actors.game.dialog.AlertDialog;
+import net.ivang.axonix.main.events.intents.game.LoadLevelIntent;
+import net.ivang.axonix.main.events.intents.ScreenIntent;
 import net.ivang.axonix.test.util.Screenshot;
 
-import static net.ivang.axonix.main.screen.game.events.intents.ScreenIntent.Screen;
+import static net.ivang.axonix.main.events.intents.ScreenIntent.Screen;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**

@@ -95,7 +95,7 @@
         }
     },
 
-    "net.ivang.axonix.main.screen.game.actor.dialog.DialogActionsGroup$Style": {
+    "net.ivang.axonix.main.actors.game.dialog.DialogActionsGroup$Style": {
         "small": {
             "button1": "levels_small",
             "button2": "repeat_small",
@@ -119,7 +119,7 @@
         }
     },
 
-    "net.ivang.axonix.main.screen.game.actor.dialog.AlertDialog$Style": {
+    "net.ivang.axonix.main.actors.game.dialog.AlertDialog$Style": {
         "small": {
             "background": "window_bg",
             "stageBackground": "window_bg_stage",
