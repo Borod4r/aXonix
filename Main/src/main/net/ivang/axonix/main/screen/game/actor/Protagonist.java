@@ -23,6 +23,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import net.ivang.axonix.main.screen.game.events.intents.LivesIntent;
 
 import static net.ivang.axonix.main.screen.game.actor.Level.Block;
 
@@ -33,10 +36,11 @@ import static net.ivang.axonix.main.screen.game.actor.Level.Block;
 public class Protagonist extends Actor {
 
     public enum State {
-        ALIVE, DEAD
+        ALIVE, DYING, DEAD
     }
 
     private State state;
+    private EventBus eventBus;
 
     private float spawnX, spawnY;
     private float prevX, prevY;
@@ -46,9 +50,13 @@ public class Protagonist extends Actor {
     private Level level;
 
     private TextureRegion region;
-    private ParticleEffect particleEffect;
+    private ParticleEffect particleAlive;
+    private ParticleEffect particleDead;
 
-    public Protagonist(float x, float y, Level level, Skin skin) {
+    public Protagonist(EventBus eventBus, float x, float y, Level level, Skin skin) {
+        this.eventBus = eventBus;
+        eventBus.register(this);
+
         this.state = State.ALIVE;
         this.speed = 8;
         this.move = Move.IDLE;
@@ -64,9 +72,11 @@ public class Protagonist extends Actor {
         setOriginX(0.75f);
         setOriginY(0.75f);
 
-        particleEffect = new ParticleEffect();
-        particleEffect.load(Gdx.files.internal("data/particles/protagonist.p"), skin.getAtlas());
-        particleEffect.setPosition(x, y);
+        particleAlive = new ParticleEffect();
+        particleAlive.load(Gdx.files.internal("data/particles/protagonist_alive.p"), skin.getAtlas());
+
+        particleDead = new ParticleEffect();
+        particleDead.load(Gdx.files.internal("data/particles/protagonist_dead.p"), skin.getAtlas());
     }
 
     @Override
@@ -76,32 +86,60 @@ public class Protagonist extends Actor {
             case ALIVE:
                 processKeys();
                 updatePosition(delta);
-                particleEffect.update(delta);
+                particleAlive.setPosition(getX(), getY());
+                particleAlive.update(delta);
                 break;
-            case DEAD:
-                this.move = Move.IDLE;
-                setX(spawnX); setY(spawnY);
-                setPrevX(spawnX); setPrevY(spawnY);
-                particleEffect.setPosition(spawnX, spawnY);
-                this.setState(State.ALIVE);
+            case DYING:
+                if (particleDead.isComplete()) {
+                    this.setState(State.DEAD);
+                } else {
+                    particleDead.update(delta);
+                    particleAlive.update(delta);
+                }
                 break;
         }
     }
 
     @Override
     public void draw(SpriteBatch batch, float parentAlpha) {
-        // draw particles
-        particleEffect.setPosition(getX(), getY());
-        particleEffect.draw(batch);
-        // draw texture
-        batch.setColor(1, 1, 1, 1);
-        batch.draw(region, getX() - getOriginX(), getY() - getOriginY(), getOriginX(), getOriginY(),
-                getWidth(), getHeight(), getScaleX(), getScaleY(), getRotation());
-
+        switch (state) {
+            case ALIVE:
+                // draw particles
+                particleAlive.draw(batch);
+                // draw texture
+                batch.setColor(1, 1, 1, 1);
+                batch.draw(region, getX() - getOriginX(), getY() - getOriginY(), getOriginX(), getOriginY(),
+                        getWidth(), getHeight(), getScaleX(), getScaleY(), getRotation());
+                break;
+            case DYING:
+                particleDead.draw(batch);
+                break;
+        }
     }
 
     public boolean isOnNewBlock() {
         return ((int) getX() - (int) getPrevX() != 0) || ((int) getY() - (int) getPrevY() != 0);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onStateChange(State state) {
+        switch (state) {
+            case DYING:
+                // init the "dying" particles
+                particleDead.setPosition(getX(), getY());
+                particleDead.start();
+                // re-spawn
+                this.move = Move.IDLE;
+                setX(spawnX); setY(spawnY);
+                setPrevX(spawnX); setPrevY(spawnY);
+                particleAlive.setPosition(spawnX, spawnY);
+                break;
+            case DEAD:
+                eventBus.post(new LivesIntent(-1));
+                this.setState(State.ALIVE);
+                break;
+        }
     }
 
     //---------------------------------------------------------------------
@@ -259,5 +297,6 @@ public class Protagonist extends Actor {
 
     public void setState(State state) {
         this.state = state;
+        eventBus.post(state);
     }
 }

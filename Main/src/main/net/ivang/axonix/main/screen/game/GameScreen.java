@@ -304,7 +304,7 @@ public class GameScreen extends BaseScreen {
     }
 
     private void setLevel(int index, boolean loadFromPrefs) {
-        if (level != null) eventBus.unregister(level);
+        if (level != null) level.unregister();
         // init level structure from pixmap
         Pixmap pixmap = new Pixmap(game.getLevelsFiles().get(index - 1));
         level = new Level(index, pixmap, skin, eventBus);

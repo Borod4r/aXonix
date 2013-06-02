@@ -25,10 +25,11 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.screen.game.GameScreen;
+import net.ivang.axonix.main.screen.game.events.facts.LevelProgressFact;
+import net.ivang.axonix.main.screen.game.events.facts.LevelScoreFact;
+import net.ivang.axonix.main.screen.game.events.facts.ObtainedPointsFact;
 import net.ivang.axonix.main.screen.game.events.intents.LevelScoreIntent;
-import net.ivang.axonix.main.screen.game.events.intents.LivesIntent;
 import net.ivang.axonix.main.screen.game.events.intents.NotificationIntent;
-import net.ivang.axonix.main.screen.game.events.facts.*;
 
 import java.util.*;
 
@@ -102,7 +103,7 @@ public class Level extends Group {
             }
         }
 
-        protagonist = new Protagonist(protStartPos.x, protStartPos.y, this, skin);
+        protagonist = new Protagonist(eventBus, protStartPos.x, protStartPos.y, this, skin);
         addActor(protagonist);
 
         this.setLevelMap(levelMap);
@@ -120,7 +121,7 @@ public class Level extends Group {
                         setBlock(protagonist.getX(), protagonist.getY(), Block.TAIL);
                         break;
                     case TAIL:
-                        killProtagonist();
+                            protagonist.setState(Protagonist.State.DYING);
                         break;
                     case BLUE:
                         if (getBlock(protagonist.getPrevX(), protagonist.getPrevY()) == Block.TAIL) {
@@ -165,19 +166,9 @@ public class Level extends Group {
         super.draw(batch, parentAlpha);
     }
 
-    public void killProtagonist() {
-        protagonist.setState(Protagonist.State.DEAD);
-
-        for(int i = 1; i < getWidth() - 1; i++) {
-            for(int j = 1; j < getHeight() - 1; j++) {
-                if (getBlock(i, j) == Block.TAIL) {
-                    setBlock(i, j, Block.EMPTY);
-                }
-            }
-        }
-
-        eventBus.post(new LivesIntent(-1));
-        showNotification("LIFE LEFT!", 0, 1);
+    public void unregister() {
+        eventBus.unregister(this);
+        eventBus.unregister(protagonist);
     }
 
     //---------------------------------------------------------------------
@@ -194,6 +185,22 @@ public class Level extends Group {
             case PAUSED:
             case GAME_OVER:
                 setState(State.PAUSED);
+                break;
+        }
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onProtagonistStateChange(Protagonist.State protagonistState) {
+        switch (protagonistState) {
+            case DYING:
+                for(int i = 1; i < getWidth() - 1; i++) {
+                    for(int j = 1; j < getHeight() - 1; j++) {
+                        if (getBlock(i, j) == Block.TAIL) {
+                            setBlock(i, j, Block.EMPTY);
+                        }
+                    }
+                }
                 break;
         }
     }
@@ -218,7 +225,7 @@ public class Level extends Group {
         // check collisions
         for (Enemy enemy : enemies) {
             if (getBlock(enemy.getX(), enemy.getY()) == Block.TAIL) {
-                killProtagonist();
+                protagonist.setState(Protagonist.State.DYING);
                 break;
             }
         }
@@ -409,6 +416,10 @@ public class Level extends Group {
     public void setState(State state) {
         this.state = state;
         eventBus.post(state);
+    }
+
+    public Protagonist getProtagonist() {
+        return protagonist;
     }
 
     //---------------------------------------------------------------------

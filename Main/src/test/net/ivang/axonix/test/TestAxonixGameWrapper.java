@@ -22,6 +22,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import net.ivang.axonix.main.AxonixGame;
 import net.ivang.axonix.main.AxonixGameWrapper;
 import net.ivang.axonix.main.screen.game.GameScreen;
+import net.ivang.axonix.main.screen.game.actor.Level;
+import net.ivang.axonix.main.screen.game.actor.Protagonist;
 import net.ivang.axonix.main.screen.game.actor.dialog.AlertDialog;
 import net.ivang.axonix.main.screen.game.events.intents.LoadLevelIntent;
 import net.ivang.axonix.main.screen.game.events.intents.ScreenIntent;
@@ -86,7 +88,6 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
 
     private void test_notificationLabel() {
         subTest_notificationLabel_go();
-        subTest_notificationLabel_lifeLeft();
     }
 
     //---------------------------------------------------------------------
@@ -308,14 +309,6 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
         assertThat(game.getGameScreen().getNotificationLabel().getActions()).isNotEmpty();
     }
 
-    private void subTest_notificationLabel_lifeLeft() {
-        eventBus.post(new LoadLevelIntent(1));
-        game.getGameScreen().getLevel().killProtagonist();
-        super.render();
-        assertThat(game.getGameScreen().getNotificationLabel().getText().toString()).isEqualTo("LIFE LEFT!");
-        assertThat(game.getGameScreen().getNotificationLabel().getActions()).isNotEmpty();
-    }
-
     //---------------------------------------------------------------------
     // Helper methods
     //---------------------------------------------------------------------
@@ -350,6 +343,14 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
     //---------------------------------------------------------------------
     // Short cuts
     //---------------------------------------------------------------------
+
+    private Level getLevel() {
+        return game.getGameScreen().getLevel();
+    }
+
+    private Protagonist getProtagonist() {
+        return getLevel().getProtagonist();
+    }
 
     private AlertDialog getAlertDialog() {
         return game.getGameScreen().getStateDialog();
