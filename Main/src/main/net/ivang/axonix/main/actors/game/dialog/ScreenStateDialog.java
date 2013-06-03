@@ -21,14 +21,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import net.ivang.axonix.main.screen.GameScreen;
 import net.ivang.axonix.main.events.facts.LevelScoreFact;
 import net.ivang.axonix.main.events.facts.TotalScoreFact;
 import net.ivang.axonix.main.events.intents.DefaultIntent;
+import net.ivang.axonix.main.events.intents.screen.LevelsScreenIntent;
 import net.ivang.axonix.main.events.intents.game.ReplayLevelIntent;
-import net.ivang.axonix.main.events.intents.ScreenIntent;
-
-import static net.ivang.axonix.main.events.intents.ScreenIntent.Screen;
+import net.ivang.axonix.main.screens.GameScreen;
 
 /**
  * @author Ivan Gadzhega
@@ -43,7 +41,7 @@ public class ScreenStateDialog extends AlertDialog {
         addButtonListener(1, new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                eventBus.post(new ScreenIntent(Screen.LEVELS));
+                eventBus.post(new LevelsScreenIntent());
             }
         });
         // replay button listener

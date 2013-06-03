@@ -24,7 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import net.ivang.axonix.main.screen.GameScreen;
+import net.ivang.axonix.main.screens.GameScreen;
 import net.ivang.axonix.main.events.facts.LevelProgressFact;
 import net.ivang.axonix.main.events.facts.LevelScoreFact;
 import net.ivang.axonix.main.events.facts.ObtainedPointsFact;

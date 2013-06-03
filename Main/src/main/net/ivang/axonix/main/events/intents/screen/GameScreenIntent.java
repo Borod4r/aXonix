@@ -14,26 +14,26 @@
  * the License.
  */
 
-package net.ivang.axonix.main.events.intents;
+package net.ivang.axonix.main.events.intents.screen;
 
 /**
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class ScreenIntent {
+public class GameScreenIntent {
 
-    public enum Screen {
-        START, LEVELS, GAME
+    private int levelIndex;
+
+    public GameScreenIntent() {
+        this.levelIndex = 0;
     }
 
-    private Screen screen;
-
-    public ScreenIntent(Screen screen) {
-        this.screen = screen;
+    public GameScreenIntent(int levelIndex) {
+        this.levelIndex = levelIndex;
     }
 
-    public Screen getScreen() {
-        return screen;
+    public int getLevelIndex() {
+        return levelIndex;
     }
 
 }

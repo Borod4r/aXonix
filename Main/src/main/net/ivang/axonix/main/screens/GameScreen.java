@@ -14,9 +14,8 @@
  * the License.
  */
 
-package net.ivang.axonix.main.screen;
+package net.ivang.axonix.main.screens;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -33,9 +32,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.AxonixGame;
-import net.ivang.axonix.main.events.intents.DefaultIntent;
-import net.ivang.axonix.main.events.intents.ScreenIntent;
-import net.ivang.axonix.main.events.intents.game.*;
 import net.ivang.axonix.main.actors.game.Level;
 import net.ivang.axonix.main.actors.game.background.Background;
 import net.ivang.axonix.main.actors.game.bar.DebugBar;
@@ -43,11 +39,17 @@ import net.ivang.axonix.main.actors.game.bar.StatusBar;
 import net.ivang.axonix.main.actors.game.dialog.AlertDialog;
 import net.ivang.axonix.main.actors.game.dialog.ScreenStateDialog;
 import net.ivang.axonix.main.actors.game.notification.NotificationLabel;
-import net.ivang.axonix.main.events.facts.*;
-import net.ivang.axonix.main.input.GameScreenInputProcessor;
+import net.ivang.axonix.main.events.facts.LevelIndexFact;
+import net.ivang.axonix.main.events.facts.LivesNumberFact;
+import net.ivang.axonix.main.events.facts.ObtainedPointsFact;
+import net.ivang.axonix.main.events.facts.TotalScoreFact;
+import net.ivang.axonix.main.events.intents.BackIntent;
+import net.ivang.axonix.main.events.intents.DefaultIntent;
+import net.ivang.axonix.main.events.intents.game.*;
+import net.ivang.axonix.main.events.intents.screen.LevelsScreenIntent;
+import net.ivang.axonix.main.events.intents.screen.StartScreenIntent;
 
 import static java.lang.Math.min;
-import static net.ivang.axonix.main.events.intents.ScreenIntent.Screen;
 
 /**
  * @author Ivan Gadzhega
@@ -59,10 +61,7 @@ public class GameScreen extends BaseScreen {
         PLAYING, PAUSED, LEVEL_COMPLETED, GAME_OVER, WIN
     }
 
-    private InputMultiplexer inputMultiplexer;
-
     private State state;
-    private EventBus eventBus;
 
     private int lives;
     private int totalScore;
@@ -79,16 +78,8 @@ public class GameScreen extends BaseScreen {
     private Background background;
 
     @Inject
-    private GameScreen(final AxonixGame game, EventBus eventBus) {
-        super(game);
-        // register with the event bus
-        this.eventBus = eventBus;
-        eventBus.register(this);
-        setState(State.PAUSED);
-        // Input event handling
-        inputMultiplexer = new InputMultiplexer();
-        inputMultiplexer.addProcessor(new GameScreenInputProcessor(eventBus));
-        inputMultiplexer.addProcessor(stage);
+    private GameScreen(AxonixGame game, InputMultiplexer inputMultiplexer, EventBus eventBus) {
+        super(game, inputMultiplexer, eventBus);
         // init sub-components
         Style style = getStyleByHeight();
         Table rootTable = initRootTable(style);
@@ -134,11 +125,6 @@ public class GameScreen extends BaseScreen {
         bigPointsLabel.setFont(style.getNext().toString());
         notificationLabel.setFont(font);
         stateDialog.setStyle(style.toString());
-    }
-
-    @Override
-    public void show() {
-        Gdx.input.setInputProcessor(inputMultiplexer);
     }
 
     @Override
@@ -259,7 +245,23 @@ public class GameScreen extends BaseScreen {
                 break;
             case GAME_OVER:
             case WIN:
-                eventBus.post(new ScreenIntent(Screen.START));
+                eventBus.post(new StartScreenIntent());
+                break;
+        }
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void doBacktAction(BackIntent intent) {
+        switch (getState()) {
+            case PLAYING:
+                setState(State.PAUSED);
+                break;
+            case PAUSED:
+            case LEVEL_COMPLETED:
+            case GAME_OVER:
+            case WIN:
+                eventBus.post(new LevelsScreenIntent());
                 break;
         }
     }

@@ -14,9 +14,10 @@
  * the License.
  */
 
-package net.ivang.axonix.main.screen;
+package net.ivang.axonix.main.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -25,11 +26,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.esotericsoftware.tablelayout.Cell;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.AxonixGame;
-import net.ivang.axonix.main.events.intents.ScreenIntent;
-
-import static net.ivang.axonix.main.events.intents.ScreenIntent.Screen;
+import net.ivang.axonix.main.events.intents.BackIntent;
+import net.ivang.axonix.main.events.intents.DefaultIntent;
+import net.ivang.axonix.main.events.intents.screen.LevelsScreenIntent;
 
 /**
  * @author Ivan Gadzhega
@@ -44,8 +46,8 @@ public class StartScreen extends BaseScreen {
     private Cell optionsButtonCell;
 
     @Inject
-    private StartScreen(final AxonixGame game, final EventBus eventBus) {
-        super(game);
+    private StartScreen(AxonixGame game, InputMultiplexer inputMultiplexer, final EventBus eventBus) {
+        super(game, inputMultiplexer, eventBus);
         // root table
         Table rootTable = new Table();
         rootTable.setFillParent(true);
@@ -58,7 +60,7 @@ public class StartScreen extends BaseScreen {
         startButton = new TextButton("Start", skin, style.toString());
         startButton.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
-                eventBus.post(new ScreenIntent(Screen.LEVELS));
+                eventBus.post(new LevelsScreenIntent());
             }
         });
         startButtonCell = rootTable.add(startButton);
@@ -81,13 +83,24 @@ public class StartScreen extends BaseScreen {
     }
 
     @Override
-    public void show() {
-        Gdx.input.setInputProcessor(stage);
-    }
-
-    @Override
     public void dispose() {
         stage.dispose();
+    }
+
+    //---------------------------------------------------------------------
+    // Subscribers
+    //---------------------------------------------------------------------
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void doDefaultAction(DefaultIntent intent) {
+        eventBus.post(new LevelsScreenIntent());
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void doBacktAction(BackIntent intent) {
+        Gdx.app.exit();
     }
 
     //---------------------------------------------------------------------

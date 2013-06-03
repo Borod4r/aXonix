@@ -21,15 +21,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import net.ivang.axonix.main.AxonixGame;
 import net.ivang.axonix.main.AxonixGameWrapper;
-import net.ivang.axonix.main.screen.GameScreen;
 import net.ivang.axonix.main.actors.game.Level;
 import net.ivang.axonix.main.actors.game.Protagonist;
 import net.ivang.axonix.main.actors.game.dialog.AlertDialog;
+import net.ivang.axonix.main.events.intents.screen.GameScreenIntent;
 import net.ivang.axonix.main.events.intents.game.LoadLevelIntent;
-import net.ivang.axonix.main.events.intents.ScreenIntent;
+import net.ivang.axonix.main.screens.GameScreen;
 import net.ivang.axonix.test.util.Screenshot;
 
-import static net.ivang.axonix.main.events.intents.ScreenIntent.Screen;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
@@ -102,7 +101,7 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
         int[] livesNumbers = SampleData.livesNumbers;
         int[] levelScores = SampleData.levelScores;
 
-        eventBus.post(new ScreenIntent(Screen.GAME));
+        eventBus.post(new GameScreenIntent());
 
         for (int levelIndex = 1; levelIndex <= 3; levelIndex++) {
             eventBus.post(new LoadLevelIntent(levelIndex));
@@ -210,8 +209,7 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
     }
 
     private void subTest_actionButtonRepeat_firstLevel() {
-        eventBus.post(new ScreenIntent(Screen.GAME));
-        eventBus.post(new LoadLevelIntent(1));
+        eventBus.post(new GameScreenIntent(1));
         game.getGameScreen().setLives(1);
         game.getGameScreen().getLevel().setScore(258);
         game.getGameScreen().setTotalScore(1595);

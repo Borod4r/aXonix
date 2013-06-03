@@ -14,13 +14,15 @@
  * the License.
  */
 
-package net.ivang.axonix.main.screen;
+package net.ivang.axonix.main.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.google.common.eventbus.EventBus;
 import net.ivang.axonix.main.AxonixGame;
 
 /**
@@ -33,10 +35,15 @@ public abstract class BaseScreen implements Screen {
     protected Stage stage;
     protected Skin skin;
 
-    protected BaseScreen(final AxonixGame game) {
+    protected EventBus eventBus;
+    protected InputMultiplexer inputMultiplexer;
+
+    protected BaseScreen(final AxonixGame game, InputMultiplexer inputMultiplexer, EventBus eventBus) {
         this.game = game;
         this.stage = new Stage();
         this.skin = game.getSkin();
+        this.inputMultiplexer = inputMultiplexer;
+        this.eventBus = eventBus;
     }
 
     @Override
@@ -53,10 +60,14 @@ public abstract class BaseScreen implements Screen {
 
     @Override
     public void show() {
+        inputMultiplexer.addProcessor(stage);
+        eventBus.register(this);
     }
 
     @Override
     public void hide() {
+        inputMultiplexer.removeProcessor(stage);
+        eventBus.unregister(this);
     }
 
     @Override

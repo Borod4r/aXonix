@@ -21,10 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.google.common.eventbus.EventBus;
-import net.ivang.axonix.main.events.intents.game.LoadLevelIntent;
-import net.ivang.axonix.main.events.intents.ScreenIntent;
-
-import static net.ivang.axonix.main.events.intents.ScreenIntent.Screen;
+import net.ivang.axonix.main.events.intents.screen.GameScreenIntent;
 
 /**
  * @author Ivan Gadzhega
@@ -32,15 +29,14 @@ import static net.ivang.axonix.main.events.intents.ScreenIntent.Screen;
  */
 public class LevelButton extends TextButton {
 
-    private final int levelNumber;
+    private final int levelIndex;
 
-    public LevelButton(final int levelNumber, Skin skin, String styleName, final EventBus eventBus) {
-        super(Integer.toString(levelNumber), skin, styleName);
-        this.levelNumber = levelNumber;
+    public LevelButton(final int levelIndex, Skin skin, String styleName, final EventBus eventBus) {
+        super(Integer.toString(levelIndex), skin, styleName);
+        this.levelIndex = levelIndex;
         addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
-                eventBus.post(new ScreenIntent(Screen.GAME));
-                eventBus.post(new LoadLevelIntent(levelNumber));
+                eventBus.post(new GameScreenIntent(levelIndex));
             }
         });
     }
@@ -49,7 +45,7 @@ public class LevelButton extends TextButton {
     // Getters & Setters
     //---------------------------------------------------------------------
 
-    public int getLevelNumber() {
-        return levelNumber;
+    public int getLevelIndex() {
+        return levelIndex;
     }
 }

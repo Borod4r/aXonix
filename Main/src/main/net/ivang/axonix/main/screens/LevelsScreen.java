@@ -14,18 +14,23 @@
  * the License.
  */
 
-package net.ivang.axonix.main.screen;
+package net.ivang.axonix.main.screens;
 
-import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.esotericsoftware.tablelayout.Cell;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.AxonixGame;
 import net.ivang.axonix.main.actors.levels.LevelButton;
+import net.ivang.axonix.main.events.intents.BackIntent;
+import net.ivang.axonix.main.events.intents.DefaultIntent;
+import net.ivang.axonix.main.events.intents.screen.GameScreenIntent;
+import net.ivang.axonix.main.events.intents.screen.StartScreenIntent;
 
 /**
  * @author Ivan Gadzhega
@@ -36,10 +41,12 @@ public class LevelsScreen extends BaseScreen {
     private final static int LEVELS_TABLE_COLS = 6;
 
     private Table levelsTable;
+    private int defaultLevelIndex;
 
     @Inject
-    private LevelsScreen(final AxonixGame game, EventBus eventBus) {
-        super(game);
+    private LevelsScreen(final AxonixGame game, InputMultiplexer inputMultiplexer, EventBus eventBus) {
+        super(game, inputMultiplexer, eventBus);
+
         levelsTable = new Table();
         Style style = getStyleByHeight();
 
@@ -78,10 +85,26 @@ public class LevelsScreen extends BaseScreen {
 
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(stage);
+        super.show();
         for(Cell cell : levelsTable.getCells()) {
             updateButtonState((LevelButton) cell.getWidget());
         }
+    }
+
+    //---------------------------------------------------------------------
+    // Subscribers
+    //---------------------------------------------------------------------
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void doDefaultAction(DefaultIntent intent) {
+        eventBus.post(new GameScreenIntent(defaultLevelIndex));
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void doBacktAction(BackIntent intent) {
+        eventBus.post(new StartScreenIntent());
     }
 
     //---------------------------------------------------------------------
@@ -89,13 +112,15 @@ public class LevelsScreen extends BaseScreen {
     //---------------------------------------------------------------------
 
     private void updateButtonState(LevelButton button) {
-        int levelNumber = button.getLevelNumber();
+        int levelIndex = button.getLevelIndex();
         // disable button if its level number isn't first and there is no prefs for previous levels
         Preferences prefs = game.getPreferences();
-//        String prevLevelPrefix = AxonixGame.PREF_KEY_PR_LEVEL + (levelNumber - 1);
-        if (levelNumber == 1 || prefs.contains(AxonixGame.PREF_KEY_LIVES + (levelNumber - 1))) {
+        if (levelIndex == 1 || prefs.contains(AxonixGame.PREF_KEY_LIVES + (levelIndex - 1))) {
             button.setColor(1f, 1f, 1f, 1f);
             button.setDisabled(false);
+            if (defaultLevelIndex < levelIndex) {
+                defaultLevelIndex = levelIndex;
+            }
         } else {
             button.setColor(1f, 1f, 1f, 0.35f);
             button.setDisabled(true);

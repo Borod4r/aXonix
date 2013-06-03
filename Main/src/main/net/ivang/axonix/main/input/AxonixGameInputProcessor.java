@@ -18,21 +18,20 @@ package net.ivang.axonix.main.input;
 
 import com.badlogic.gdx.InputAdapter;
 import com.google.common.eventbus.EventBus;
+import net.ivang.axonix.main.events.intents.BackIntent;
 import net.ivang.axonix.main.events.intents.DefaultIntent;
-import net.ivang.axonix.main.events.intents.ScreenIntent;
 
 import static com.badlogic.gdx.Input.Keys;
-import static net.ivang.axonix.main.events.intents.ScreenIntent.Screen;
 
 /**
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class GameScreenInputProcessor extends InputAdapter {
+public class AxonixGameInputProcessor extends InputAdapter {
 
     private EventBus eventBus;
 
-    public  GameScreenInputProcessor(EventBus eventBus) {
+    public AxonixGameInputProcessor(EventBus eventBus) {
         this.eventBus = eventBus;
     }
 
@@ -42,9 +41,9 @@ public class GameScreenInputProcessor extends InputAdapter {
             case Keys.SPACE:
                 eventBus.post(new DefaultIntent());
                 return true;
+            case Keys.BACK:
             case Keys.ESCAPE:
-                //TODO: only for testing purposes
-                eventBus.post(new ScreenIntent(Screen.START));
+                eventBus.post(new BackIntent());
                 return true;
         }
         return false;

@@ -18,6 +18,7 @@ package net.ivang.axonix.main;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -27,10 +28,13 @@ import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import net.ivang.axonix.main.screen.StartScreen;
-import net.ivang.axonix.main.screen.GameScreen;
-import net.ivang.axonix.main.events.intents.ScreenIntent;
-import net.ivang.axonix.main.screen.LevelsScreen;
+import net.ivang.axonix.main.events.intents.screen.GameScreenIntent;
+import net.ivang.axonix.main.events.intents.screen.LevelsScreenIntent;
+import net.ivang.axonix.main.events.intents.screen.StartScreenIntent;
+import net.ivang.axonix.main.input.AxonixGameInputProcessor;
+import net.ivang.axonix.main.screens.GameScreen;
+import net.ivang.axonix.main.screens.LevelsScreen;
+import net.ivang.axonix.main.screens.StartScreen;
 
 import java.util.Arrays;
 import java.util.List;
@@ -54,11 +58,14 @@ public class AxonixGame extends Game {
     private List<FileHandle> levelsFiles;
     private Preferences preferences;
 
-
-    @Inject private AxonixGame(EventBus eventBus) {
+    @Inject private AxonixGame(InputMultiplexer inputMultiplexer, EventBus eventBus) {
         initSkin();
         initLevels();
         initPreferences();
+        // Input event handling
+        inputMultiplexer.addProcessor(new AxonixGameInputProcessor(eventBus));
+        Gdx.input.setInputProcessor(inputMultiplexer);
+        // register with the event bus
         eventBus.register(this);
     }
 
@@ -73,17 +80,23 @@ public class AxonixGame extends Game {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void changeScreen(ScreenIntent intent) {
-        switch (intent.getScreen()) {
-            case START:
-                setScreen(startScreen);
-                break;
-            case LEVELS:
-                setScreen(levelsScreen);
-                break;
-            case GAME:
-                setScreen(gameScreen);
-                break;
+    public void setStartScreen(StartScreenIntent intent) {
+        setScreen(startScreen);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void setLevelsScreen(LevelsScreenIntent intent) {
+        setScreen(levelsScreen);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void setGameScreen(GameScreenIntent intent) {
+        setScreen(gameScreen);
+        int levelIndex = intent.getLevelIndex();
+        if ( levelIndex != 0) {
+            gameScreen.loadLevel(levelIndex);
         }
     }
 

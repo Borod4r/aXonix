@@ -16,12 +16,13 @@
 
 package net.ivang.axonix.main;
 
+import com.badlogic.gdx.InputMultiplexer;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
-import net.ivang.axonix.main.screen.StartScreen;
-import net.ivang.axonix.main.screen.GameScreen;
-import net.ivang.axonix.main.screen.LevelsScreen;
+import net.ivang.axonix.main.screens.StartScreen;
+import net.ivang.axonix.main.screens.GameScreen;
+import net.ivang.axonix.main.screens.LevelsScreen;
 
 /**
  * @author Ivan Gadzhega
@@ -37,6 +38,8 @@ public class AxonixModule extends AbstractModule {
         bind(StartScreen.class).in(Singleton.class);
         bind(LevelsScreen.class).in(Singleton.class);
         bind(GameScreen.class).in(Singleton.class);
+        // Input Multiplexer
+        bind(InputMultiplexer.class).in(Singleton.class);
         // Event Bus
         bind(EventBus.class).in(Singleton.class);
     }
