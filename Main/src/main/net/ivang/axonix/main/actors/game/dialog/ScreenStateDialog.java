@@ -21,7 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import net.ivang.axonix.main.events.facts.LevelScoreFact;
+import net.ivang.axonix.main.events.facts.level.LevelScoreFact;
 import net.ivang.axonix.main.events.facts.TotalScoreFact;
 import net.ivang.axonix.main.events.intents.DefaultIntent;
 import net.ivang.axonix.main.events.intents.screen.LevelsScreenIntent;

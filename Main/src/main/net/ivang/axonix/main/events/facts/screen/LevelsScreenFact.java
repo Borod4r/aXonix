@@ -14,22 +14,11 @@
  * the License.
  */
 
-package net.ivang.axonix.main.events.facts;
+package net.ivang.axonix.main.events.facts.screen;
 
 /**
  * @author Ivan Gadzhega
- * @since 0.1
+ * @since 0.2
  */
-public class LevelProgressFact {
-
-    private byte percentComplete;
-
-    public LevelProgressFact(byte percentComplete) {
-        this.percentComplete = percentComplete;
-    }
-
-    public byte getPercentComplete() {
-        return percentComplete;
-    }
-
+public class LevelsScreenFact {
 }

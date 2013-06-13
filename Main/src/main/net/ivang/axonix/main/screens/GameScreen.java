@@ -39,7 +39,7 @@ import net.ivang.axonix.main.actors.game.bar.StatusBar;
 import net.ivang.axonix.main.actors.game.dialog.AlertDialog;
 import net.ivang.axonix.main.actors.game.dialog.ScreenStateDialog;
 import net.ivang.axonix.main.actors.game.notification.NotificationLabel;
-import net.ivang.axonix.main.events.facts.LevelIndexFact;
+import net.ivang.axonix.main.events.facts.level.LevelIndexFact;
 import net.ivang.axonix.main.events.facts.LivesNumberFact;
 import net.ivang.axonix.main.events.facts.ObtainedPointsFact;
 import net.ivang.axonix.main.events.facts.TotalScoreFact;

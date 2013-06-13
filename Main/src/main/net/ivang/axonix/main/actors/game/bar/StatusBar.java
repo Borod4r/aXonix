@@ -22,9 +22,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import net.ivang.axonix.main.events.facts.LevelIndexFact;
-import net.ivang.axonix.main.events.facts.LevelProgressFact;
-import net.ivang.axonix.main.events.facts.LevelScoreFact;
+import net.ivang.axonix.main.events.facts.level.LevelIndexFact;
+import net.ivang.axonix.main.events.facts.level.LevelProgressFact;
+import net.ivang.axonix.main.events.facts.level.LevelScoreFact;
 import net.ivang.axonix.main.events.facts.LivesNumberFact;
 
 import static com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;

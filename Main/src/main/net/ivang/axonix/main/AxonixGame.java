@@ -16,10 +16,7 @@
 
 package net.ivang.axonix.main;
 
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -28,6 +25,9 @@ import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import net.ivang.axonix.main.events.facts.screen.GameScreenFact;
+import net.ivang.axonix.main.events.facts.screen.LevelsScreenFact;
+import net.ivang.axonix.main.events.facts.screen.StartScreenFact;
 import net.ivang.axonix.main.events.intents.screen.GameScreenIntent;
 import net.ivang.axonix.main.events.intents.screen.LevelsScreenIntent;
 import net.ivang.axonix.main.events.intents.screen.StartScreenIntent;
@@ -35,6 +35,7 @@ import net.ivang.axonix.main.input.AxonixGameInputProcessor;
 import net.ivang.axonix.main.screens.GameScreen;
 import net.ivang.axonix.main.screens.LevelsScreen;
 import net.ivang.axonix.main.screens.StartScreen;
+import net.ivang.axonix.main.sound.SoundManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -54,9 +55,13 @@ public class AxonixGame extends Game {
     @Inject private LevelsScreen levelsScreen;
     @Inject private GameScreen gameScreen;
 
+    @Inject private SoundManager soundManager;
+
     private Skin skin;
     private List<FileHandle> levelsFiles;
     private Preferences preferences;
+
+    private EventBus eventBus;
 
     @Inject private AxonixGame(InputMultiplexer inputMultiplexer, EventBus eventBus) {
         initSkin();
@@ -66,12 +71,18 @@ public class AxonixGame extends Game {
         inputMultiplexer.addProcessor(new AxonixGameInputProcessor(eventBus));
         Gdx.input.setInputProcessor(inputMultiplexer);
         // register with the event bus
+        this.eventBus = eventBus;
         eventBus.register(this);
     }
 
     @Override
     public void create() {
-        setScreen(startScreen);
+        eventBus.post(new StartScreenIntent());
+    }
+
+    @Override
+    public void setScreen(Screen screen) {
+        throw new UnsupportedOperationException("Use intents instead of setting screens directly");
     }
 
     //---------------------------------------------------------------------
@@ -81,23 +92,26 @@ public class AxonixGame extends Game {
     @Subscribe
     @SuppressWarnings("unused")
     public void setStartScreen(StartScreenIntent intent) {
-        setScreen(startScreen);
+        super.setScreen(startScreen);
+        eventBus.post(new StartScreenFact());
     }
 
     @Subscribe
     @SuppressWarnings("unused")
     public void setLevelsScreen(LevelsScreenIntent intent) {
-        setScreen(levelsScreen);
+        super.setScreen(levelsScreen);
+        eventBus.post(new LevelsScreenFact());
     }
 
     @Subscribe
     @SuppressWarnings("unused")
     public void setGameScreen(GameScreenIntent intent) {
-        setScreen(gameScreen);
+        super.setScreen(gameScreen);
         int levelIndex = intent.getLevelIndex();
         if ( levelIndex != 0) {
             gameScreen.loadLevel(levelIndex);
         }
+        eventBus.post(new GameScreenFact());
     }
 
     @Subscribe

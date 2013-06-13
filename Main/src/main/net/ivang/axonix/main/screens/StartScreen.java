@@ -82,11 +82,6 @@ public class StartScreen extends BaseScreen {
 
     }
 
-    @Override
-    public void dispose() {
-        stage.dispose();
-    }
-
     //---------------------------------------------------------------------
     // Subscribers
     //---------------------------------------------------------------------

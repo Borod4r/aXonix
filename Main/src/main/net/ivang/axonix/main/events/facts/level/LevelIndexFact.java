@@ -14,22 +14,21 @@
  * the License.
  */
 
-package net.ivang.axonix.main.events.facts;
+package net.ivang.axonix.main.events.facts.level;
 
 /**
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class LevelScoreFact {
+public class LevelIndexFact {
 
-    private int score;
+    private int levelIndex;
 
-    public LevelScoreFact(int score) {
-        this.score = score;
+    public LevelIndexFact(int levelIndex) {
+        this.levelIndex = levelIndex;
     }
 
-    public int getScore() {
-        return score;
+    public int getLevelIndex() {
+        return levelIndex;
     }
-
 }

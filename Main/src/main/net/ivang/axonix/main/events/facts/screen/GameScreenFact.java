@@ -14,21 +14,11 @@
  * the License.
  */
 
-package net.ivang.axonix.main.events.facts;
+package net.ivang.axonix.main.events.facts.screen;
 
 /**
  * @author Ivan Gadzhega
- * @since 0.1
+ * @since 0.2
  */
-public class LevelIndexFact {
-
-    private int levelIndex;
-
-    public LevelIndexFact(int levelIndex) {
-        this.levelIndex = levelIndex;
-    }
-
-    public int getLevelIndex() {
-        return levelIndex;
-    }
+public class GameScreenFact {
 }
