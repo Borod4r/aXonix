@@ -17,7 +17,6 @@
 package net.ivang.axonix.main.screens;
 
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -31,6 +30,7 @@ import net.ivang.axonix.main.events.intents.BackIntent;
 import net.ivang.axonix.main.events.intents.DefaultIntent;
 import net.ivang.axonix.main.events.intents.screen.GameScreenIntent;
 import net.ivang.axonix.main.events.intents.screen.StartScreenIntent;
+import net.ivang.axonix.main.preferences.PreferencesWrapper;
 
 /**
  * @author Ivan Gadzhega
@@ -39,6 +39,9 @@ import net.ivang.axonix.main.events.intents.screen.StartScreenIntent;
 public class LevelsScreen extends BaseScreen {
 
     private final static int LEVELS_TABLE_COLS = 6;
+
+    @Inject
+    private PreferencesWrapper preferences;
 
     private Table levelsTable;
     private int defaultLevelIndex;
@@ -52,7 +55,6 @@ public class LevelsScreen extends BaseScreen {
 
         for (int levelNumber = 1; levelNumber <= game.getLevelsFiles().size(); levelNumber++) {
             LevelButton button = new LevelButton(levelNumber, skin, style.toString(), eventBus);
-            updateButtonState(button);
             levelsTable.add(button);
             if (levelNumber % LEVELS_TABLE_COLS == 0) {
                 levelsTable.row();
@@ -114,8 +116,7 @@ public class LevelsScreen extends BaseScreen {
     private void updateButtonState(LevelButton button) {
         int levelIndex = button.getLevelIndex();
         // disable button if its level number isn't first and there is no prefs for previous levels
-        Preferences prefs = game.getPreferences();
-        if (levelIndex == 1 || prefs.contains(AxonixGame.PREF_KEY_LIVES + (levelIndex - 1))) {
+        if (levelIndex == 1 || preferences.containsLives(levelIndex - 1)) {
             button.setColor(1f, 1f, 1f, 1f);
             button.setDisabled(false);
             if (defaultLevelIndex < levelIndex) {

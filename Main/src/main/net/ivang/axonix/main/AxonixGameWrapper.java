@@ -27,12 +27,13 @@ import com.google.inject.Injector;
  */
 public class AxonixGameWrapper implements ApplicationListener {
 
+    protected Injector injector;
     protected AxonixGame game;
     protected EventBus eventBus;
 
     @Override
     public void create() {
-        Injector injector = Guice.createInjector(new AxonixModule());
+        injector = Guice.createInjector(new AxonixModule());
         game = injector.getInstance(AxonixGame.class);
         eventBus = injector.getInstance(EventBus.class);
         game.create();

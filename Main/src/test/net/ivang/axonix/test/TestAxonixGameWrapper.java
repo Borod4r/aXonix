@@ -19,13 +19,13 @@ package net.ivang.axonix.test;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import net.ivang.axonix.main.AxonixGame;
 import net.ivang.axonix.main.AxonixGameWrapper;
 import net.ivang.axonix.main.actors.game.Level;
 import net.ivang.axonix.main.actors.game.Protagonist;
 import net.ivang.axonix.main.actors.game.dialog.AlertDialog;
-import net.ivang.axonix.main.events.intents.screen.GameScreenIntent;
 import net.ivang.axonix.main.events.intents.game.LoadLevelIntent;
+import net.ivang.axonix.main.events.intents.screen.GameScreenIntent;
+import net.ivang.axonix.main.preferences.PreferencesWrapper;
 import net.ivang.axonix.main.screens.GameScreen;
 import net.ivang.axonix.test.util.Screenshot;
 
@@ -39,6 +39,14 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
 
     private static final String DIR_TEST = "aXonix/Test/";
     private static final String DIR_SCREENSHOTS = DIR_TEST + "Screenshots/";
+
+    private PreferencesWrapper preferences;
+
+    @Override
+    public void create() {
+        super.create();
+        preferences = injector.getInstance(PreferencesWrapper.class);
+    }
 
     @Override
     public void render() {
@@ -111,10 +119,10 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
             game.getGameScreen().setState(GameScreen.State.LEVEL_COMPLETED);
             super.render();
 
-            int savedLivesNumber = game.getPreferences().getInteger(AxonixGame.PREF_KEY_LIVES + levelIndex);
+            int savedLivesNumber = preferences.getLives(levelIndex);
             assertThat(savedLivesNumber).isEqualTo(livesNumbers[levelIndex-1]);
 
-            int savedLevelScore = game.getPreferences().getInteger(AxonixGame.PREF_KEY_LVL_SCORE + levelIndex);
+            int savedLevelScore = preferences.getLevelScore(levelIndex);
             assertThat(savedLevelScore).isEqualTo(levelScores[levelIndex-1]);
         }
     }
@@ -128,7 +136,7 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
         game.getGameScreen().setState(GameScreen.State.WIN);
         super.render();
 
-        int savedTotalScore = game.getPreferences().getInteger(AxonixGame.PREF_KEY_TTL_SCORE);
+        int savedTotalScore = preferences.getTotalScore();
         assertThat(savedTotalScore).isEqualTo(1533);
     }
 
@@ -141,7 +149,7 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
         game.getGameScreen().setState(GameScreen.State.GAME_OVER);
         super.render();
 
-        int savedTotalScore = game.getPreferences().getInteger(AxonixGame.PREF_KEY_TTL_SCORE);
+        int savedTotalScore = preferences.getTotalScore();
         assertThat(savedTotalScore).isEqualTo(1595);
     }
 
@@ -312,8 +320,8 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
     //---------------------------------------------------------------------
 
     private void clearPreferences() {
-        game.getPreferences().clear();
-        game.getPreferences().flush();
+        preferences.clear();
+        preferences.flush();
     }
 
     private void initPreferencesWithSampleData() {
@@ -322,12 +330,12 @@ public class TestAxonixGameWrapper extends AxonixGameWrapper {
         int[] levelScores = SampleData.levelScores;
         // level info
         for (int levelIndex = 1; levelIndex <= 3; levelIndex++) {
-            game.getPreferences().putInteger(AxonixGame.PREF_KEY_LIVES + levelIndex, livesNumbers[levelIndex-1]);
-            game.getPreferences().putInteger(AxonixGame.PREF_KEY_LVL_SCORE + levelIndex, levelScores[levelIndex-1]);
+            preferences.setLives(levelIndex, livesNumbers[levelIndex-1]);
+            preferences.setLevelScore(levelIndex, levelScores[levelIndex-1]);
         }
         // game info
-        game.getPreferences().putInteger(AxonixGame.PREF_KEY_TTL_SCORE, SampleData.totalScore);
-        game.getPreferences().flush();
+        preferences.setTotalScore(SampleData.totalScore);
+        preferences.flush();
     }
 
     private void deleteScreenshots() {

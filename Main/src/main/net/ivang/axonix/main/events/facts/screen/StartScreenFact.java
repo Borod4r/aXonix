@@ -20,5 +20,4 @@ package net.ivang.axonix.main.events.facts.screen;
  * @author Ivan Gadzhega
  * @since 0.2
  */
-public class StartScreenFact {
-}
+public class StartScreenFact { }

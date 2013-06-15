@@ -17,7 +17,6 @@
 package net.ivang.axonix.main.screens;
 
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Action;
@@ -48,6 +47,7 @@ import net.ivang.axonix.main.events.intents.DefaultIntent;
 import net.ivang.axonix.main.events.intents.game.*;
 import net.ivang.axonix.main.events.intents.screen.LevelsScreenIntent;
 import net.ivang.axonix.main.events.intents.screen.StartScreenIntent;
+import net.ivang.axonix.main.preferences.PreferencesWrapper;
 
 import static java.lang.Math.min;
 
@@ -60,6 +60,9 @@ public class GameScreen extends BaseScreen {
     public enum State {
         PLAYING, PAUSED, LEVEL_COMPLETED, GAME_OVER, WIN
     }
+
+    @Inject
+    private PreferencesWrapper preferences;
 
     private State state;
 
@@ -327,49 +330,40 @@ public class GameScreen extends BaseScreen {
         eventBus.post(new LevelIndexFact(index));
     }
 
-    private void loadLevelInfoFromPrefs(int levelNumber) {
-        Preferences prefs = game.getPreferences();
-        if (levelNumber == 0) {
+    private void loadLevelInfoFromPrefs(int levelIndex) {
+        if (levelIndex == 0) {
             setLives(3);
-        } else if (prefs.contains(AxonixGame.PREF_KEY_LIVES + levelNumber)) {
-            int savedLivesNumber = prefs.getInteger(AxonixGame.PREF_KEY_LIVES + levelNumber);
+        } else if (preferences.containsLives(levelIndex)) {
+            int savedLivesNumber = preferences.getLives(levelIndex);
             setLives(savedLivesNumber);
         } else {
-            throw new IllegalArgumentException("Preferences do not contain values for index:" + levelNumber);
+            throw new IllegalArgumentException("Preferences do not contain values for index:" + levelIndex);
         }
     }
 
     private void saveLevelInfoToPrefs() {
-        Preferences prefs = game.getPreferences();
-        boolean prefsChanged = false;
-
-        int savedLivesNumber = prefs.getInteger(AxonixGame.PREF_KEY_LIVES + levelIndex);
-        int savedLevelScore = prefs.getInteger(AxonixGame.PREF_KEY_LVL_SCORE + levelIndex);
+        int savedLivesNumber = preferences.getLives(levelIndex);
+        int savedLevelScore = preferences.getLevelScore(levelIndex);
 
         int newLivesNumber = getLives();
         int newLevelScore = level.getScore();
 
         if (newLivesNumber > savedLivesNumber) {
-            prefs.putInteger(AxonixGame.PREF_KEY_LIVES + levelIndex, newLivesNumber);
-            prefsChanged = true;
+            preferences.setLives(levelIndex, newLivesNumber);
         }
         if (newLevelScore > savedLevelScore) {
-            prefs.putInteger(AxonixGame.PREF_KEY_LVL_SCORE + levelIndex, newLevelScore);
-            prefsChanged = true;
+            preferences.setLevelScore(levelIndex, newLevelScore);
         }
 
-        if (prefsChanged) {
-            prefs.flush();
-        }
+        preferences.flush();
     }
 
     private void saveGameInfoToPrefs() {
-        Preferences prefs = game.getPreferences();
-        int savedTotalScore = prefs.getInteger(AxonixGame.PREF_KEY_TTL_SCORE);
+        int savedTotalScore = preferences.getTotalScore();
         int newTotalScore = getTotalScore();
         if (newTotalScore > savedTotalScore) {
-            prefs.putInteger(AxonixGame.PREF_KEY_TTL_SCORE, newTotalScore);
-            prefs.flush();
+            preferences.setTotalScore(newTotalScore);
+            preferences.flush();
         }
     }
 

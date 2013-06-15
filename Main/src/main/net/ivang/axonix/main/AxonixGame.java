@@ -16,7 +16,10 @@
 
 package net.ivang.axonix.main;
 
-import com.badlogic.gdx.*;
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -35,7 +38,6 @@ import net.ivang.axonix.main.input.AxonixGameInputProcessor;
 import net.ivang.axonix.main.screens.GameScreen;
 import net.ivang.axonix.main.screens.LevelsScreen;
 import net.ivang.axonix.main.screens.StartScreen;
-import net.ivang.axonix.main.sound.SoundManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -46,27 +48,19 @@ import java.util.List;
  */
 public class AxonixGame extends Game {
 
-    public static final String PREFS_NAME = "aXonix";
-    public static final String PREF_KEY_LIVES = "lives_";
-    public static final String PREF_KEY_LVL_SCORE = "level_score_";
-    public static final String PREF_KEY_TTL_SCORE = "total_score";
-
     @Inject private StartScreen startScreen;
     @Inject private LevelsScreen levelsScreen;
     @Inject private GameScreen gameScreen;
 
-    @Inject private SoundManager soundManager;
-
     private Skin skin;
     private List<FileHandle> levelsFiles;
-    private Preferences preferences;
 
     private EventBus eventBus;
 
-    @Inject private AxonixGame(InputMultiplexer inputMultiplexer, EventBus eventBus) {
+    @Inject
+    private AxonixGame(InputMultiplexer inputMultiplexer, EventBus eventBus) {
         initSkin();
         initLevels();
-        initPreferences();
         // Input event handling
         inputMultiplexer.addProcessor(new AxonixGameInputProcessor(eventBus));
         Gdx.input.setInputProcessor(inputMultiplexer);
@@ -135,10 +129,6 @@ public class AxonixGame extends Game {
         levelsFiles = Arrays.asList(dirHandle.list());
     }
 
-    private void initPreferences() {
-        preferences = Gdx.app.getPreferences(AxonixGame.PREFS_NAME);
-    }
-
     //---------------------------------------------------------------------
     // Getters & Setters
     //---------------------------------------------------------------------
@@ -149,10 +139,6 @@ public class AxonixGame extends Game {
 
     public Skin getSkin() {
         return skin;
-    }
-
-    public Preferences getPreferences() {
-        return preferences;
     }
 
     public StartScreen getStartScreen() {
