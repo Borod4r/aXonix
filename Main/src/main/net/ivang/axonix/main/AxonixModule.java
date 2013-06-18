@@ -24,6 +24,7 @@ import net.ivang.axonix.main.preferences.PreferencesWrapper;
 import net.ivang.axonix.main.screens.GameScreen;
 import net.ivang.axonix.main.screens.LevelsScreen;
 import net.ivang.axonix.main.screens.StartScreen;
+import net.ivang.axonix.main.sound.SoundManager;
 
 /**
  * @author Ivan Gadzhega
@@ -41,6 +42,8 @@ public class AxonixModule extends AbstractModule {
         bind(GameScreen.class).in(Singleton.class);
         // Input Multiplexer
         bind(InputMultiplexer.class).in(Singleton.class);
+        // Sound
+        bind(SoundManager.class).in(Singleton.class);
         // Preferences
         bind(PreferencesWrapper.class).in(Singleton.class);
         // Event Bus

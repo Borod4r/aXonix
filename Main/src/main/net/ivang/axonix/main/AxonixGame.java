@@ -33,11 +33,14 @@ import net.ivang.axonix.main.events.facts.screen.LevelsScreenFact;
 import net.ivang.axonix.main.events.facts.screen.StartScreenFact;
 import net.ivang.axonix.main.events.intents.screen.GameScreenIntent;
 import net.ivang.axonix.main.events.intents.screen.LevelsScreenIntent;
+import net.ivang.axonix.main.events.intents.screen.OptionsScreenIntent;
 import net.ivang.axonix.main.events.intents.screen.StartScreenIntent;
 import net.ivang.axonix.main.input.AxonixGameInputProcessor;
 import net.ivang.axonix.main.screens.GameScreen;
 import net.ivang.axonix.main.screens.LevelsScreen;
+import net.ivang.axonix.main.screens.OptionsScreen;
 import net.ivang.axonix.main.screens.StartScreen;
+import net.ivang.axonix.main.sound.SoundManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -49,8 +52,11 @@ import java.util.List;
 public class AxonixGame extends Game {
 
     @Inject private StartScreen startScreen;
+    @Inject private OptionsScreen optionsScreen;
     @Inject private LevelsScreen levelsScreen;
     @Inject private GameScreen gameScreen;
+
+    @Inject private SoundManager soundManager;
 
     private Skin skin;
     private List<FileHandle> levelsFiles;
@@ -88,6 +94,13 @@ public class AxonixGame extends Game {
     public void setStartScreen(StartScreenIntent intent) {
         super.setScreen(startScreen);
         eventBus.post(new StartScreenFact());
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void setOptionsScreen(OptionsScreenIntent intent) {
+        super.setScreen(optionsScreen);
+//        eventBus.post(new OptionsScreenFact());
     }
 
     @Subscribe

@@ -30,6 +30,9 @@ public class PreferencesWrapper {
     private static final String PREF_KEY_LVL_SCORE = "level_score_";
     private static final String PREF_KEY_TTL_SCORE = "total_score";
 
+    private static final String PREF_KEY_MUSIC_VOLUME = "music_volume";
+    private static final float MUSIC_VOLUME_DEF_VALUE = 0.7f;
+
     private Preferences preferences;
     private boolean isChanged;
 
@@ -71,6 +74,17 @@ public class PreferencesWrapper {
 
     public void setTotalScore(int totalScore) {
         preferences.putInteger(PREF_KEY_TTL_SCORE, totalScore);
+        isChanged = true;
+    }
+
+    /* Options */
+
+    public float getMusicVolume() {
+        return preferences.getFloat(PREF_KEY_MUSIC_VOLUME, MUSIC_VOLUME_DEF_VALUE);
+    }
+
+    public void setMusicVolume(float musicVolume) {
+        preferences.putFloat(PREF_KEY_MUSIC_VOLUME, musicVolume);
         isChanged = true;
     }
 

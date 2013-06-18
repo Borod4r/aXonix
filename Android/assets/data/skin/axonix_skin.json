@@ -151,5 +151,72 @@
             "actionsGroupStyle": "large"
         }
 
+    },
+
+    "net.ivang.axonix.main.actors.options.VolumeSlider$Style": {
+        "small":{
+            "background": "slider_bg",
+            "knobBefore": "slider_before",
+            "prefWidth": 180,
+            "prefHeight": 28
+        },
+        "normal":{
+            "background": "slider_bg",
+            "knobBefore": "slider_before",
+            "prefWidth": 280,
+            "prefHeight": 42
+        },
+        "large":{
+            "background": "slider_bg",
+            "knobBefore": "slider_before",
+            "prefWidth": 420,
+            "prefHeight": 64
+        }
+    },
+
+    "com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
+        "small_white":{
+            "font": "small",
+            "fontColor": "white"
+        },
+        "normal_white":{
+            "font": "normal",
+            "fontColor": "white"
+        },
+        "large_white":{
+            "font": "large",
+            "fontColor": "white"
+        },
+        "small_yellow":{
+            "font": "small",
+            "fontColor": "yellow"
+        },
+        "normal_yellow":{
+            "font": "normal",
+            "fontColor": "yellow"
+        },
+        "large_yellow":{
+            "font": "large",
+            "fontColor": "yellow"
+        }
+    },
+
+    "net.ivang.axonix.main.screens.OptionsScreen$Style": {
+        "small": {
+            "labelStyle": "small_white",
+            "valueStyle": "small_yellow",
+            "sliderStyle": "small"
+        },
+        "normal": {
+            "labelStyle": "normal_white",
+            "valueStyle": "normal_yellow",
+            "sliderStyle": "normal"
+        },
+        "large": {
+            "labelStyle": "large_white",
+            "valueStyle": "large_yellow",
+            "sliderStyle": "large"
+        }
     }
+
 }

@@ -95,9 +95,26 @@ ic_repeat_small
   orig: 32, 32
   offset: 0, 0
   index: -1
-button
+slider_before
   rotate: false
   xy: 950, 94
+  size: 19, 30
+  split: 9, 9, 9, 9
+  orig: 19, 30
+  offset: 0, 0
+  index: -1
+slider_bg
+  rotate: false
+  xy: 683, 28
+  size: 19, 30
+  split: 6, 6, 6, 6
+  pad: 18, 0, 6, 6
+  orig: 19, 30
+  offset: 0, 0
+  index: -1
+button
+  rotate: false
+  xy: 971, 94
   size: 13, 30
   split: 6, 6, 6, 6
   orig: 13, 30
@@ -105,7 +122,7 @@ button
   index: -1
 button_over
   rotate: false
-  xy: 683, 28
+  xy: 704, 28
   size: 13, 30
   split: 6, 6, 6, 6
   orig: 13, 30

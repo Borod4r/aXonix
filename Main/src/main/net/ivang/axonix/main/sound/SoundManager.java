@@ -21,9 +21,11 @@ import com.badlogic.gdx.audio.Music;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import net.ivang.axonix.main.events.facts.MusicVolumeFact;
 import net.ivang.axonix.main.events.facts.screen.GameScreenFact;
 import net.ivang.axonix.main.events.facts.screen.LevelsScreenFact;
 import net.ivang.axonix.main.events.facts.screen.StartScreenFact;
+import net.ivang.axonix.main.preferences.PreferencesWrapper;
 import net.ivang.axonix.main.screens.GameScreen;
 
 /**
@@ -32,18 +34,16 @@ import net.ivang.axonix.main.screens.GameScreen;
  */
 public class SoundManager {
 
-    private Music gameScreenMusic;
-    private Music startScreenMusic;
+    private PreferencesWrapper preferences;
+
+    private Loop currentLoop;
+    private float musicVolume;
 
     @Inject
-    public SoundManager(EventBus eventBus) {
+    public SoundManager(PreferencesWrapper preferences, EventBus eventBus) {
+        this.preferences = preferences;
+        this.musicVolume = preferences.getMusicVolume();
         eventBus.register(this);
-        // start screen
-        startScreenMusic = Gdx.audio.newMusic(Gdx.files.internal("data/music/loop_start.ogg"));
-        startScreenMusic.setLooping(true);
-        // game screen
-        gameScreenMusic = Gdx.audio.newMusic(Gdx.files.internal("data/music/loop_game.ogg"));
-        gameScreenMusic.setLooping(true);
     }
 
     //---------------------------------------------------------------------
@@ -52,27 +52,37 @@ public class SoundManager {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onScreenChangeTo(StartScreenFact fact) {
-        if (!startScreenMusic.isPlaying()) {
-            startScreenMusic.play();
+    public void onMusicVolumeChange(MusicVolumeFact fact) {
+        musicVolume = fact.getVolume();
+        if (musicVolume > 0) {
+            Music loopMusic = currentLoop.getMusic();
+            loopMusic.setVolume(musicVolume);
+            if (!loopMusic.isPlaying()) {
+                loopMusic.play();
+            }
+        } else {
+            currentLoop.getMusic().pause();
         }
-        gameScreenMusic.stop();
+        // save to preferences
+        preferences.setMusicVolume(musicVolume);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onScreenChangeTo(StartScreenFact fact) {
+        setCurrentLoop(Loop.START);
     }
 
     @Subscribe
     @SuppressWarnings("unused")
     public void onScreenChangeTo(LevelsScreenFact fact) {
-        if (!startScreenMusic.isPlaying()) {
-            startScreenMusic.play();
-        }
-        gameScreenMusic.stop();
+        setCurrentLoop(Loop.START);
     }
 
     @Subscribe
     @SuppressWarnings("unused")
     public void onScreenChangeTo(GameScreenFact fact) {
-        startScreenMusic.stop();
-        gameScreenMusic.play();
+        setCurrentLoop(Loop.GAME);
     }
 
     @Subscribe
@@ -80,16 +90,54 @@ public class SoundManager {
     public void onGameScreenStateChange(GameScreen.State state) {
         switch (state) {
             case PLAYING:
-                gameScreenMusic.play();
+                currentLoop.getMusic().play();
                 break;
             case PAUSED:
-                gameScreenMusic.pause();
+                currentLoop.getMusic().pause();
                 break;
             case LEVEL_COMPLETED:
             case GAME_OVER:
             case WIN:
-                gameScreenMusic.stop();
+                currentLoop.getMusic().stop();
                 break;
         }
     }
+
+    public void setCurrentLoop(Loop currentLoop) {
+        this.currentLoop = currentLoop;
+
+        for (Loop loop : Loop.values()) {
+            Music loopMusic = loop.getMusic();
+            if (loop == currentLoop) {
+                if (musicVolume > 0 && !loopMusic.isPlaying()) {
+                    loopMusic.setVolume(musicVolume);
+                    loopMusic.play();
+                }
+            } else {
+                loopMusic.stop();
+            }
+        }
+    }
+
+    //---------------------------------------------------------------------
+    // Nested Classes
+    //---------------------------------------------------------------------
+
+    private enum Loop {
+        START(Gdx.audio.newMusic(Gdx.files.internal("data/music/loop_start.ogg"))),
+        GAME(Gdx.audio.newMusic(Gdx.files.internal("data/music/loop_game.ogg")));
+
+        private final Music music;
+
+        private Loop(Music music) {
+            this.music = music;
+            music.setLooping(true);
+//            music.setVolume(preferences.);
+        }
+
+        public Music getMusic() {
+            return music;
+        }
+    }
+
 }

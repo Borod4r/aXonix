@@ -32,6 +32,7 @@ import net.ivang.axonix.main.AxonixGame;
 import net.ivang.axonix.main.events.intents.BackIntent;
 import net.ivang.axonix.main.events.intents.DefaultIntent;
 import net.ivang.axonix.main.events.intents.screen.LevelsScreenIntent;
+import net.ivang.axonix.main.events.intents.screen.OptionsScreenIntent;
 
 /**
  * @author Ivan Gadzhega
@@ -67,6 +68,11 @@ public class StartScreen extends BaseScreen {
         rootTable.row();
         // options button
         optionsButton = new TextButton("Options", skin, style.toString());
+        optionsButton.addListener(new ChangeListener() {
+            public void changed(ChangeEvent event, Actor actor) {
+                eventBus.post(new OptionsScreenIntent());
+            }
+        });
         optionsButtonCell = rootTable.add(optionsButton);
         // stage
         stage.addActor(rootTable);
