@@ -13,14 +13,44 @@
 
     },
 
+    "com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
+        "small_white":{
+            "font": "small",
+            "fontColor": "white"
+        },
+        "normal_white":{
+            "font": "normal",
+            "fontColor": "white"
+        },
+        "large_white":{
+            "font": "large",
+            "fontColor": "white"
+        },
+        "xlarge_white":{
+            "font": "xlarge",
+            "fontColor": "white"
+        },
+        "small_yellow":{
+            "font": "small",
+            "fontColor": "yellow"
+        },
+        "normal_yellow":{
+            "font": "normal",
+            "fontColor": "yellow"
+        },
+        "large_yellow":{
+            "font": "large",
+            "fontColor": "yellow"
+        }
+    },
+
     "com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
         "small":{
             "up": "button",
             "down": "button_over",
             "over": "button_over",
             "font": "small",
-            "fontColor": "white",
-            "overFontColor": "blue"
+            "fontColor": "white"
         },
         "normal":{
             "up": "button",
@@ -95,6 +125,27 @@
         }
     },
 
+    "net.ivang.axonix.main.actors.options.VolumeSlider$Style": {
+        "small":{
+            "background": "slider_bg",
+            "knobBefore": "slider_before",
+            "prefWidth": 180,
+            "prefHeight": 28
+        },
+        "normal":{
+            "background": "slider_bg",
+            "knobBefore": "slider_before",
+            "prefWidth": 280,
+            "prefHeight": 42
+        },
+        "large":{
+            "background": "slider_bg",
+            "knobBefore": "slider_before",
+            "prefWidth": 420,
+            "prefHeight": 64
+        }
+    },
+
     "net.ivang.axonix.main.actors.game.dialog.DialogActionsGroup$Style": {
         "small": {
             "button1": "levels_small",
@@ -125,79 +176,81 @@
             "stageBackground": "window_bg_stage",
             "hPad": 24,
             "vPad": 12,
-            "titleFont": "normal",
-            "labelsValuesFont": "small",
-            "valuesColor": "yellow",
-            "actionsGroupStyle": "small"
+            "title": "normal_white",
+            "label": "small_white",
+            "value": "small_yellow",
+            "actionsGroup": "small"
         },
         "normal": {
             "background": "window_bg",
             "stageBackground": "window_bg_stage",
             "hPad": 36,
             "vPad": 18,
-            "titleFont": "large",
-            "labelsValuesFont": "normal",
-            "valuesColor": "yellow",
-            "actionsGroupStyle": "normal"
+            "title": "large_white",
+            "label": "normal_white",
+            "value": "normal_yellow",
+            "actionsGroup": "normal"
         },
         "large": {
             "background": "window_bg",
             "stageBackground": "window_bg_stage",
             "hPad": 56,
             "vPad": 28,
-            "titleFont": "xlarge",
-            "labelsValuesFont": "large",
-            "valuesColor": "yellow",
-            "actionsGroupStyle": "large"
-        }
-
-    },
-
-    "net.ivang.axonix.main.actors.options.VolumeSlider$Style": {
-        "small":{
-            "background": "slider_bg",
-            "knobBefore": "slider_before",
-            "prefWidth": 180,
-            "prefHeight": 28
-        },
-        "normal":{
-            "background": "slider_bg",
-            "knobBefore": "slider_before",
-            "prefWidth": 280,
-            "prefHeight": 42
-        },
-        "large":{
-            "background": "slider_bg",
-            "knobBefore": "slider_before",
-            "prefWidth": 420,
-            "prefHeight": 64
+            "title": "xlarge_white",
+            "label": "large_white",
+            "value": "large_yellow",
+            "actionsGroup": "large"
         }
     },
 
-    "com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
-        "small_white":{
-            "font": "small",
-            "fontColor": "white"
+    "net.ivang.axonix.main.actors.game.bar.StatusBar$Style": {
+        "small": {
+            "label": "small_white",
+            "value": "small_yellow"
         },
-        "normal_white":{
-            "font": "normal",
-            "fontColor": "white"
+        "normal": {
+            "label": "normal_white",
+            "value": "normal_yellow"
         },
-        "large_white":{
-            "font": "large",
-            "fontColor": "white"
+        "large": {
+            "label": "large_white",
+            "value": "large_yellow"
+        }
+    },
+
+    "net.ivang.axonix.main.actors.game.bar.DebugBar$Style": {
+        "default": {
+            "labelStyle": "small_white"
+        }
+    },
+
+    "net.ivang.axonix.main.screens.StartScreen$Style": {
+        "small": {
+            "button": "small",
+            "buttonWidth": 176,
+            "buttonHeight": 37,
+            "buttonPad": 3,
+            "logoWidth": 225,
+            "logoHeight": 53,
+            "logoPad": 7
         },
-        "small_yellow":{
-            "font": "small",
-            "fontColor": "yellow"
+        "normal": {
+            "button": "normal",
+            "buttonWidth": 268,
+            "buttonHeight": 57,
+            "buttonPad": 5,
+            "logoWidth": 343,
+            "logoHeight": 80,
+            "logoPad": 11
         },
-        "normal_yellow":{
-            "font": "normal",
-            "fontColor": "yellow"
-        },
-        "large_yellow":{
-            "font": "large",
-            "fontColor": "yellow"
+        "large": {
+            "button": "large",
+            "buttonWidth": 400,
+            "buttonHeight": 85,
+            "buttonPad": 8,
+            "logoWidth": 512,
+            "logoHeight": 120,
+            "logoPad": 16
         }
     },
 
@@ -216,6 +269,58 @@
             "labelStyle": "large_white",
             "valueStyle": "large_yellow",
             "sliderStyle": "large"
+        }
+    },
+
+    "net.ivang.axonix.main.screens.LevelsScreen$Style": {
+        "small": {
+            "button": "small",
+            "buttonWidth": 37,
+            "buttonHeight": 37,
+            "buttonPad": 9
+        },
+        "normal": {
+            "button": "normal",
+            "buttonWidth": 57,
+            "buttonHeight": 57,
+            "buttonPad": 13
+        },
+        "large": {
+            "button": "large",
+            "buttonWidth": 85,
+            "buttonHeight": 85,
+            "buttonPad": 20
+        }
+    },
+
+
+    "net.ivang.axonix.main.screens.GameScreen$Style": {
+        "small": {
+            "statusBar": "small",
+            "statusCellHeight": 12,
+            "points": "small_white",
+            "bigPoints": "normal_white",
+            "notification": "small_white",
+            "stateDialog": "small",
+            "debugBar": "default"
+        },
+        "normal": {
+            "statusBar": "normal",
+            "statusCellHeight": 18,
+            "points": "normal_white",
+            "bigPoints": "large_white",
+            "notification": "normal_white",
+            "stateDialog": "normal",
+            "debugBar": "default"
+        },
+        "large": {
+            "statusBar": "large",
+            "statusCellHeight": 28,
+            "points": "large_white",
+            "bigPoints": "xlarge_white",
+            "notification": "large_white",
+            "stateDialog": "large",
+            "debugBar": "default"
         }
     }
 

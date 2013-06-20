@@ -17,13 +17,11 @@
 package net.ivang.axonix.main.actors.game.dialog;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
@@ -35,7 +33,6 @@ import static com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
  */
 public abstract class AlertDialog extends Table {
 
-    private Skin skin;
     private Style style;
 
     private Table window;
@@ -44,26 +41,21 @@ public abstract class AlertDialog extends Table {
     private Label totalScoreLabel, totalScoreValue;
     private DialogActionsGroup actionsGroup;
 
-    public AlertDialog(String titleText, Skin skin, String styleName) {
-        super();
-        this.skin = skin;
+    public AlertDialog(String titleText, Style style) {
+        this.style = style;
+
         setFillParent(true);
         setVisible(false);
-        setStyle(styleName);
 
         window = new Table();
         window.setBackground(style.background);
         window.pad(style.vPad, style.hPad, style.vPad, style.hPad);
 
-        LabelStyle titleStyle= new LabelStyle(style.titleFont, style.titleColor);
-        LabelStyle labelStyle= new LabelStyle(style.labelsValuesFont, style.labelsColor);
-        LabelStyle valueStyle= new LabelStyle(style.labelsValuesFont, style.valuesColor);
-
-        title = new Label(titleText, titleStyle);
-        levelScoreLabel = new Label("Level Score: ", labelStyle);
-        totalScoreLabel = new Label("Total Score: ", labelStyle);
-        levelScoreValue = new Label(null, valueStyle);
-        totalScoreValue = new Label(null, valueStyle);
+        title = new Label(titleText, style.title);
+        levelScoreLabel = new Label("Level Score: ", style.label);
+        totalScoreLabel = new Label("Total Score: ", style.label);
+        levelScoreValue = new Label(null, style.value);
+        totalScoreValue = new Label(null, style.value);
 
         window.add(title).colspan(2);
         window.row();
@@ -76,7 +68,7 @@ public abstract class AlertDialog extends Table {
         add(window);
         row();
 
-        actionsGroup = new DialogActionsGroup(style.actionsGroupStyle);
+        actionsGroup = new DialogActionsGroup(style.actionsGroup);
         add(actionsGroup).center();
     }
 
@@ -92,30 +84,19 @@ public abstract class AlertDialog extends Table {
         totalScoreValue.setText(Integer.toString(score));
     }
 
-    public void setStyle(String styleName) {
-        setStyle(skin.get(styleName, Style.class));
-    }
-
     public void setStyle(Style style) {
-        if (style == null) throw new IllegalArgumentException("style cannot be null.");
         this.style = style;
 
-        if (window != null) {
-            window.setBackground(style.background);
-            window.pad(style.vPad, style.hPad, style.vPad, style.hPad);
-        }
+        window.setBackground(style.background);
+        window.pad(style.vPad, style.hPad, style.vPad, style.hPad);
 
-        LabelStyle titleStyle= new LabelStyle(style.titleFont, style.titleColor);
-        LabelStyle labelStyle= new LabelStyle(style.labelsValuesFont, style.labelsColor);
-        LabelStyle valueStyle= new LabelStyle(style.labelsValuesFont, style.valuesColor);
+        title.setStyle(style.title);
+        levelScoreLabel.setStyle(style.label);
+        levelScoreValue.setStyle(style.value);
+        totalScoreLabel.setStyle(style.label);
+        totalScoreValue.setStyle(style.value);
 
-        if (title != null) title.setStyle(titleStyle);
-        if (levelScoreLabel != null) levelScoreLabel.setStyle(labelStyle);
-        if (levelScoreValue != null) levelScoreValue.setStyle(valueStyle);
-        if (totalScoreLabel != null) totalScoreLabel.setStyle(labelStyle);
-        if (totalScoreValue != null) totalScoreValue.setStyle(valueStyle);
-
-        if (actionsGroup != null) actionsGroup.setStyle(style.actionsGroupStyle);
+        actionsGroup.setStyle(style.actionsGroup);
     }
 
     public boolean addButtonListener(int whichButton , EventListener listener) {
@@ -124,14 +105,12 @@ public abstract class AlertDialog extends Table {
 
     @Override
     protected void drawBackground (SpriteBatch batch, float parentAlpha) {
-        if (style.stageBackground != null) {
-            Color color = getColor();
-            batch.setColor(color.r, color.g, color.b, color.a * parentAlpha);
-            Stage stage = getStage();
-            Vector2 position = stageToLocalCoordinates(Vector2.tmp.set(0, 0));
-            Vector2 size = stageToLocalCoordinates(Vector2.tmp2.set(stage.getWidth(), stage.getHeight()));
-            style.stageBackground.draw(batch, getX() + position.x, getY() + position.y, getX() + size.x, getY() + size.y);
-        }
+        Color color = getColor();
+        batch.setColor(color.r, color.g, color.b, color.a * parentAlpha);
+        Stage stage = getStage();
+        Vector2 position = stageToLocalCoordinates(Vector2.tmp.set(0, 0));
+        Vector2 size = stageToLocalCoordinates(Vector2.tmp2.set(stage.getWidth(), stage.getHeight()));
+        style.stageBackground.draw(batch, getX() + position.x, getY() + position.y, getX() + size.x, getY() + size.y);
 
         super.drawBackground(batch, parentAlpha);
     }
@@ -153,16 +132,14 @@ public abstract class AlertDialog extends Table {
     // Nested Classes
     //---------------------------------------------------------------------
 
-    static public class Style {
+    public static class Style {
         public Drawable background;
         public Drawable stageBackground;
         public float hPad, vPad;
-        public BitmapFont titleFont;
-        public BitmapFont labelsValuesFont;
-        public Color titleColor = new Color(1, 1, 1, 1);
-        public Color labelsColor = new Color(1, 1, 1, 1);
-        public Color valuesColor = new Color(1, 1, 1, 1);
-        public DialogActionsGroup.Style actionsGroupStyle;
+        public LabelStyle title;
+        public LabelStyle label;
+        public LabelStyle value;
+        public DialogActionsGroup.Style actionsGroup;
     }
 
 }

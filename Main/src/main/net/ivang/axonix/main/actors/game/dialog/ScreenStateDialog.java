@@ -17,15 +17,14 @@
 package net.ivang.axonix.main.actors.game.dialog;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import net.ivang.axonix.main.events.facts.level.LevelScoreFact;
 import net.ivang.axonix.main.events.facts.TotalScoreFact;
+import net.ivang.axonix.main.events.facts.level.LevelScoreFact;
 import net.ivang.axonix.main.events.intents.DefaultIntent;
-import net.ivang.axonix.main.events.intents.screen.LevelsScreenIntent;
 import net.ivang.axonix.main.events.intents.game.ReplayLevelIntent;
+import net.ivang.axonix.main.events.intents.screen.LevelsScreenIntent;
 import net.ivang.axonix.main.screens.GameScreen;
 
 /**
@@ -34,8 +33,8 @@ import net.ivang.axonix.main.screens.GameScreen;
  */
 public class ScreenStateDialog extends AlertDialog {
 
-    public ScreenStateDialog(String titleText, Skin skin, String styleName, final EventBus eventBus) {
-        super(titleText, skin, styleName);
+    public ScreenStateDialog(String titleText, Style style, final EventBus eventBus) {
+        super(titleText, style);
         eventBus.register(this);
         // levels button listener
         addButtonListener(1, new ChangeListener() {

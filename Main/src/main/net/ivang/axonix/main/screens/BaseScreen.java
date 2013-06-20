@@ -44,6 +44,9 @@ public abstract class BaseScreen implements Screen {
         this.skin = game.getSkin();
         this.inputMultiplexer = inputMultiplexer;
         this.eventBus = eventBus;
+
+        String styleName = getStyleNameByHeight();
+        setStyleByName(styleName, false);
     }
 
     @Override
@@ -56,6 +59,10 @@ public abstract class BaseScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
+        stage.setViewport(width, height, false);
+
+        String styleName = getStyleNameByHeight(height);
+        setStyleByName(styleName, true);
     }
 
     @Override
@@ -87,38 +94,36 @@ public abstract class BaseScreen implements Screen {
     // Helper methods
     //---------------------------------------------------------------------
 
-    protected Style getStyleByHeight() {
-        return getStyleByHeight(Gdx.graphics.getHeight());
+    protected String getStyleNameByHeight() {
+        return getStyleNameByHeight(Gdx.graphics.getHeight());
     }
 
-    protected Style getStyleByHeight(int height) {
+    protected String getStyleNameByHeight(int height) {
         if (height < 480) {
-            return Style.SMALL;
+            return StyleName.SMALL.toString();
         } else if (height < 720) {
-            return Style.NORMAL;
+            return StyleName.NORMAL.toString();
         } else {
-            return Style.LARGE;
+            return StyleName.LARGE.toString();
         }
     }
 
-    protected float getScaleByStyle(Style style) {
-        float scale = 1f;
-        switch (style) {
-            case SMALL:
-                scale = 0.44f; // 320/720
-                break;
-            case NORMAL:
-                scale = 0.67f; // 480/720
-                break;
+    protected void setStyleByName(String styleName) { }
+
+    protected void applyStyle() { }
+
+    protected void setStyleByName(String styleName, boolean apply) {
+        setStyleByName(styleName);
+        if (apply) {
+            applyStyle();
         }
-        return scale;
     }
 
     //---------------------------------------------------------------------
     // Nested Classes
     //---------------------------------------------------------------------
 
-    protected enum Style {
+    private enum StyleName {
         SMALL("small"),
         NORMAL("normal"),
         LARGE("large"),
@@ -126,13 +131,8 @@ public abstract class BaseScreen implements Screen {
 
         private final String styleName;
 
-        private Style(String styleName) {
+        private StyleName(String styleName) {
             this.styleName = styleName;
-        }
-
-        public Style getNext() {
-            int next = (ordinal() + 1) % values().length;
-            return values()[next];
         }
 
         public String toString() {

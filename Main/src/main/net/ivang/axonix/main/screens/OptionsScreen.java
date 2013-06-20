@@ -40,7 +40,6 @@ import static com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 public class OptionsScreen extends BaseScreen {
 
     private Style style;
-
     private Label musicVolumeLabel;
     private Label musicVolumeValue;
     private VolumeSlider musicVolumeSlider;
@@ -51,8 +50,6 @@ public class OptionsScreen extends BaseScreen {
     @Inject
     private OptionsScreen(final AxonixGame game, InputMultiplexer inputMultiplexer, final EventBus eventBus) {
         super(game, inputMultiplexer, eventBus);
-
-        setStyle(getStyleByHeight().toString());
 
         // root table
         Table rootTable = new Table();
@@ -93,27 +90,6 @@ public class OptionsScreen extends BaseScreen {
         preferences.flush();
     }
 
-    @Override
-    public void resize(int width, int height) {
-        stage.setViewport(width, height, true);
-        setStyle(getStyleByHeight(height).toString());
-    }
-
-    public void setStyle(String styleName) {
-        setStyle(skin.get(styleName, Style.class));
-    }
-
-    public void setStyle(Style style) {
-        if (style != null) {
-            this.style = style;
-            if (musicVolumeLabel != null) musicVolumeLabel.setStyle(style.labelStyle);
-            if (musicVolumeValue != null) musicVolumeValue.setStyle(style.valueStyle);
-            if (musicVolumeSlider != null) musicVolumeSlider.setStyle(style.sliderStyle);
-        } else {
-            throw new IllegalArgumentException("style cannot be null.");
-        }
-    }
-
     //---------------------------------------------------------------------
     // Subscribers
     //---------------------------------------------------------------------
@@ -130,6 +106,22 @@ public class OptionsScreen extends BaseScreen {
     @SuppressWarnings("unused")
     public void doBacktAction(BackIntent intent) {
         eventBus.post(new StartScreenIntent());
+    }
+
+    //---------------------------------------------------------------------
+    // Helper Methods
+    //---------------------------------------------------------------------
+
+    @Override
+    protected void setStyleByName(String styleName) {
+        style = skin.get(styleName, Style.class);
+    }
+
+    @Override
+    protected void applyStyle() {
+        musicVolumeLabel.setStyle(style.labelStyle);
+        musicVolumeValue.setStyle(style.valueStyle);
+        musicVolumeSlider.setStyle(style.sliderStyle);
     }
 
     //---------------------------------------------------------------------

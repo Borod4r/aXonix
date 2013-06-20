@@ -17,7 +17,6 @@
 package net.ivang.axonix.main.actors.levels;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.google.common.eventbus.EventBus;
@@ -31,8 +30,8 @@ public class LevelButton extends TextButton {
 
     private final int levelIndex;
 
-    public LevelButton(final int levelIndex, Skin skin, String styleName, final EventBus eventBus) {
-        super(Integer.toString(levelIndex), skin, styleName);
+    public LevelButton(final int levelIndex, TextButtonStyle style, final EventBus eventBus) {
+        super(Integer.toString(levelIndex), style);
         this.levelIndex = levelIndex;
         addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {

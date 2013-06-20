@@ -32,6 +32,8 @@ import net.ivang.axonix.main.events.intents.screen.GameScreenIntent;
 import net.ivang.axonix.main.events.intents.screen.StartScreenIntent;
 import net.ivang.axonix.main.preferences.PreferencesWrapper;
 
+import static com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+
 /**
  * @author Ivan Gadzhega
  * @since 0.1
@@ -40,21 +42,21 @@ public class LevelsScreen extends BaseScreen {
 
     private final static int LEVELS_TABLE_COLS = 6;
 
-    @Inject
-    private PreferencesWrapper preferences;
-
+    private Style style;
     private Table levelsTable;
     private int defaultLevelIndex;
+
+    @Inject
+    private PreferencesWrapper preferences;
 
     @Inject
     private LevelsScreen(final AxonixGame game, InputMultiplexer inputMultiplexer, EventBus eventBus) {
         super(game, inputMultiplexer, eventBus);
 
         levelsTable = new Table();
-        Style style = getStyleByHeight();
 
         for (int levelNumber = 1; levelNumber <= game.getLevelsFiles().size(); levelNumber++) {
-            LevelButton button = new LevelButton(levelNumber, skin, style.toString(), eventBus);
+            LevelButton button = new LevelButton(levelNumber, style.button, eventBus);
             levelsTable.add(button);
             if (levelNumber % LEVELS_TABLE_COLS == 0) {
                 levelsTable.row();
@@ -64,25 +66,6 @@ public class LevelsScreen extends BaseScreen {
         ScrollPane scrollPane = new ScrollPane(levelsTable);
         scrollPane.setFillParent(true);
         stage.addActor(scrollPane);
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        stage.setViewport(width, height, true);
-        Style style = getStyleByHeight(height);
-        float scale = getScaleByStyle(style);
-        float buttonSide = 85 * scale;
-        float padding = 20 * scale;
-
-        TextButton.TextButtonStyle buttonStyle = skin.get(style.toString(), TextButton.TextButtonStyle.class);
-
-        for(Cell cell : levelsTable.getCells()) {
-            TextButton button = (TextButton) cell.getWidget();
-            if (button != null) {
-                button.setStyle(buttonStyle);
-            }
-            cell.width(buttonSide).height(buttonSide).pad(padding);
-        }
     }
 
     @Override
@@ -113,6 +96,22 @@ public class LevelsScreen extends BaseScreen {
     // Helper methods
     //---------------------------------------------------------------------
 
+    @Override
+    protected void setStyleByName(String styleName) {
+        style = skin.get(styleName, Style.class);
+    }
+
+    @Override
+    protected void applyStyle() {
+        for(Cell cell : levelsTable.getCells()) {
+            TextButton button = (TextButton) cell.getWidget();
+            if (button != null) {
+                button.setStyle(style.button);
+            }
+            cell.width(style.buttonWidth).height(style.buttonHeight).pad(style.buttonPad);
+        }
+    }
+
     private void updateButtonState(LevelButton button) {
         int levelIndex = button.getLevelIndex();
         // disable button if its level number isn't first and there is no prefs for previous levels
@@ -126,6 +125,17 @@ public class LevelsScreen extends BaseScreen {
             button.setColor(1f, 1f, 1f, 0.35f);
             button.setDisabled(true);
         }
+    }
+
+    //---------------------------------------------------------------------
+    // Nested Classes
+    //---------------------------------------------------------------------
+
+    public static class Style {
+        public TextButtonStyle button;
+        public float buttonWidth;
+        public float buttonHeight;
+        public float buttonPad;
     }
 
 }

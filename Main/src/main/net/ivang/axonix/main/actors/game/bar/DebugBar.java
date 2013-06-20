@@ -18,7 +18,6 @@ package net.ivang.axonix.main.actors.game.bar;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 /**
@@ -30,12 +29,12 @@ public class DebugBar extends Table {
     private Label fpsLabel;
     private Label sizeLabel;
 
-    public DebugBar(Skin skin, String fontName) {
+    public DebugBar(Style style) {
         this.setFillParent(true);
         this.right().top();
 
-        fpsLabel = new Label(null, skin, fontName, "white");
-        sizeLabel = new Label(null, skin, fontName, "white");
+        fpsLabel = new Label(null, style.labelStyle);
+        sizeLabel = new Label(null, style.labelStyle);
 
         add(fpsLabel).padRight(5);
         add(sizeLabel).padRight(5);
@@ -49,6 +48,14 @@ public class DebugBar extends Table {
         String height = Integer.toString(Gdx.graphics.getHeight());
         fpsLabel.setText(fps + "fps");
         sizeLabel.setText(width + "x" + height);
+    }
+
+    //---------------------------------------------------------------------
+    // Nested Classes
+    //---------------------------------------------------------------------
+
+    public static class Style {
+        public Label.LabelStyle labelStyle;
     }
 
 }

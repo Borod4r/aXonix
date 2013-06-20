@@ -16,18 +16,14 @@
 
 package net.ivang.axonix.main.actors.game.bar;
 
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import net.ivang.axonix.main.events.facts.LivesNumberFact;
 import net.ivang.axonix.main.events.facts.level.LevelIndexFact;
 import net.ivang.axonix.main.events.facts.level.LevelProgressFact;
 import net.ivang.axonix.main.events.facts.level.LevelScoreFact;
-import net.ivang.axonix.main.events.facts.LivesNumberFact;
-
-import static com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 
 /**
  * @author Ivan Gadzhega
@@ -46,20 +42,17 @@ public class StatusBar extends Table {
 
     private Label progress;
 
-    private Skin skin;
-
-    public StatusBar(EventBus eventBus, Skin skin, String fontName) {
+    public StatusBar(EventBus eventBus, Style style) {
         eventBus.register(this);
-        this.skin = skin;
 
-        livesLabel = new Label("Lives: ", skin, fontName, "white");
-        scoreLabel = new Label("Score: ", skin, fontName, "white");
-        levelLabel = new Label("Level: ", skin, fontName, "white");
+        livesLabel = new Label("Lives: ", style.label);
+        scoreLabel = new Label("Score: ", style.label);
+        levelLabel = new Label("Level: ", style.label);
 
-        livesValue = new Label("n/a", skin, fontName, "yellow");
-        scoreValue = new Label("n/a", skin, fontName, "yellow");
-        levelValue = new Label("n/a", skin, fontName, "yellow");
-        progress = new Label("n/a", skin, fontName, "yellow");
+        livesValue = new Label("n/a", style.value);
+        scoreValue = new Label("n/a", style.value);
+        levelValue = new Label("n/a", style.value);
+        progress = new Label("n/a", style.value);
 
         // lives
         add(livesLabel).padLeft(5);
@@ -74,24 +67,20 @@ public class StatusBar extends Table {
         add(progress).padLeft(5).padRight(5);
     }
 
-    public void setFont(String fontName) {
-        setFont(skin.getFont(fontName));
-
-    }
-
-    public void setFont(BitmapFont font) {
-        LabelStyle whiteStyle = new LabelStyle(font, skin.getColor("white"));
-
-        livesLabel.setStyle(whiteStyle);
-        scoreLabel.setStyle(whiteStyle);
-        levelLabel.setStyle(whiteStyle);
-
-        LabelStyle yellowStyle = new LabelStyle(font, skin.getColor("yellow"));
-
-        livesValue.setStyle(yellowStyle);
-        scoreValue.setStyle(yellowStyle);
-        levelValue.setStyle(yellowStyle);
-        progress.setStyle(yellowStyle);
+    public void setStyle(Style style) {
+        if (style != null) {
+            // names
+            livesLabel.setStyle(style.label);
+            scoreLabel.setStyle(style.label);
+            levelLabel.setStyle(style.label);
+            // values
+            livesValue.setStyle(style.value);
+            scoreValue.setStyle(style.value);
+            levelValue.setStyle(style.value);
+            progress.setStyle(style.value);
+        } else {
+            throw new IllegalArgumentException("style cannot be null.");
+        }
     }
 
     //---------------------------------------------------------------------
@@ -124,6 +113,15 @@ public class StatusBar extends Table {
     public void onLevelProgressChange(LevelProgressFact fact) {
         String percent = Byte.toString(fact.getPercentComplete());
         progress.setText("(" + percent + "/80%)");
+    }
+
+    //---------------------------------------------------------------------
+    // Nested Classes
+    //---------------------------------------------------------------------
+
+    static public class Style {
+        public Label.LabelStyle label;
+        public Label.LabelStyle value;
     }
 
 }

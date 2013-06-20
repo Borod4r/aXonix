@@ -18,12 +18,12 @@ package net.ivang.axonix.main.screens;
 
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.ParallelAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.esotericsoftware.tablelayout.Cell;
@@ -37,11 +37,10 @@ import net.ivang.axonix.main.actors.game.bar.DebugBar;
 import net.ivang.axonix.main.actors.game.bar.StatusBar;
 import net.ivang.axonix.main.actors.game.dialog.AlertDialog;
 import net.ivang.axonix.main.actors.game.dialog.ScreenStateDialog;
-import net.ivang.axonix.main.actors.game.notification.NotificationLabel;
-import net.ivang.axonix.main.events.facts.level.LevelIndexFact;
 import net.ivang.axonix.main.events.facts.LivesNumberFact;
 import net.ivang.axonix.main.events.facts.ObtainedPointsFact;
 import net.ivang.axonix.main.events.facts.TotalScoreFact;
+import net.ivang.axonix.main.events.facts.level.LevelIndexFact;
 import net.ivang.axonix.main.events.intents.BackIntent;
 import net.ivang.axonix.main.events.intents.DefaultIntent;
 import net.ivang.axonix.main.events.intents.game.*;
@@ -49,6 +48,7 @@ import net.ivang.axonix.main.events.intents.screen.LevelsScreenIntent;
 import net.ivang.axonix.main.events.intents.screen.StartScreenIntent;
 import net.ivang.axonix.main.preferences.PreferencesWrapper;
 
+import static com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import static java.lang.Math.min;
 
 /**
@@ -71,22 +71,23 @@ public class GameScreen extends BaseScreen {
     private int levelIndex;
     Level level;
 
+    private Style style;
     private StatusBar statusBar;
     private Cell levelCell;
     private Cell statusCell;
-    private NotificationLabel pointsLabel;
-    private NotificationLabel bigPointsLabel;
-    private NotificationLabel notificationLabel;
+    private Label pointsLabel;
+    private Label bigPointsLabel;
+    private Label notificationLabel;
     private AlertDialog stateDialog;
     private Background background;
 
     @Inject
     private GameScreen(AxonixGame game, InputMultiplexer inputMultiplexer, EventBus eventBus) {
         super(game, inputMultiplexer, eventBus);
+
         // init sub-components
-        Style style = getStyleByHeight();
         Table rootTable = initRootTable(style);
-        DebugBar debugBar = initDebugBar();
+        DebugBar debugBar = initDebugBar(style);
         initBackground();
         initPointsLabels(style);
         initNotificationLabel(style);
@@ -111,23 +112,14 @@ public class GameScreen extends BaseScreen {
 
     @Override
     public void resize(int width, int height) {
-        stage.setViewport(width, height, false);
+        super.resize(width, height);
+
         if (level != null) {
             float scale = calculateScaling(stage, level, statusCell.getMaxHeight());
             level.setScale(scale);
             levelCell.width(level.getWidth() * scale).height(level.getHeight() * scale);
         }
         background.update(true);
-
-        Style style = getStyleByHeight(height);
-        BitmapFont font = skin.getFont(style.toString());
-
-        statusCell.height(font.getLineHeight());
-        statusBar.setFont(font);
-        pointsLabel.setFont(font);
-        bigPointsLabel.setFont(style.getNext().toString());
-        notificationLabel.setFont(font);
-        stateDialog.setStyle(style.toString());
     }
 
     @Override
@@ -211,7 +203,7 @@ public class GameScreen extends BaseScreen {
     public void showObtainedPoints(ObtainedPointsFact fact) {
         // text
         int points = fact.getPoints();
-        NotificationLabel label = (points <= 200) ? getPointsLabel(): getBigPointsLabel();
+        Label label = (points <= 200) ? getPointsLabel(): getBigPointsLabel();
         label.setText(Integer.toString(points));
         // position
         float x = fact.getX();
@@ -273,6 +265,21 @@ public class GameScreen extends BaseScreen {
     // Helper methods
     //---------------------------------------------------------------------
 
+    @Override
+    protected void setStyleByName(String styleName) {
+        style = skin.get(styleName, Style.class);
+    }
+
+    @Override
+    protected void applyStyle() {
+        statusBar.setStyle(style.statusBar);
+        statusCell.height(style.statusCellHeight);
+        pointsLabel.setStyle(style.points);
+        bigPointsLabel.setStyle(style.bigPoints);
+        notificationLabel.setStyle(style.notification);
+        stateDialog.setStyle(style.stateDialog);
+    }
+
     private void initBackground() {
         background = new Background(skin);
     }
@@ -281,9 +288,9 @@ public class GameScreen extends BaseScreen {
         Table rootTable = new Table();
         rootTable.setFillParent(true);
         // status bar
-        statusBar = new StatusBar(eventBus, skin, style.toString());
+        statusBar = new StatusBar(eventBus, style.statusBar);
         statusCell = rootTable.add(statusBar);
-        statusCell.height(skin.getFont(style.toString()).getLineHeight()).left();
+        statusCell.height(style.statusCellHeight).left();
         rootTable.row();
         // level cell
         levelCell = rootTable.add();
@@ -291,22 +298,25 @@ public class GameScreen extends BaseScreen {
     }
 
     private void initPointsLabels(Style style) {
-        pointsLabel = new NotificationLabel(null, skin, style.toString());
-        bigPointsLabel = new NotificationLabel(null, skin, style.getNext().toString());
+        pointsLabel = new Label(null, style.points);
+        pointsLabel.setVisible(false);
+        bigPointsLabel = new Label(null, style.bigPoints);
+        bigPointsLabel.setVisible(false);
     }
 
     private void initNotificationLabel(Style style) {
-        notificationLabel = new NotificationLabel(null, skin, style.toString());
+        notificationLabel = new Label(null, style.notification);
         notificationLabel.setFillParent(true);
         notificationLabel.setAlignment(Align.center);
+        notificationLabel.setVisible(false);
     }
 
     private void initStateDialog(Style style) {
-        stateDialog = new ScreenStateDialog(null, skin, style.toString(), eventBus);
+        stateDialog = new ScreenStateDialog(null, style.stateDialog, eventBus);
     }
 
-    private DebugBar initDebugBar() {
-        return new DebugBar(skin, Style.SMALL.toString());
+    private DebugBar initDebugBar(Style style) {
+        return new DebugBar(style.debugBar);
     }
 
     private void setLevel(int index, boolean loadFromPrefs) {
@@ -404,7 +414,7 @@ public class GameScreen extends BaseScreen {
         eventBus.post(new LivesNumberFact(lives));
     }
 
-    public NotificationLabel getNotificationLabel() {
+    public Label getNotificationLabel() {
         return notificationLabel;
     }
 
@@ -425,15 +435,30 @@ public class GameScreen extends BaseScreen {
         eventBus.post(new TotalScoreFact(totalScore));
     }
 
-    public NotificationLabel getPointsLabel() {
+    public Label getPointsLabel() {
         return pointsLabel;
     }
 
-    public NotificationLabel getBigPointsLabel() {
+    public Label getBigPointsLabel() {
         return bigPointsLabel;
     }
 
     public AlertDialog getStateDialog() {
         return stateDialog;
     }
+
+    //---------------------------------------------------------------------
+    // Nested Classes
+    //---------------------------------------------------------------------
+
+    public static class Style {
+        public StatusBar.Style statusBar;
+        public float statusCellHeight;
+        public LabelStyle points;
+        public LabelStyle bigPoints;
+        public LabelStyle notification;
+        public AlertDialog.Style stateDialog;
+        public DebugBar.Style debugBar;
+    }
+
 }

@@ -34,12 +34,15 @@ import net.ivang.axonix.main.events.intents.DefaultIntent;
 import net.ivang.axonix.main.events.intents.screen.LevelsScreenIntent;
 import net.ivang.axonix.main.events.intents.screen.OptionsScreenIntent;
 
+import static com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+
 /**
  * @author Ivan Gadzhega
  * @since 0.1
  */
 public class StartScreen extends BaseScreen {
 
+    private Style style;
     private Button startButton;
     private Button optionsButton;
     private Cell logoCell;
@@ -49,6 +52,7 @@ public class StartScreen extends BaseScreen {
     @Inject
     private StartScreen(AxonixGame game, InputMultiplexer inputMultiplexer, final EventBus eventBus) {
         super(game, inputMultiplexer, eventBus);
+
         // root table
         Table rootTable = new Table();
         rootTable.setFillParent(true);
@@ -57,8 +61,7 @@ public class StartScreen extends BaseScreen {
         logoCell = rootTable.add(logo);
         rootTable.row();
         // start button
-        Style style = getStyleByHeight();
-        startButton = new TextButton("Start", skin, style.toString());
+        startButton = new TextButton("Start", style.button);
         startButton.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
                 eventBus.post(new LevelsScreenIntent());
@@ -67,7 +70,7 @@ public class StartScreen extends BaseScreen {
         startButtonCell = rootTable.add(startButton);
         rootTable.row();
         // options button
-        optionsButton = new TextButton("Options", skin, style.toString());
+        optionsButton = new TextButton("Options", style.button);
         optionsButton.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
                 eventBus.post(new OptionsScreenIntent());
@@ -76,16 +79,6 @@ public class StartScreen extends BaseScreen {
         optionsButtonCell = rootTable.add(optionsButton);
         // stage
         stage.addActor(rootTable);
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        stage.setViewport(width, height, true);
-        Style style = getStyleByHeight(height);
-        float scale = getScaleByStyle(style);
-        resizeLogo(scale);
-        resizeButtons(style, scale);
-
     }
 
     //---------------------------------------------------------------------
@@ -108,24 +101,35 @@ public class StartScreen extends BaseScreen {
     // Helper methods
     //---------------------------------------------------------------------
 
-    private void resizeLogo(float scale) {
-        float logoWidth = 512 * scale;
-        float logoHeight = 120 * scale;
-        float padding = 16 * scale;
-        logoCell.width(logoWidth).height(logoHeight).pad(padding);
+    @Override
+    protected void setStyleByName(String styleName) {
+        style = skin.get(styleName, Style.class);
     }
 
-    private void resizeButtons(Style style, float scale) {
-        Button.ButtonStyle buttonStyle = skin.get(style.toString(), TextButton.TextButtonStyle.class);
-        float buttonWidth = 400 * scale;
-        float buttonHeight = 85 * scale;
-        float padding = 8 * scale;
+    @Override
+    protected void applyStyle() {
+        // logo
+        logoCell.width(style.logoWidth).height(style.logoHeight).pad(style.logoPad);
         // start button
-        startButton.setStyle(buttonStyle);
-        startButtonCell.width(buttonWidth).height(buttonHeight).pad(padding);
+        startButton.setStyle(style.button);
+        startButtonCell.width(style.buttonWidth).height(style.buttonHeight).pad(style.buttonPad);
         // options button
-        optionsButton.setStyle(buttonStyle);
-        optionsButtonCell.width(buttonWidth).height(buttonHeight).pad(padding);
+        optionsButton.setStyle(style.button);
+        optionsButtonCell.width(style.buttonWidth).height(style.buttonHeight).pad(style.buttonPad);
+    }
+
+    //---------------------------------------------------------------------
+    // Nested Classes
+    //---------------------------------------------------------------------
+
+    static public class Style {
+        public TextButtonStyle button;
+        public float buttonWidth;
+        public float buttonHeight;
+        public float buttonPad;
+        public float logoWidth;
+        public float logoHeight;
+        public float logoPad;
     }
 
 }
