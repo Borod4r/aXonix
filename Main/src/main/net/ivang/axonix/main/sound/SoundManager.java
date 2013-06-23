@@ -18,15 +18,19 @@ package net.ivang.axonix.main.sound;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import net.ivang.axonix.main.events.facts.EnemyDirectionFact;
 import net.ivang.axonix.main.events.facts.MusicVolumeFact;
 import net.ivang.axonix.main.events.facts.screen.GameScreenFact;
 import net.ivang.axonix.main.events.facts.screen.LevelsScreenFact;
 import net.ivang.axonix.main.events.facts.screen.StartScreenFact;
 import net.ivang.axonix.main.preferences.PreferencesWrapper;
 import net.ivang.axonix.main.screens.GameScreen;
+
+import java.util.Random;
 
 /**
  * @author Ivan Gadzhega
@@ -103,7 +107,17 @@ public class SoundManager {
         }
     }
 
-    public void setCurrentLoop(Loop currentLoop) {
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onEnemyCollision(EnemyDirectionFact fact) {
+        Sounds.ENEMY_COLLISION.play(1);
+    }
+
+    //---------------------------------------------------------------------
+    // Helper methods
+    //---------------------------------------------------------------------
+
+    private void setCurrentLoop(Loop currentLoop) {
         this.currentLoop = currentLoop;
 
         for (Loop loop : Loop.values()) {
@@ -132,7 +146,6 @@ public class SoundManager {
         private Loop(Music music) {
             this.music = music;
             music.setLooping(true);
-//            music.setVolume(preferences.);
         }
 
         public Music getMusic() {
@@ -140,4 +153,45 @@ public class SoundManager {
         }
     }
 
+    private enum Sounds {
+        ENEMY_COLLISION(Gdx.audio.newSound(Gdx.files.internal("data/music/enemy_collision.ogg")), false, 150, 100);
+
+        private final Sound sound;
+        private boolean concurrent;
+        private int gapMin, gapRange;
+        private long lastPlayed;
+        private int gap;
+        private Random random;
+
+        private Sounds(Sound sound, boolean concurrent, int gapMin, int gapRange) {
+            this.sound = sound;
+            this.concurrent = concurrent;
+            this.gapMin = gapMin;
+            this.gapRange = gapRange;
+
+            if (gapRange != 0) {
+                this.random = new Random();
+                gap = getRandomGap();
+            } else {
+                gap = gapMin;
+            }
+        }
+
+        public long play(float volume) {
+            long soundId = -1;
+            long now = System.currentTimeMillis();
+            if (gap <= 0 || now - lastPlayed > gap) {
+                lastPlayed = now;
+                if (gapRange != 0) gap = getRandomGap();
+                if (!concurrent) sound.stop();
+                soundId = sound.play(volume);
+            }
+            return soundId;
+        }
+
+        private int getRandomGap() {
+            return random.nextInt(gapRange) + gapMin;
+        }
+
+    }
 }

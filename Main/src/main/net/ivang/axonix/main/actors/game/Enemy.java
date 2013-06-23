@@ -22,6 +22,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.google.common.eventbus.EventBus;
+import net.ivang.axonix.main.events.facts.EnemyDirectionFact;
 
 /**
  * @author Ivan Gadzhega
@@ -32,8 +34,9 @@ public class Enemy extends Actor {
     private Move moveDirection;
     private TextureRegion region;
     private ParticleEffect particleEffect;
+    private EventBus eventBus;
 
-    Enemy(float x, float y, Skin skin) {
+    Enemy(float x, float y, Skin skin, EventBus eventBus) {
         setX(x); setY(y);
         setWidth(1f);
         setHeight(1f);
@@ -44,7 +47,9 @@ public class Enemy extends Actor {
         particleEffect = new ParticleEffect();
         particleEffect.load(Gdx.files.internal("data/particles/enemy.p"), skin.getAtlas());
         particleEffect.setPosition(x, y);
-
+        // register with the event bus
+        this.eventBus = eventBus;
+        eventBus.register(this);
     }
 
     @Override
@@ -65,12 +70,12 @@ public class Enemy extends Actor {
                 y += deltaPx;
                 if (level.getBlock(x, y + radius) == Level.Block.BLUE) {
                     if (level.getBlock(x - radius, y) == Level.Block.BLUE) {
-                        moveDirection = Move.DOWN_RIGHT;
+                        setMoveDirection(Move.DOWN_RIGHT);
                     } else {
-                        moveDirection = Move.DOWN_LEFT;
+                        setMoveDirection(Move.DOWN_LEFT);
                     }
                 } else if (level.getBlock(x - radius, y) == Level.Block.BLUE) {
-                    moveDirection = Move.UP_RIGHT;
+                    setMoveDirection(Move.UP_RIGHT);
                 }
                 break;
             case UP_RIGHT:
@@ -78,12 +83,12 @@ public class Enemy extends Actor {
                 y += deltaPx;
                 if (level.getBlock(x, y + radius) == Level.Block.BLUE) {
                     if (level.getBlock(x + radius, y) == Level.Block.BLUE) {
-                        moveDirection = Move.DOWN_LEFT;
+                        setMoveDirection(Move.DOWN_LEFT);
                     } else {
-                        moveDirection = Move.DOWN_RIGHT;
+                        setMoveDirection(Move.DOWN_RIGHT);
                     }
                 } else if (level.getBlock(x + radius, y)== Level.Block.BLUE) {
-                    moveDirection = Move.UP_LEFT;
+                    setMoveDirection(Move.UP_LEFT);
                 }
                 break;
             case DOWN_LEFT:
@@ -91,12 +96,12 @@ public class Enemy extends Actor {
                 y -= deltaPx;
                 if (level.getBlock(x, y - radius) == Level.Block.BLUE) {
                     if (level.getBlock(x - radius, y) == Level.Block.BLUE) {
-                        moveDirection = Move.UP_RIGHT;
+                        setMoveDirection(Move.UP_RIGHT);
                     } else {
-                        moveDirection = Move.UP_LEFT;
+                        setMoveDirection(Move.UP_LEFT);
                     }
                 } else if (level.getBlock(x - radius, y) == Level.Block.BLUE) {
-                    moveDirection = Move.DOWN_RIGHT;
+                    setMoveDirection(Move.DOWN_RIGHT);
                 }
                 break;
             case DOWN_RIGHT:
@@ -104,12 +109,12 @@ public class Enemy extends Actor {
                 y -= deltaPx;
                 if (level.getBlock(x, y - radius) == Level.Block.BLUE) {
                     if (level.getBlock(x + radius, y) == Level.Block.BLUE) {
-                        moveDirection = Move.UP_LEFT;
+                        setMoveDirection(Move.UP_LEFT);
                     } else {
-                        moveDirection = Move.UP_RIGHT;
+                        setMoveDirection(Move.UP_RIGHT);
                     }
                 } else if (level.getBlock(x + radius, y) == Level.Block.BLUE) {
-                    moveDirection = Move.DOWN_LEFT;
+                    setMoveDirection(Move.DOWN_LEFT);
                 }
                 break;
         }
@@ -130,4 +135,12 @@ public class Enemy extends Actor {
         batch.draw(region, getX() - getOriginX(), getY() - getOriginY(), getWidth(), getHeight());
     }
 
+    //---------------------------------------------------------------------
+    // Getters & Setters
+    //---------------------------------------------------------------------
+
+    public void setMoveDirection(Move moveDirection) {
+        this.moveDirection = moveDirection;
+        eventBus.post(new EnemyDirectionFact(moveDirection));
+    }
 }

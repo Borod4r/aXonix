@@ -90,7 +90,7 @@ public class Level extends Group {
                 if(pix == EARTH) {
                     levelMap[x][y] = Block.BLUE;
                 }else if (pix == ENEMY) {
-                    Enemy enemy = new Enemy(x + 0.5f, y + 0.5f, skin);
+                    Enemy enemy = new Enemy(x + 0.5f, y + 0.5f, skin, eventBus);
                     enemies.add(enemy);
                     addActor(enemy);
                     levelMap[x][y] = Block.EMPTY;
