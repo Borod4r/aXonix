@@ -33,6 +33,9 @@ public class PreferencesWrapper {
     private static final String PREF_KEY_MUSIC_VOLUME = "music_volume";
     private static final float MUSIC_VOLUME_DEF_VALUE = 0.7f;
 
+    private static final String PREF_KEY_SFX_VOLUME = "sfx_volume";
+    private static final float SFX_VOLUME_DEF_VALUE = 0.7f;
+
     private Preferences preferences;
     private boolean isChanged;
 
@@ -85,6 +88,15 @@ public class PreferencesWrapper {
 
     public void setMusicVolume(float musicVolume) {
         preferences.putFloat(PREF_KEY_MUSIC_VOLUME, musicVolume);
+        isChanged = true;
+    }
+
+    public float getSfxVolume() {
+        return preferences.getFloat(PREF_KEY_SFX_VOLUME, SFX_VOLUME_DEF_VALUE);
+    }
+
+    public void setSfxVolume(float sfxVolume) {
+        preferences.putFloat(PREF_KEY_SFX_VOLUME, sfxVolume);
         isChanged = true;
     }
 

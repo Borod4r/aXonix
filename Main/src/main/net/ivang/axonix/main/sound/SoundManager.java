@@ -24,6 +24,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.events.facts.EnemyDirectionFact;
 import net.ivang.axonix.main.events.facts.MusicVolumeFact;
+import net.ivang.axonix.main.events.facts.SfxVolumeFact;
 import net.ivang.axonix.main.events.facts.screen.GameScreenFact;
 import net.ivang.axonix.main.events.facts.screen.LevelsScreenFact;
 import net.ivang.axonix.main.events.facts.screen.StartScreenFact;
@@ -42,11 +43,13 @@ public class SoundManager {
 
     private Loop currentLoop;
     private float musicVolume;
+    private float sfxVolume;
 
     @Inject
     public SoundManager(PreferencesWrapper preferences, EventBus eventBus) {
         this.preferences = preferences;
         this.musicVolume = preferences.getMusicVolume();
+        this.sfxVolume = preferences.getSfxVolume();
         eventBus.register(this);
     }
 
@@ -69,6 +72,16 @@ public class SoundManager {
         }
         // save to preferences
         preferences.setMusicVolume(musicVolume);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onSfxVolumeChange(SfxVolumeFact fact) {
+        sfxVolume = fact.getVolume();
+        // save to preferences
+        preferences.setSfxVolume(sfxVolume);
+        // play sample sound
+        Sounds.ENEMY_COLLISION.play(sfxVolume);
     }
 
     @Subscribe
@@ -110,7 +123,7 @@ public class SoundManager {
     @Subscribe
     @SuppressWarnings("unused")
     public void onEnemyCollision(EnemyDirectionFact fact) {
-        Sounds.ENEMY_COLLISION.play(1);
+        Sounds.ENEMY_COLLISION.play(sfxVolume);
     }
 
     //---------------------------------------------------------------------
@@ -179,12 +192,14 @@ public class SoundManager {
 
         public long play(float volume) {
             long soundId = -1;
-            long now = System.currentTimeMillis();
-            if (gap <= 0 || now - lastPlayed > gap) {
-                lastPlayed = now;
-                if (gapRange != 0) gap = getRandomGap();
-                if (!concurrent) sound.stop();
-                soundId = sound.play(volume);
+            if (volume > 0) {
+                long now = System.currentTimeMillis();
+                if (gap <= 0 || now - lastPlayed > gap) {
+                    lastPlayed = now;
+                    if (gapRange != 0) gap = getRandomGap();
+                    if (!concurrent) sound.stop();
+                    soundId = sound.play(volume);
+                }
             }
             return soundId;
         }

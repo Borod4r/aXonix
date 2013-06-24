@@ -258,17 +258,23 @@
         "small": {
             "labelStyle": "small_white",
             "valueStyle": "small_yellow",
-            "sliderStyle": "small"
+            "sliderStyle": "small",
+            "labelPad": 14,
+            "sectionPad": 14
         },
         "normal": {
             "labelStyle": "normal_white",
             "valueStyle": "normal_yellow",
-            "sliderStyle": "normal"
+            "sliderStyle": "normal",
+            "labelPad": 20,
+            "sectionPad": 20
         },
         "large": {
             "labelStyle": "large_white",
             "valueStyle": "large_yellow",
-            "sliderStyle": "large"
+            "sliderStyle": "large",
+            "labelPad": 30,
+            "sectionPad": 30
         }
     },
 
