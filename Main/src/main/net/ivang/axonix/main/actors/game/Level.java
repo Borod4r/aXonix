@@ -24,6 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import net.ivang.axonix.main.events.facts.TailBlockFact;
 import net.ivang.axonix.main.screens.GameScreen;
 import net.ivang.axonix.main.events.facts.level.LevelProgressFact;
 import net.ivang.axonix.main.events.facts.level.LevelScoreFact;
@@ -119,6 +120,7 @@ public class Level extends Group {
                 switch (getBlock(protagonist.getX(), protagonist.getY())) {
                     case EMPTY:
                         setBlock(protagonist.getX(), protagonist.getY(), Block.TAIL);
+                        eventBus.post(new TailBlockFact());
                         break;
                     case TAIL:
                             protagonist.setState(Protagonist.State.DYING);

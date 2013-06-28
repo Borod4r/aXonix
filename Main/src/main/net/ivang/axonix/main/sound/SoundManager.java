@@ -25,6 +25,7 @@ import com.google.inject.Inject;
 import net.ivang.axonix.main.events.facts.EnemyDirectionFact;
 import net.ivang.axonix.main.events.facts.MusicVolumeFact;
 import net.ivang.axonix.main.events.facts.SfxVolumeFact;
+import net.ivang.axonix.main.events.facts.TailBlockFact;
 import net.ivang.axonix.main.events.facts.screen.GameScreenFact;
 import net.ivang.axonix.main.events.facts.screen.LevelsScreenFact;
 import net.ivang.axonix.main.events.facts.screen.StartScreenFact;
@@ -126,6 +127,12 @@ public class SoundManager {
         Sounds.ENEMY_COLLISION.play(sfxVolume);
     }
 
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onNewTailBlock(TailBlockFact fact) {
+        Sounds.TAIL_BLOCK.play(sfxVolume);
+    }
+
     //---------------------------------------------------------------------
     // Helper methods
     //---------------------------------------------------------------------
@@ -167,9 +174,11 @@ public class SoundManager {
     }
 
     private enum Sounds {
-        ENEMY_COLLISION(Gdx.audio.newSound(Gdx.files.internal("data/music/enemy_collision.ogg")), false, 150, 100);
+        ENEMY_COLLISION(Gdx.audio.newSound(Gdx.files.internal("data/music/enemy_collision.ogg")), false, 150, 100),
+        TAIL_BLOCK(Gdx.audio.newSound(Gdx.files.internal("data/music/tail.ogg")), true, 0, 0);
 
         private final Sound sound;
+        private long soundId;
         private boolean concurrent;
         private int gapMin, gapRange;
         private long lastPlayed;
@@ -191,17 +200,21 @@ public class SoundManager {
         }
 
         public long play(float volume) {
-            long soundId = -1;
+            long newId = -1;
             if (volume > 0) {
                 long now = System.currentTimeMillis();
                 if (gap <= 0 || now - lastPlayed > gap) {
                     lastPlayed = now;
                     if (gapRange != 0) gap = getRandomGap();
-                    if (!concurrent) sound.stop();
-                    soundId = sound.play(volume);
+                    newId = sound.play(volume);
+                    // workaround to avoid clapping on android
+                    if (!concurrent) {
+                        sound.stop(soundId);
+                        soundId = newId;
+                    }
                 }
             }
-            return soundId;
+            return newId;
         }
 
         private int getRandomGap() {
