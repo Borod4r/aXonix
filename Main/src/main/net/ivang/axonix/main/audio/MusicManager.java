@@ -14,43 +14,35 @@
  * the License.
  */
 
-package net.ivang.axonix.main.sound;
+package net.ivang.axonix.main.audio;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import net.ivang.axonix.main.events.facts.EnemyDirectionFact;
 import net.ivang.axonix.main.events.facts.MusicVolumeFact;
-import net.ivang.axonix.main.events.facts.SfxVolumeFact;
-import net.ivang.axonix.main.events.facts.TailBlockFact;
 import net.ivang.axonix.main.events.facts.screen.GameScreenFact;
 import net.ivang.axonix.main.events.facts.screen.LevelsScreenFact;
 import net.ivang.axonix.main.events.facts.screen.StartScreenFact;
 import net.ivang.axonix.main.preferences.PreferencesWrapper;
 import net.ivang.axonix.main.screens.GameScreen;
 
-import java.util.Random;
-
 /**
  * @author Ivan Gadzhega
  * @since 0.2
  */
-public class SoundManager {
+public class MusicManager {
 
     private PreferencesWrapper preferences;
 
     private Loop currentLoop;
     private float musicVolume;
-    private float sfxVolume;
 
     @Inject
-    public SoundManager(PreferencesWrapper preferences, EventBus eventBus) {
+    public MusicManager(PreferencesWrapper preferences, EventBus eventBus) {
         this.preferences = preferences;
         this.musicVolume = preferences.getMusicVolume();
-        this.sfxVolume = preferences.getSfxVolume();
         eventBus.register(this);
     }
 
@@ -73,16 +65,6 @@ public class SoundManager {
         }
         // save to preferences
         preferences.setMusicVolume(musicVolume);
-    }
-
-    @Subscribe
-    @SuppressWarnings("unused")
-    public void onSfxVolumeChange(SfxVolumeFact fact) {
-        sfxVolume = fact.getVolume();
-        // save to preferences
-        preferences.setSfxVolume(sfxVolume);
-        // play sample sound
-        Sounds.ENEMY_COLLISION.play(sfxVolume);
     }
 
     @Subscribe
@@ -121,18 +103,6 @@ public class SoundManager {
         }
     }
 
-    @Subscribe
-    @SuppressWarnings("unused")
-    public void onEnemyCollision(EnemyDirectionFact fact) {
-        Sounds.ENEMY_COLLISION.play(sfxVolume);
-    }
-
-    @Subscribe
-    @SuppressWarnings("unused")
-    public void onNewTailBlock(TailBlockFact fact) {
-        Sounds.TAIL_BLOCK.play(sfxVolume);
-    }
-
     //---------------------------------------------------------------------
     // Helper methods
     //---------------------------------------------------------------------
@@ -158,13 +128,13 @@ public class SoundManager {
     //---------------------------------------------------------------------
 
     private enum Loop {
-        START(Gdx.audio.newMusic(Gdx.files.internal("data/music/loop_start.ogg"))),
-        GAME(Gdx.audio.newMusic(Gdx.files.internal("data/music/loop_game.ogg")));
+        START("data/audio/music/loop_start.ogg"),
+        GAME("data/audio/music/loop_game.ogg");
 
         private final Music music;
 
-        private Loop(Music music) {
-            this.music = music;
+        private Loop(String path) {
+            this.music = Gdx.audio.newMusic(Gdx.files.internal(path));
             music.setLooping(true);
         }
 
@@ -173,53 +143,4 @@ public class SoundManager {
         }
     }
 
-    private enum Sounds {
-        ENEMY_COLLISION(Gdx.audio.newSound(Gdx.files.internal("data/music/enemy_collision.ogg")), false, 150, 100),
-        TAIL_BLOCK(Gdx.audio.newSound(Gdx.files.internal("data/music/tail.ogg")), true, 0, 0);
-
-        private final Sound sound;
-        private long soundId;
-        private boolean concurrent;
-        private int gapMin, gapRange;
-        private long lastPlayed;
-        private int gap;
-        private Random random;
-
-        private Sounds(Sound sound, boolean concurrent, int gapMin, int gapRange) {
-            this.sound = sound;
-            this.concurrent = concurrent;
-            this.gapMin = gapMin;
-            this.gapRange = gapRange;
-
-            if (gapRange != 0) {
-                this.random = new Random();
-                gap = getRandomGap();
-            } else {
-                gap = gapMin;
-            }
-        }
-
-        public long play(float volume) {
-            long newId = -1;
-            if (volume > 0) {
-                long now = System.currentTimeMillis();
-                if (gap <= 0 || now - lastPlayed > gap) {
-                    lastPlayed = now;
-                    if (gapRange != 0) gap = getRandomGap();
-                    newId = sound.play(volume);
-                    // workaround to avoid clapping on android
-                    if (!concurrent) {
-                        sound.stop(soundId);
-                        soundId = newId;
-                    }
-                }
-            }
-            return newId;
-        }
-
-        private int getRandomGap() {
-            return random.nextInt(gapRange) + gapMin;
-        }
-
-    }
 }

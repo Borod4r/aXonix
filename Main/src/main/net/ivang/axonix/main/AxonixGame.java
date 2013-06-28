@@ -40,7 +40,8 @@ import net.ivang.axonix.main.screens.GameScreen;
 import net.ivang.axonix.main.screens.LevelsScreen;
 import net.ivang.axonix.main.screens.OptionsScreen;
 import net.ivang.axonix.main.screens.StartScreen;
-import net.ivang.axonix.main.sound.SoundManager;
+import net.ivang.axonix.main.audio.MusicManager;
+import net.ivang.axonix.main.audio.SoundManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -56,6 +57,7 @@ public class AxonixGame extends Game {
     @Inject private LevelsScreen levelsScreen;
     @Inject private GameScreen gameScreen;
 
+    @Inject private MusicManager musicManager;
     @Inject private SoundManager soundManager;
 
     private Skin skin;
