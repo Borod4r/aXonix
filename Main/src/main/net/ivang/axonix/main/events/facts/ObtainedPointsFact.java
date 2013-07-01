@@ -21,6 +21,11 @@ package net.ivang.axonix.main.events.facts;
  * @since 0.1
  */
 public class ObtainedPointsFact {
+
+    public static final int QUANTITY_1 = 20;
+    public static final int QUANTITY_2 = 50;
+    public static final int QUANTITY_3 = 100;
+
     private int points;
     private float x, y;
     private float deltaY;

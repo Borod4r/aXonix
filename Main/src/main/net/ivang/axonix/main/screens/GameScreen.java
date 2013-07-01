@@ -203,7 +203,7 @@ public class GameScreen extends BaseScreen {
     public void showObtainedPoints(ObtainedPointsFact fact) {
         // text
         int points = fact.getPoints();
-        Label label = (points <= 200) ? getPointsLabel(): getBigPointsLabel();
+        Label label = (points <= ObtainedPointsFact.QUANTITY_3) ? getPointsLabel(): getBigPointsLabel();
         label.setText(Integer.toString(points));
         // position
         float x = fact.getX();

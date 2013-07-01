@@ -16,17 +16,14 @@
 
 package net.ivang.axonix.main.audio;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.events.facts.EnemyDirectionFact;
+import net.ivang.axonix.main.events.facts.ObtainedPointsFact;
 import net.ivang.axonix.main.events.facts.SfxVolumeFact;
 import net.ivang.axonix.main.events.facts.TailBlockFact;
 import net.ivang.axonix.main.preferences.PreferencesWrapper;
-
-import java.util.Random;
 
 /**
  * @author Ivan Gadzhega
@@ -71,57 +68,51 @@ public class SoundManager {
         Sounds.TAIL_BLOCK.play(sfxVolume);
     }
 
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onPointsObtained(ObtainedPointsFact fact) {
+        int points = fact.getPoints();
+        if (points < ObtainedPointsFact.QUANTITY_1) {
+            Sounds.FILLING_SHORT_1.play(sfxVolume);
+        } else if (points < ObtainedPointsFact.QUANTITY_2){
+            Sounds.FILLING_SHORT_2.play(sfxVolume);
+        } else if (points < ObtainedPointsFact.QUANTITY_3) {
+            Sounds.FILLING_SHORT_3.play(sfxVolume);
+        } else {
+            Sounds.FILLING.play(sfxVolume);
+        }
+    }
+
     //---------------------------------------------------------------------
     // Nested Classes
     //---------------------------------------------------------------------
 
     private enum Sounds {
         ENEMY_DIRECTION("data/audio/sounds/enemy_direction.ogg", false, 150, 100),
-        TAIL_BLOCK("data/audio/sounds/tail_block.ogg", true, 0, 0);
+        TAIL_BLOCK("data/audio/sounds/tail_block.ogg"),
+        FILLING_SHORT_1("data/audio/sounds/filling_short_1.ogg"),
+        FILLING_SHORT_2("data/audio/sounds/filling_short_2.ogg"),
+        FILLING_SHORT_3("data/audio/sounds/filling_short_3.ogg"),
+        FILLING("data/audio/sounds/filling_1.ogg",
+                "data/audio/sounds/filling_2.ogg",
+                "data/audio/sounds/filling_3.ogg");
 
-        private final Sound sound;
-        private long soundId;
-        private boolean concurrent;
-        private int gapMin, gapRange;
-        private long lastPlayed;
-        private int gap;
-        private Random random;
+        private final SoundWrapper sound;
+
+        private Sounds(String path) {
+            this.sound = new CustomSoundWrapper(path, true, 0, 0);
+        }
 
         private Sounds(String path, boolean concurrent, int gapMin, int gapRange) {
-            this.sound = Gdx.audio.newSound(Gdx.files.internal(path));
-            this.concurrent = concurrent;
-            this.gapMin = gapMin;
-            this.gapRange = gapRange;
+            this.sound = new CustomSoundWrapper(path, concurrent, gapMin, gapRange);
+        }
 
-            if (gapRange != 0) {
-                this.random = new Random();
-                gap = getRandomGap();
-            } else {
-                gap = gapMin;
-            }
+        private Sounds(String... paths) {
+            this.sound = new SequentialSoundWrapper(paths);
         }
 
         public long play(float volume) {
-            long newId = -1;
-            if (volume > 0) {
-                long now = System.currentTimeMillis();
-                if (gap <= 0 || now - lastPlayed > gap) {
-                    lastPlayed = now;
-                    if (gapRange != 0) gap = getRandomGap();
-                    newId = sound.play(volume);
-                    // workaround to avoid clapping on android
-                    if (!concurrent) {
-                        sound.stop(soundId);
-                        soundId = newId;
-                    }
-                }
-            }
-            return newId;
+            return sound.play(volume);
         }
-
-        private int getRandomGap() {
-            return random.nextInt(gapRange) + gapMin;
-        }
-
     }
 }
