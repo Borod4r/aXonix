@@ -5,6 +5,15 @@ This product is licensed to you under the Apache License, Version 2.0 (the "Lice
 See the LICENSE file for the full license text.
 You may not use this product except in compliance with the License.
 
+
+MUSIC, SOUNDS and IMAGES
+---------------------------
+Unless otherwise specified, all music, sounds and images are licensed under the Creative Commons
+Attribution-NonCommercial 3.0 Unported License. To view a copy of this license,
+visit http://creativecommons.org/licenses/by-nc/3.0/ or send a letter to Creative Commons,
+444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
+
+
 THIRD PARTY COMPONENTS
 -------------------------------
 This software includes third party software subject to the associated copyrights, as follows:
