@@ -19,6 +19,7 @@ package net.ivang.axonix.main.audio;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import net.ivang.axonix.main.actors.game.Protagonist;
 import net.ivang.axonix.main.events.facts.EnemyDirectionFact;
 import net.ivang.axonix.main.events.facts.ObtainedPointsFact;
 import net.ivang.axonix.main.events.facts.SfxVolumeFact;
@@ -83,12 +84,21 @@ public class SoundManager {
         }
     }
 
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onProtagonistStateChange(Protagonist.State state) {
+        if (state == Protagonist.State.DYING) {
+            Sounds.PROT_DYING.play(sfxVolume);
+        }
+    }
+
     //---------------------------------------------------------------------
     // Nested Classes
     //---------------------------------------------------------------------
 
     private enum Sounds {
         ENEMY_DIRECTION("data/audio/sounds/enemy_direction.ogg", false, 150, 100),
+        PROT_DYING("data/audio/sounds/prot_dying.ogg"),
         TAIL_BLOCK("data/audio/sounds/tail_block.ogg"),
         FILLING_SHORT_1("data/audio/sounds/filling_short_1.ogg"),
         FILLING_SHORT_2("data/audio/sounds/filling_short_2.ogg"),
