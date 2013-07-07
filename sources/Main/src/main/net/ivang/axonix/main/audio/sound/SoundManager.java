@@ -21,6 +21,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.actors.game.Protagonist;
 import net.ivang.axonix.main.events.facts.*;
+import net.ivang.axonix.main.events.intents.BackIntent;
 import net.ivang.axonix.main.events.intents.DefaultIntent;
 import net.ivang.axonix.main.preferences.PreferencesWrapper;
 
@@ -98,8 +99,14 @@ public class SoundManager {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onButtonClick(DefaultIntent intent) {
+    public void onDefaultIntent(DefaultIntent intent) {
         Sounds.BUTTON_CLICK.play(sfxVolume);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onBackIntent(BackIntent intent) {
+        Sounds.BACK_INTENT.play(sfxVolume);
     }
 
     //---------------------------------------------------------------------
@@ -107,10 +114,11 @@ public class SoundManager {
     //---------------------------------------------------------------------
 
     private enum Sounds {
+        ENEMY_DIRECTION("data/audio/sounds/enemy_direction.ogg", false, 150, 100),
         BUTTON_CLICK("data/audio/sounds/button_click.ogg", false, 100, 0),
+        BACK_INTENT("data/audio/sounds/back_intent.ogg"),
         PROT_DYING("data/audio/sounds/prot_dying.ogg"),
         TAIL_BLOCK("data/audio/sounds/tail_block.ogg"),
-        ENEMY_DIRECTION("data/audio/sounds/enemy_direction.ogg", false, 150, 100),
         FILLING_SHORT_1("data/audio/sounds/filling_short_1.ogg"),
         FILLING_SHORT_2("data/audio/sounds/filling_short_2.ogg"),
         FILLING_SHORT_3("data/audio/sounds/filling_short_3.ogg"),
