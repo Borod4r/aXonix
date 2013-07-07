@@ -21,6 +21,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.actors.game.Protagonist;
 import net.ivang.axonix.main.events.facts.*;
+import net.ivang.axonix.main.events.intents.DefaultIntent;
 import net.ivang.axonix.main.preferences.PreferencesWrapper;
 
 /**
@@ -95,12 +96,18 @@ public class SoundManager {
         Sounds.BUTTON_CLICK.play(sfxVolume);
     }
 
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onButtonClick(DefaultIntent intent) {
+        Sounds.BUTTON_CLICK.play(sfxVolume);
+    }
+
     //---------------------------------------------------------------------
     // Nested Classes
     //---------------------------------------------------------------------
 
     private enum Sounds {
-        BUTTON_CLICK("data/audio/sounds/button_click.ogg"),
+        BUTTON_CLICK("data/audio/sounds/button_click.ogg", false, 100, 0),
         PROT_DYING("data/audio/sounds/prot_dying.ogg"),
         TAIL_BLOCK("data/audio/sounds/tail_block.ogg"),
         ENEMY_DIRECTION("data/audio/sounds/enemy_direction.ogg", false, 150, 100),
