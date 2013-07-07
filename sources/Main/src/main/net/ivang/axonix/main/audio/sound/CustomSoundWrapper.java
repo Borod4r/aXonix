@@ -14,7 +14,7 @@
  * the License.
  */
 
-package net.ivang.axonix.main.audio;
+package net.ivang.axonix.main.audio.sound;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;

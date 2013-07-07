@@ -24,8 +24,8 @@ import net.ivang.axonix.main.preferences.PreferencesWrapper;
 import net.ivang.axonix.main.screens.GameScreen;
 import net.ivang.axonix.main.screens.LevelsScreen;
 import net.ivang.axonix.main.screens.StartScreen;
-import net.ivang.axonix.main.audio.MusicManager;
-import net.ivang.axonix.main.audio.SoundManager;
+import net.ivang.axonix.main.audio.music.MusicManager;
+import net.ivang.axonix.main.audio.sound.SoundManager;
 
 /**
  * @author Ivan Gadzhega

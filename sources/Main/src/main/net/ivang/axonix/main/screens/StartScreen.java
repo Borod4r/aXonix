@@ -29,6 +29,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.AxonixGame;
+import net.ivang.axonix.main.events.facts.ButtonClickFact;
 import net.ivang.axonix.main.events.intents.BackIntent;
 import net.ivang.axonix.main.events.intents.DefaultIntent;
 import net.ivang.axonix.main.events.intents.screen.LevelsScreenIntent;
@@ -64,6 +65,7 @@ public class StartScreen extends BaseScreen {
         startButton = new TextButton("Start", style.button);
         startButton.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
+                eventBus.post(new ButtonClickFact());
                 eventBus.post(new LevelsScreenIntent());
             }
         });
@@ -73,6 +75,7 @@ public class StartScreen extends BaseScreen {
         optionsButton = new TextButton("Options", style.button);
         optionsButton.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
+                eventBus.post(new ButtonClickFact());
                 eventBus.post(new OptionsScreenIntent());
             }
         });

@@ -14,16 +14,13 @@
  * the License.
  */
 
-package net.ivang.axonix.main.audio;
+package net.ivang.axonix.main.audio.sound;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.actors.game.Protagonist;
-import net.ivang.axonix.main.events.facts.EnemyDirectionFact;
-import net.ivang.axonix.main.events.facts.ObtainedPointsFact;
-import net.ivang.axonix.main.events.facts.SfxVolumeFact;
-import net.ivang.axonix.main.events.facts.TailBlockFact;
+import net.ivang.axonix.main.events.facts.*;
 import net.ivang.axonix.main.preferences.PreferencesWrapper;
 
 /**
@@ -92,14 +89,21 @@ public class SoundManager {
         }
     }
 
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onButtonClick(ButtonClickFact fact) {
+        Sounds.BUTTON_CLICK.play(sfxVolume);
+    }
+
     //---------------------------------------------------------------------
     // Nested Classes
     //---------------------------------------------------------------------
 
     private enum Sounds {
-        ENEMY_DIRECTION("data/audio/sounds/enemy_direction.ogg", false, 150, 100),
+        BUTTON_CLICK("data/audio/sounds/button_click.ogg"),
         PROT_DYING("data/audio/sounds/prot_dying.ogg"),
         TAIL_BLOCK("data/audio/sounds/tail_block.ogg"),
+        ENEMY_DIRECTION("data/audio/sounds/enemy_direction.ogg", false, 150, 100),
         FILLING_SHORT_1("data/audio/sounds/filling_short_1.ogg"),
         FILLING_SHORT_2("data/audio/sounds/filling_short_2.ogg"),
         FILLING_SHORT_3("data/audio/sounds/filling_short_3.ogg"),

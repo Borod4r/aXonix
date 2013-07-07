@@ -14,14 +14,10 @@
  * the License.
  */
 
-package net.ivang.axonix.main.audio;
+package net.ivang.axonix.main.events.facts;
 
 /**
  * @author Ivan Gadzhega
  * @since 0.2
  */
-public interface SoundWrapper {
-
-    long play(float volume);
-
-}
+public class ButtonClickFact { }

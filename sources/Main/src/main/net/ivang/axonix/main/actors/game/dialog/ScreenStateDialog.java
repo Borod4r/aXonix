@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import net.ivang.axonix.main.events.facts.ButtonClickFact;
 import net.ivang.axonix.main.events.facts.TotalScoreFact;
 import net.ivang.axonix.main.events.facts.level.LevelScoreFact;
 import net.ivang.axonix.main.events.intents.DefaultIntent;
@@ -40,6 +41,7 @@ public class ScreenStateDialog extends AlertDialog {
         addButtonListener(1, new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                eventBus.post(new ButtonClickFact());
                 eventBus.post(new LevelsScreenIntent());
             }
         });
@@ -47,6 +49,7 @@ public class ScreenStateDialog extends AlertDialog {
         addButtonListener(2, new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                eventBus.post(new ButtonClickFact());
                 eventBus.post(new ReplayLevelIntent());
             }
         });
@@ -54,6 +57,7 @@ public class ScreenStateDialog extends AlertDialog {
         addButtonListener(3, new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                eventBus.post(new ButtonClickFact());
                 eventBus.post(new DefaultIntent());
             }
         });
