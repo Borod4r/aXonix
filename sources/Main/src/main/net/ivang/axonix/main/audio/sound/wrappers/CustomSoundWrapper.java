@@ -14,7 +14,7 @@
  * the License.
  */
 
-package net.ivang.axonix.main.audio.sound;
+package net.ivang.axonix.main.audio.sound.wrappers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
@@ -27,16 +27,19 @@ import java.util.Random;
  */
 public class CustomSoundWrapper implements SoundWrapper {
 
-    private final Sound sound;
-    private long soundId;
-    private boolean concurrent;
-    private int gapMin, gapRange;
+    private final String path;
+    private final boolean concurrent;
+    private final int gapMin, gapRange;
+
     private long lastPlayed;
     private int gap;
     private Random random;
 
+    private Sound sound;
+    private long soundId;
+
     public CustomSoundWrapper(String path, boolean concurrent, int gapMin, int gapRange) {
-        this.sound = Gdx.audio.newSound(Gdx.files.internal(path));
+        this.path = path;
         this.concurrent = concurrent;
         this.gapMin = gapMin;
         this.gapRange = gapRange;
@@ -47,6 +50,10 @@ public class CustomSoundWrapper implements SoundWrapper {
         } else {
             gap = gapMin;
         }
+    }
+
+    public void init() {
+        this.sound = Gdx.audio.newSound(Gdx.files.internal(path));
     }
 
     public long play(float volume) {

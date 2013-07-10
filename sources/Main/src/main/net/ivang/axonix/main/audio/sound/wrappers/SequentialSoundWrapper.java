@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package net.ivang.axonix.main.audio.sound;
+package net.ivang.axonix.main.audio.sound.wrappers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
@@ -24,10 +24,16 @@ import com.badlogic.gdx.audio.Sound;
  */
 public class SequentialSoundWrapper implements SoundWrapper {
 
-    private final Sound[] sounds;
+    private final String[] paths;
+
+    private Sound[] sounds;
     private int index;
 
     public SequentialSoundWrapper(String... paths) {
+        this.paths = paths;
+    }
+
+    public void init() {
         this.sounds = new Sound[paths.length];
         for (int i = 0; i < paths.length; i++) {
             sounds[i] = Gdx.audio.newSound(Gdx.files.internal(paths[i]));

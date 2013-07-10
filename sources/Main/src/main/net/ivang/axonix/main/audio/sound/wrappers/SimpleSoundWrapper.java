@@ -14,14 +14,30 @@
  * the License.
  */
 
-package net.ivang.axonix.main.audio.sound;
+package net.ivang.axonix.main.audio.sound.wrappers;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 
 /**
  * @author Ivan Gadzhega
  * @since 0.2
  */
-public interface SoundWrapper {
+public class SimpleSoundWrapper implements SoundWrapper {
 
-    long play(float volume);
+    private final String path;
+    private Sound sound;
+
+    public SimpleSoundWrapper(String path) {
+        this.path = path;
+    }
+
+    public void init() {
+        this.sound = Gdx.audio.newSound(Gdx.files.internal(path));
+    }
+
+    public long play(float volume) {
+        return sound.play(volume);
+    }
 
 }

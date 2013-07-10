@@ -20,6 +20,10 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.actors.game.Protagonist;
+import net.ivang.axonix.main.audio.sound.wrappers.CustomSoundWrapper;
+import net.ivang.axonix.main.audio.sound.wrappers.SequentialSoundWrapper;
+import net.ivang.axonix.main.audio.sound.wrappers.SimpleSoundWrapper;
+import net.ivang.axonix.main.audio.sound.wrappers.SoundWrapper;
 import net.ivang.axonix.main.events.facts.*;
 import net.ivang.axonix.main.events.intents.BackIntent;
 import net.ivang.axonix.main.events.intents.DefaultIntent;
@@ -40,6 +44,7 @@ public class SoundManager {
         this.preferences = preferences;
         this.sfxVolume = preferences.getSfxVolume();
         eventBus.register(this);
+        Sounds.initAll();
     }
 
     //---------------------------------------------------------------------
@@ -129,7 +134,7 @@ public class SoundManager {
         private final SoundWrapper sound;
 
         private Sounds(String path) {
-            this.sound = new CustomSoundWrapper(path, true, 0, 0);
+            this.sound = new SimpleSoundWrapper(path);
         }
 
         private Sounds(String path, boolean concurrent, int gapMin, int gapRange) {
@@ -138,6 +143,23 @@ public class SoundManager {
 
         private Sounds(String... paths) {
             this.sound = new SequentialSoundWrapper(paths);
+        }
+
+        /**
+         * Initializes all sound wrappers for this enum.
+         *
+         * Should be called outside, because on android static classes may keep on living even though
+         * the game has been closed and then music will not be reinitialized properly after reopening.
+         */
+
+        public static void initAll() {
+            for (Sounds sound : values()) {
+                sound.init();
+            }
+        }
+
+        public void init() {
+            sound.init();
         }
 
         public long play(float volume) {
