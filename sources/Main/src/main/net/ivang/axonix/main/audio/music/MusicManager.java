@@ -36,7 +36,7 @@ public class MusicManager {
 
     private PreferencesWrapper preferences;
 
-    private Loop currentLoop;
+    private Loops currentLoop;
     private float musicVolume;
 
     @Inject
@@ -44,6 +44,7 @@ public class MusicManager {
         this.preferences = preferences;
         this.musicVolume = preferences.getMusicVolume();
         eventBus.register(this);
+        Loops.initAll();
     }
 
     //---------------------------------------------------------------------
@@ -55,13 +56,12 @@ public class MusicManager {
     public void onMusicVolumeChange(MusicVolumeFact fact) {
         musicVolume = fact.getVolume();
         if (musicVolume > 0) {
-            Music loopMusic = currentLoop.getMusic();
-            loopMusic.setVolume(musicVolume);
-            if (!loopMusic.isPlaying()) {
-                loopMusic.play();
+            currentLoop.setVolume(musicVolume);
+            if (!currentLoop.isPlaying()) {
+                currentLoop.play();
             }
         } else {
-            currentLoop.getMusic().pause();
+            currentLoop.pause();
         }
         // save to preferences
         preferences.setMusicVolume(musicVolume);
@@ -70,19 +70,19 @@ public class MusicManager {
     @Subscribe
     @SuppressWarnings("unused")
     public void onScreenChangeTo(StartScreenFact fact) {
-        setCurrentLoop(Loop.START);
+        setCurrentLoop(Loops.START);
     }
 
     @Subscribe
     @SuppressWarnings("unused")
     public void onScreenChangeTo(LevelsScreenFact fact) {
-        setCurrentLoop(Loop.START);
+        setCurrentLoop(Loops.START);
     }
 
     @Subscribe
     @SuppressWarnings("unused")
     public void onScreenChangeTo(GameScreenFact fact) {
-        setCurrentLoop(Loop.GAME);
+        setCurrentLoop(Loops.GAME);
     }
 
     @Subscribe
@@ -90,15 +90,15 @@ public class MusicManager {
     public void onGameScreenStateChange(GameScreen.State state) {
         switch (state) {
             case PLAYING:
-                currentLoop.getMusic().play();
+                currentLoop.play();
                 break;
             case PAUSED:
-                currentLoop.getMusic().pause();
+                currentLoop.pause();
                 break;
             case LEVEL_COMPLETED:
             case GAME_OVER:
             case WIN:
-                currentLoop.getMusic().stop();
+                currentLoop.stop();
                 break;
         }
     }
@@ -107,18 +107,17 @@ public class MusicManager {
     // Helper methods
     //---------------------------------------------------------------------
 
-    private void setCurrentLoop(Loop currentLoop) {
+    private void setCurrentLoop(Loops currentLoop) {
         this.currentLoop = currentLoop;
 
-        for (Loop loop : Loop.values()) {
-            Music loopMusic = loop.getMusic();
+        for (Loops loop : Loops.values()) {
             if (loop == currentLoop) {
-                if (musicVolume > 0 && !loopMusic.isPlaying()) {
-                    loopMusic.setVolume(musicVolume);
-                    loopMusic.play();
+                if (musicVolume > 0 && !loop.isPlaying()) {
+                    loop.setVolume(musicVolume);
+                    loop.play();
                 }
             } else {
-                loopMusic.stop();
+                loop.stop();
             }
         }
     }
@@ -127,19 +126,59 @@ public class MusicManager {
     // Nested Classes
     //---------------------------------------------------------------------
 
-    private enum Loop {
+    private enum Loops {
         START("data/audio/music/loop_start.ogg"),
         GAME("data/audio/music/loop_game.ogg");
 
-        private final Music music;
+        private final String path;
+        private Music music;
 
-        private Loop(String path) {
+        private Loops(String path) {
+            this.path = path;
+        }
+
+        /**
+         * Initializes music from internal file by path.
+         *
+         * Should be called outside, because on android static classes may keep on living even though
+         * the game has been closed and then music will not be reinitialized properly after reopening.
+         */
+        public void init() {
             this.music = Gdx.audio.newMusic(Gdx.files.internal(path));
             music.setLooping(true);
         }
 
-        public Music getMusic() {
-            return music;
+        /**
+         * Initializes all music loops for this enum.
+         *
+         * Should be called outside, because on android static classes may keep on living even though
+         * the game has been closed and then music will not be reinitialized properly after reopening.
+         */
+
+        public static void initAll() {
+            for (Loops loop : values()) {
+                loop.init();
+            }
+        }
+
+        public void play() {
+            music.play();
+        }
+
+        public void pause() {
+            music.pause();
+        }
+
+        public void stop() {
+            music.stop();
+        }
+
+        public boolean isPlaying() {
+            return music.isPlaying();
+        }
+
+        public void setVolume(float volume) {
+            music.setVolume(volume);
         }
     }
 
