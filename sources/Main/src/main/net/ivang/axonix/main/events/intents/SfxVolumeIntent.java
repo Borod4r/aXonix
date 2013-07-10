@@ -14,17 +14,17 @@
  * the License.
  */
 
-package net.ivang.axonix.main.events.facts;
+package net.ivang.axonix.main.events.intents;
 
 /**
  * @author Ivan Gadzhega
  * @since 0.2
  */
-public class MusicVolumeFact {
+public class SfxVolumeIntent {
 
     float volume;
 
-    public MusicVolumeFact(float volume) {
+    public SfxVolumeIntent(float volume) {
         this.volume = volume;
     }
 

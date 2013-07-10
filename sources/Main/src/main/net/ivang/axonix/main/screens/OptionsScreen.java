@@ -27,8 +27,8 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.AxonixGame;
 import net.ivang.axonix.main.actors.options.VolumeSlider;
-import net.ivang.axonix.main.events.facts.MusicVolumeFact;
-import net.ivang.axonix.main.events.facts.SfxVolumeFact;
+import net.ivang.axonix.main.events.intents.SfxVolumeIntent;
+import net.ivang.axonix.main.events.intents.MusicVolumeIntent;
 import net.ivang.axonix.main.events.intents.BackIntent;
 import net.ivang.axonix.main.events.intents.DefaultIntent;
 import net.ivang.axonix.main.events.intents.screen.StartScreenIntent;
@@ -80,7 +80,7 @@ public class OptionsScreen extends BaseScreen {
         musicVolumeSlider.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
                 float value = ((VolumeSlider) actor).getValue();
-                eventBus.post(new MusicVolumeFact(value));
+                eventBus.post(new MusicVolumeIntent(value));
             }
         });
 
@@ -94,7 +94,7 @@ public class OptionsScreen extends BaseScreen {
         sfxVolumeSlider.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
                 float value = ((VolumeSlider) actor).getValue();
-                eventBus.post(new SfxVolumeFact(value));
+                eventBus.post(new SfxVolumeIntent(value));
             }
         });
 
@@ -132,16 +132,18 @@ public class OptionsScreen extends BaseScreen {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onMusicVolumeChange(MusicVolumeFact fact) {
-        float musicVolume = fact.getVolume();
+    public void onMusicVolumeChange(MusicVolumeIntent intent) {
+        float musicVolume = intent.getVolume();
+        preferences.setMusicVolume(musicVolume);
         musicVolumeValue.setText(Math.round(musicVolume * 100) + "%");
 
     }
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onSfxVolumeChange(SfxVolumeFact fact) {
-        float sfxVolume = fact.getVolume();
+    public void onSfxVolumeChange(SfxVolumeIntent intent) {
+        float sfxVolume = intent.getVolume();
+        preferences.setSfxVolume(sfxVolume);
         sfxVolumeValue.setText(Math.round(sfxVolume * 100) + "%");
     }
 

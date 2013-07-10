@@ -21,7 +21,7 @@ import com.badlogic.gdx.audio.Music;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import net.ivang.axonix.main.events.facts.MusicVolumeFact;
+import net.ivang.axonix.main.events.intents.MusicVolumeIntent;
 import net.ivang.axonix.main.events.facts.screen.GameScreenFact;
 import net.ivang.axonix.main.events.facts.screen.LevelsScreenFact;
 import net.ivang.axonix.main.events.facts.screen.StartScreenFact;
@@ -34,14 +34,11 @@ import net.ivang.axonix.main.screens.GameScreen;
  */
 public class MusicManager {
 
-    private PreferencesWrapper preferences;
-
     private Loops currentLoop;
     private float musicVolume;
 
     @Inject
     public MusicManager(PreferencesWrapper preferences, EventBus eventBus) {
-        this.preferences = preferences;
         this.musicVolume = preferences.getMusicVolume();
         eventBus.register(this);
         Loops.initAll();
@@ -53,8 +50,8 @@ public class MusicManager {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onMusicVolumeChange(MusicVolumeFact fact) {
-        musicVolume = fact.getVolume();
+    public void onMusicVolumeChange(MusicVolumeIntent intent) {
+        musicVolume = intent.getVolume();
         if (musicVolume > 0) {
             currentLoop.setVolume(musicVolume);
             if (!currentLoop.isPlaying()) {
@@ -63,8 +60,6 @@ public class MusicManager {
         } else {
             currentLoop.pause();
         }
-        // save to preferences
-        preferences.setMusicVolume(musicVolume);
     }
 
     @Subscribe

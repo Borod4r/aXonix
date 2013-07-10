@@ -27,6 +27,7 @@ import net.ivang.axonix.main.audio.sound.wrappers.SoundWrapper;
 import net.ivang.axonix.main.events.facts.*;
 import net.ivang.axonix.main.events.intents.BackIntent;
 import net.ivang.axonix.main.events.intents.DefaultIntent;
+import net.ivang.axonix.main.events.intents.SfxVolumeIntent;
 import net.ivang.axonix.main.preferences.PreferencesWrapper;
 
 /**
@@ -35,13 +36,10 @@ import net.ivang.axonix.main.preferences.PreferencesWrapper;
  */
 public class SoundManager {
 
-    private PreferencesWrapper preferences;
-
     private float sfxVolume;
 
     @Inject
     public SoundManager(PreferencesWrapper preferences, EventBus eventBus) {
-        this.preferences = preferences;
         this.sfxVolume = preferences.getSfxVolume();
         eventBus.register(this);
         Sounds.initAll();
@@ -53,10 +51,8 @@ public class SoundManager {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onSfxVolumeChange(SfxVolumeFact fact) {
-        sfxVolume = fact.getVolume();
-        // save to preferences
-        preferences.setSfxVolume(sfxVolume);
+    public void onSfxVolumeChange(SfxVolumeIntent intent) {
+        sfxVolume = intent.getVolume();
         // play sample sound
         Sounds.ENEMY_DIRECTION.play(sfxVolume);
     }
