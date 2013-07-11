@@ -53,10 +53,7 @@ public class MusicManager {
     public void onMusicVolumeChange(MusicVolumeIntent intent) {
         musicVolume = intent.getVolume();
         if (musicVolume > 0) {
-            currentLoop.setVolume(musicVolume);
-            if (!currentLoop.isPlaying()) {
-                currentLoop.play();
-            }
+            currentLoop.play(musicVolume);
         } else {
             currentLoop.pause();
         }
@@ -85,7 +82,7 @@ public class MusicManager {
     public void onGameScreenStateChange(GameScreen.State state) {
         switch (state) {
             case PLAYING:
-                currentLoop.play();
+                currentLoop.play(musicVolume);
                 break;
             case PAUSED:
                 currentLoop.pause();
@@ -102,18 +99,15 @@ public class MusicManager {
     // Helper methods
     //---------------------------------------------------------------------
 
-    private void setCurrentLoop(Loops currentLoop) {
-        this.currentLoop = currentLoop;
-
-        for (Loops loop : Loops.values()) {
-            if (loop == currentLoop) {
-                if (musicVolume > 0 && !loop.isPlaying()) {
-                    loop.setVolume(musicVolume);
-                    loop.play();
-                }
-            } else {
-                loop.stop();
+    private void setCurrentLoop(Loops loop) {
+        if (currentLoop != loop) {
+            // stop the previous loop
+            if (currentLoop != null) {
+                currentLoop.stop();
             }
+            // play new loop
+            currentLoop = loop;
+            currentLoop.play(musicVolume);
         }
     }
 
@@ -156,8 +150,11 @@ public class MusicManager {
             }
         }
 
-        public void play() {
-            music.play();
+        public void play(float volume) {
+            music.setVolume(volume);
+            if (volume > 0 && !music.isPlaying()) {
+                music.play();
+            }
         }
 
         public void pause() {
@@ -168,13 +165,6 @@ public class MusicManager {
             music.stop();
         }
 
-        public boolean isPlaying() {
-            return music.isPlaying();
-        }
-
-        public void setVolume(float volume) {
-            music.setVolume(volume);
-        }
     }
 
 }
