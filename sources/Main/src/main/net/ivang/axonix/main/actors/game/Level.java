@@ -24,13 +24,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import net.ivang.axonix.main.events.facts.ObtainedPointsFact;
 import net.ivang.axonix.main.events.facts.TailBlockFact;
-import net.ivang.axonix.main.screens.GameScreen;
 import net.ivang.axonix.main.events.facts.level.LevelProgressFact;
 import net.ivang.axonix.main.events.facts.level.LevelScoreFact;
-import net.ivang.axonix.main.events.facts.ObtainedPointsFact;
 import net.ivang.axonix.main.events.intents.game.LevelScoreIntent;
 import net.ivang.axonix.main.events.intents.game.NotificationIntent;
+import net.ivang.axonix.main.screens.GameScreen;
 
 import java.util.*;
 
@@ -117,13 +117,15 @@ public class Level extends Group {
             super.act(delta);
             // change blocks states
             if(protagonist.isOnNewBlock()) {
+                // previous block
+                if (getBlock(protagonist.getPrevX(), protagonist.getPrevY())  == Block.EMPTY) {
+                    setBlock(protagonist.getPrevX(), protagonist.getPrevY(), Block.TAIL);
+                    eventBus.post(new TailBlockFact());
+                }
+                // current block
                 switch (getBlock(protagonist.getX(), protagonist.getY())) {
-                    case EMPTY:
-                        setBlock(protagonist.getX(), protagonist.getY(), Block.TAIL);
-                        eventBus.post(new TailBlockFact());
-                        break;
                     case TAIL:
-                            protagonist.setState(Protagonist.State.DYING);
+                        protagonist.setState(Protagonist.State.DYING);
                         break;
                     case BLUE:
                         if (getBlock(protagonist.getPrevX(), protagonist.getPrevY()) == Block.TAIL) {
@@ -226,7 +228,10 @@ public class Level extends Group {
         }
         // check collisions
         for (Enemy enemy : enemies) {
-            if (getBlock(enemy.getX(), enemy.getY()) == Block.TAIL) {
+            boolean onTailBlock = getBlock(enemy.getX(), enemy.getY()) == Block.TAIL;
+            boolean onEnemyBlock = (int) protagonist.getX() == (int) enemy.getX() &&
+                                   (int) protagonist.getY() == (int) enemy.getY();
+            if (onTailBlock || onEnemyBlock) {
                 protagonist.setState(Protagonist.State.DYING);
                 break;
             }
