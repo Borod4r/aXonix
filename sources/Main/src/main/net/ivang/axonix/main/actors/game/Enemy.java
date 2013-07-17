@@ -20,6 +20,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.google.common.eventbus.EventBus;
@@ -31,12 +32,14 @@ import net.ivang.axonix.main.events.facts.EnemyDirectionFact;
  */
 public class Enemy extends Actor {
 
+    private Circle collisionCircle;
     private Move moveDirection;
     private TextureRegion region;
     private ParticleEffect particleEffect;
     private EventBus eventBus;
 
     Enemy(float x, float y, Skin skin, EventBus eventBus) {
+        this.collisionCircle = new Circle(x, y, 0.5f);
         setX(x); setY(y);
         setWidth(1f);
         setHeight(1f);
@@ -139,8 +142,24 @@ public class Enemy extends Actor {
     // Getters & Setters
     //---------------------------------------------------------------------
 
+    @Override
+    public void setX(float x) {
+        super.setX(x);
+        collisionCircle.x = x;
+    }
+
+    @Override
+    public void setY(float y) {
+        super.setY(y);
+        collisionCircle.y = y;
+    }
+
     public void setMoveDirection(Move moveDirection) {
         this.moveDirection = moveDirection;
         eventBus.post(new EnemyDirectionFact(moveDirection));
+    }
+
+    public Circle getCollisionCircle() {
+        return collisionCircle;
     }
 }

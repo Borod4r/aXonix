@@ -18,6 +18,9 @@ package net.ivang.axonix.main.actors.game;
 
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -226,14 +229,30 @@ public class Level extends Group {
         if (percentComplete > 80) {
             setState(State.LEVEL_COMPLETED);
         }
-        // check collisions
+
+        collision_check:
         for (Enemy enemy : enemies) {
-            boolean onTailBlock = getBlock(enemy.getX(), enemy.getY()) == Block.TAIL;
-            boolean onEnemyBlock = (int) protagonist.getX() == (int) enemy.getX() &&
-                                   (int) protagonist.getY() == (int) enemy.getY();
-            if (onTailBlock || onEnemyBlock) {
+            // check collision with protagonist
+            Circle enemyCircle = enemy.getCollisionCircle();
+            Circle protagonistCircle = protagonist.getCollisionCircle();
+            if (Intersector.overlapCircles(enemyCircle, protagonistCircle)) {
                 protagonist.setState(Protagonist.State.DYING);
-                break;
+                break collision_check;
+            }
+            // check collision with tail
+            int ex = (int) enemy.getX();
+            int ey = (int) enemy.getY();
+            for (int i = ex - 1; i <= ex + 1; i++) {
+                for (int j = ey - 1; j <= ey + 1; j++) {
+                    Block block = getBlock(i, j);
+                    if (block == Block.TAIL) {
+                        Rectangle blockRectangle = new Rectangle(i,j, 1, 1);
+                        if (Intersector.overlapCircleRectangle(enemyCircle, blockRectangle)) {
+                            protagonist.setState(Protagonist.State.DYING);
+                            break collision_check;
+                        }
+                    }
+                }
             }
         }
     }

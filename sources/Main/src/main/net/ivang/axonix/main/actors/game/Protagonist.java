@@ -21,6 +21,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.google.common.eventbus.EventBus;
@@ -47,6 +48,8 @@ public class Protagonist extends Actor {
     private float speed;
     private Move move;
 
+    private Circle collisionCircle;
+
     private Level level;
 
     private TextureRegion region;
@@ -62,6 +65,7 @@ public class Protagonist extends Actor {
         this.move = Move.IDLE;
         this.level = level;
         this.region = skin.getRegion("circular_flare");
+        this.collisionCircle = new Circle(x, y, 0.5f);
 
         setX(x); setY(y);
         setSpawnX(x); setSpawnY(y);
@@ -259,6 +263,18 @@ public class Protagonist extends Actor {
     // Getters & Setters
     //---------------------------------------------------------------------
 
+    @Override
+    public void setX(float x) {
+        super.setX(x);
+        collisionCircle.x = x;
+    }
+
+    @Override
+    public void setY(float y) {
+        super.setY(y);
+        collisionCircle.y = y;
+    }
+
     public float getPrevX() {
         return prevX;
     }
@@ -298,5 +314,9 @@ public class Protagonist extends Actor {
     public void setState(State state) {
         this.state = state;
         eventBus.post(state);
+    }
+
+    public Circle getCollisionCircle() {
+        return collisionCircle;
     }
 }
