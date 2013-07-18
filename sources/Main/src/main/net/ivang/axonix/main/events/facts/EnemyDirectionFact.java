@@ -16,7 +16,7 @@
 
 package net.ivang.axonix.main.events.facts;
 
-import net.ivang.axonix.main.actors.game.Move;
+import net.ivang.axonix.main.actors.game.level.Move;
 
 /**
  * @author Ivan Gadzhega

@@ -14,7 +14,7 @@
  * the License.
  */
 
-package net.ivang.axonix.main.actors.game;
+package net.ivang.axonix.main.actors.game.level;
 
 import java.util.Random;
 

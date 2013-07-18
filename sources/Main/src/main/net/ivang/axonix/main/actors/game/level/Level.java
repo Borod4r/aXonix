@@ -14,10 +14,9 @@
  * the License.
  */
 
-package net.ivang.axonix.main.actors.game;
+package net.ivang.axonix.main.actors.game.level;
 
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
@@ -37,6 +36,8 @@ import net.ivang.axonix.main.screens.GameScreen;
 
 import java.util.*;
 
+import static net.ivang.axonix.main.actors.game.level.Block.Type;
+
 /**
  * @author Ivan Gadzhega
  * @since 0.1
@@ -55,7 +56,6 @@ public class Level extends Group {
     private int filledBlocks;
 
     private Protagonist protagonist;
-    private Vector2 protStartPos;
     private List<Enemy> enemies;
 
     private Skin skin;
@@ -66,10 +66,11 @@ public class Level extends Group {
         this.eventBus = eventBus;
         eventBus.register(this);
 
+        this.skin = skin;
         this.width = pixmap.getWidth();
         this.height = pixmap.getHeight();
         this.levelMap = new Block[width][height];
-        this.skin = skin;
+        this.enemies = new ArrayList<Enemy>();
 
         initFromPixmap(pixmap);
 
@@ -85,32 +86,30 @@ public class Level extends Group {
         final int ENEMY = 0xFF0000;
         final int PROTAGONIST = 0x00FF00;
 
-        enemies = new ArrayList<Enemy>();
-
-        Block[][] levelMap = new Block[width][height];
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 int pix = (pixmap.getPixel(x, height-y-1) >>> 8) & 0xffffff;
                 if(pix == EARTH) {
-                    levelMap[x][y] = Block.BLUE;
+                    levelMap[x][y] = new Block(x, y, Type.BLUE, skin);
                 }else if (pix == ENEMY) {
+                    levelMap[x][y] = new Block(x, y, Type.EMPTY, skin);
                     Enemy enemy = new Enemy(x + 0.5f, y + 0.5f, skin, eventBus);
                     enemies.add(enemy);
-                    addActor(enemy);
-                    levelMap[x][y] = Block.EMPTY;
                 } else if (pix == PROTAGONIST) {
-                    protStartPos = new Vector2(x + 0.5f, y + 0.5f);
-                    levelMap[x][y] = Block.BLUE;
+                    levelMap[x][y] = new Block(x, y, Type.BLUE, skin);
+                    protagonist = new Protagonist(eventBus, x + 0.5f, y + 0.5f, this, skin);
                 } else {
-                    levelMap[x][y] = Block.EMPTY;
+                    levelMap[x][y] = new Block(x, y, Type.EMPTY, skin);
                 }
+                addActor(levelMap[x][y]);
             }
         }
 
-        protagonist = new Protagonist(eventBus, protStartPos.x, protStartPos.y, this, skin);
         addActor(protagonist);
 
-        this.setLevelMap(levelMap);
+        for (Enemy enemy : enemies) {
+            addActor(enemy);
+        }
     }
 
     @Override
@@ -121,17 +120,18 @@ public class Level extends Group {
             // change blocks states
             if(protagonist.isOnNewBlock()) {
                 // previous block
-                if (getBlock(protagonist.getPrevX(), protagonist.getPrevY())  == Block.EMPTY) {
-                    setBlock(protagonist.getPrevX(), protagonist.getPrevY(), Block.TAIL);
+                Block prevBlock = getBlock(protagonist.getPrevX(), protagonist.getPrevY());
+                if (prevBlock.hasType(Type.EMPTY)) {
+                    prevBlock.setType(Type.TAIL);
                     eventBus.post(new TailBlockFact());
                 }
                 // current block
-                switch (getBlock(protagonist.getX(), protagonist.getY())) {
+                switch (getBlock(protagonist.getX(), protagonist.getY()).getType()) {
                     case TAIL:
                         protagonist.setState(Protagonist.State.DYING);
                         break;
                     case BLUE:
-                        if (getBlock(protagonist.getPrevX(), protagonist.getPrevY()) == Block.TAIL) {
+                        if (prevBlock.hasType(Type.TAIL)) {
                             // fill areas
                             int newBlocks = fillAreas();
                             // update level score
@@ -147,30 +147,6 @@ public class Level extends Group {
                 }
             }
         }
-    }
-
-    @Override
-    public void draw(SpriteBatch batch, float parentAlpha) {
-        for(int i = 0; i < getWidth(); i++) {
-            for(int j = 0; j < getHeight(); j++) {
-                switch (getBlock(i, j)) {
-                    case BLUE:
-                        batch.setColor(1, 1, 1, 1);
-                        break;
-                    case GREEN:
-                        batch.setColor(0, 1, 0.3f, 1);
-                        break;
-                    case TAIL:
-                        batch.setColor(0.3f, 0.3f, 1f, 1);
-                        break;
-                    default:
-                        continue;
-                }
-                batch.draw(skin.getRegion("block"), getX() + i * getScaleX(), getY() + j * getScaleY(), getScaleX(), getScaleY());
-            }
-        }
-
-        super.draw(batch, parentAlpha);
     }
 
     public void unregister() {
@@ -203,8 +179,9 @@ public class Level extends Group {
             case DYING:
                 for(int i = 1; i < getWidth() - 1; i++) {
                     for(int j = 1; j < getHeight() - 1; j++) {
-                        if (getBlock(i, j) == Block.TAIL) {
-                            setBlock(i, j, Block.EMPTY);
+                        Block block = getBlock(i, j);
+                        if (block.hasType(Type.TAIL)) {
+                            block.setType(Type.EMPTY);
                         }
                     }
                 }
@@ -245,7 +222,7 @@ public class Level extends Group {
             for (int i = ex - 1; i <= ex + 1; i++) {
                 for (int j = ey - 1; j <= ey + 1; j++) {
                     Block block = getBlock(i, j);
-                    if (block == Block.TAIL) {
+                    if (block.hasType(Type.TAIL)) {
                         Rectangle blockRectangle = new Rectangle(i,j, 1, 1);
                         if (Intersector.overlapCircleRectangle(enemyCircle, blockRectangle)) {
                             protagonist.setState(Protagonist.State.DYING);
@@ -272,7 +249,7 @@ public class Level extends Group {
         for(int i = 1; i < width - 1; i++) {
             for(int j = 1; j < height - 1; j++) {
                 Block A = levelMap[i][j];
-                if (A == Block.EMPTY) {
+                if (A.hasType(Type.EMPTY)) {
                     byte B = tmpState[i][j-1];
                     byte C = tmpState[i-1][j];
 
@@ -312,9 +289,9 @@ public class Level extends Group {
                             }
                         }
                     }
-                } else if(A == Block.TAIL) {
+                } else if(A.hasType(Type.TAIL)) {
                     // turn tail to blue blocks
-                    setBlock(i, j, Block.BLUE);
+                    A.setType(Type.BLUE);
                     blocks++;
 
                 }
@@ -336,7 +313,7 @@ public class Level extends Group {
 
         for(List<Vector2> spot : spots.values()) {
             for(Vector2 pos : spot) {
-                setBlock(pos.x, pos.y, Block.GREEN);
+                levelMap[(int) pos.x][(int) pos.y].setType(Type.GREEN);
                 blocks++;
             }
 
@@ -375,16 +352,6 @@ public class Level extends Group {
     // Getters & Setters
     //---------------------------------------------------------------------
 
-    public void setBlock(int x, int y, Block value) {
-        if (x >= 0 && x < width && y >=0 && y < height) {
-            levelMap[x][y] = value;
-        }
-    }
-
-    public void setBlock(float x, float y, Block block) {
-        setBlock((int) x, (int) y, block);
-    }
-
     public Block getBlock(int x, int y) {
         return levelMap[x][y];
     }
@@ -407,14 +374,6 @@ public class Level extends Group {
 
     public void setHeight(int height) {
         this.height = height;
-    }
-
-    public Block[][] getLevelMap() {
-        return levelMap;
-    }
-
-    public void setLevelMap(Block[][] levelMap) {
-        this.levelMap = levelMap;
     }
 
     public int getScore() {
@@ -456,7 +415,4 @@ public class Level extends Group {
         PLAYING, PAUSED, LEVEL_COMPLETED
     }
 
-    public enum Block {
-        EMPTY, BLUE, GREEN, TAIL
-    }
 }

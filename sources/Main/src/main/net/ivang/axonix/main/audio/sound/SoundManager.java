@@ -19,7 +19,7 @@ package net.ivang.axonix.main.audio.sound;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import net.ivang.axonix.main.actors.game.Protagonist;
+import net.ivang.axonix.main.actors.game.level.Protagonist;
 import net.ivang.axonix.main.audio.sound.wrappers.CustomSoundWrapper;
 import net.ivang.axonix.main.audio.sound.wrappers.SequentialSoundWrapper;
 import net.ivang.axonix.main.audio.sound.wrappers.SimpleSoundWrapper;

@@ -14,7 +14,7 @@
  * the License.
  */
 
-package net.ivang.axonix.main.actors.game;
+package net.ivang.axonix.main.actors.game.level;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
@@ -25,6 +25,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.google.common.eventbus.EventBus;
 import net.ivang.axonix.main.events.facts.EnemyDirectionFact;
+
+import static net.ivang.axonix.main.actors.game.level.Block.Type;
 
 /**
  * @author Ivan Gadzhega
@@ -38,7 +40,7 @@ public class Enemy extends Actor {
     private ParticleEffect particleEffect;
     private EventBus eventBus;
 
-    Enemy(float x, float y, Skin skin, EventBus eventBus) {
+    public Enemy(float x, float y, Skin skin, EventBus eventBus) {
         this.collisionCircle = new Circle(x, y, 0.5f);
         setX(x); setY(y);
         setWidth(1f);
@@ -71,52 +73,52 @@ public class Enemy extends Actor {
             case UP_LEFT:
                 x -= deltaPx;
                 y += deltaPx;
-                if (level.getBlock(x, y + radius) == Level.Block.BLUE) {
-                    if (level.getBlock(x - radius, y) == Level.Block.BLUE) {
+                if (level.getBlock(x, y + radius).hasType(Type.BLUE)) {
+                    if (level.getBlock(x - radius, y).hasType(Type.BLUE)) {
                         setMoveDirection(Move.DOWN_RIGHT);
                     } else {
                         setMoveDirection(Move.DOWN_LEFT);
                     }
-                } else if (level.getBlock(x - radius, y) == Level.Block.BLUE) {
+                } else if (level.getBlock(x - radius, y).hasType(Type.BLUE)) {
                     setMoveDirection(Move.UP_RIGHT);
                 }
                 break;
             case UP_RIGHT:
                 x += deltaPx;
                 y += deltaPx;
-                if (level.getBlock(x, y + radius) == Level.Block.BLUE) {
-                    if (level.getBlock(x + radius, y) == Level.Block.BLUE) {
+                if (level.getBlock(x, y + radius).hasType(Type.BLUE)) {
+                    if (level.getBlock(x + radius, y).hasType(Type.BLUE)) {
                         setMoveDirection(Move.DOWN_LEFT);
                     } else {
                         setMoveDirection(Move.DOWN_RIGHT);
                     }
-                } else if (level.getBlock(x + radius, y)== Level.Block.BLUE) {
+                } else if (level.getBlock(x + radius, y).hasType(Type.BLUE)) {
                     setMoveDirection(Move.UP_LEFT);
                 }
                 break;
             case DOWN_LEFT:
                 x -= deltaPx;
                 y -= deltaPx;
-                if (level.getBlock(x, y - radius) == Level.Block.BLUE) {
-                    if (level.getBlock(x - radius, y) == Level.Block.BLUE) {
+                if (level.getBlock(x, y - radius).hasType(Type.BLUE)) {
+                    if (level.getBlock(x - radius, y).hasType(Type.BLUE)) {
                         setMoveDirection(Move.UP_RIGHT);
                     } else {
                         setMoveDirection(Move.UP_LEFT);
                     }
-                } else if (level.getBlock(x - radius, y) == Level.Block.BLUE) {
+                } else if (level.getBlock(x - radius, y).hasType(Type.BLUE)) {
                     setMoveDirection(Move.DOWN_RIGHT);
                 }
                 break;
             case DOWN_RIGHT:
                 x += deltaPx;
                 y -= deltaPx;
-                if (level.getBlock(x, y - radius) == Level.Block.BLUE) {
-                    if (level.getBlock(x + radius, y) == Level.Block.BLUE) {
+                if (level.getBlock(x, y - radius).hasType(Type.BLUE)) {
+                    if (level.getBlock(x + radius, y).hasType(Type.BLUE)) {
                         setMoveDirection(Move.UP_LEFT);
                     } else {
                         setMoveDirection(Move.UP_RIGHT);
                     }
-                } else if (level.getBlock(x + radius, y) == Level.Block.BLUE) {
+                } else if (level.getBlock(x + radius, y).hasType(Type.BLUE)) {
                     setMoveDirection(Move.DOWN_LEFT);
                 }
                 break;

@@ -14,7 +14,7 @@
  * the License.
  */
 
-package net.ivang.axonix.main.actors.game;
+package net.ivang.axonix.main.actors.game.level;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -28,7 +28,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import net.ivang.axonix.main.events.intents.game.LivesIntent;
 
-import static net.ivang.axonix.main.actors.game.Level.Block;
+import static net.ivang.axonix.main.actors.game.level.Block.Type;
 
 /**
  * @author Ivan Gadzhega
@@ -161,7 +161,7 @@ public class Protagonist extends Actor {
         boolean isDraggedRight = (Gdx.input.isTouched() && dx > 0 && diff >= 0);
 
         Block block = level.getBlock(getX(), getY());
-        boolean onFilledBlock = (block == Block.BLUE) || ((block == Block.GREEN));
+        boolean onFilledBlock = (block.hasType(Type.BLUE)) || ((block.hasType(Type.GREEN)));
 
         if((onFilledBlock || move != Move.DOWN)
                 && (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S) || isDraggedUp)) {

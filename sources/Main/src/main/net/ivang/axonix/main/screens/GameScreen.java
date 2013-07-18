@@ -31,7 +31,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.AxonixGame;
-import net.ivang.axonix.main.actors.game.Level;
+import net.ivang.axonix.main.actors.game.level.Level;
 import net.ivang.axonix.main.actors.game.background.Background;
 import net.ivang.axonix.main.actors.game.bar.DebugBar;
 import net.ivang.axonix.main.actors.game.bar.StatusBar;
