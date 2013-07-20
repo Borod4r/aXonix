@@ -27,11 +27,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
  */
 public class Block extends Actor {
 
-    private TextureRegion region;
+    private TextureRegion regionBlue;
+    private TextureRegion regionRed;
     private Type type;
 
     public Block(float x, float y, Type type, Skin skin) {
-        this.region = skin.getRegion("block");
+        this.regionBlue = skin.getRegion("block_blue");
+        this.regionRed = skin.getRegion("block_red");
         setX(x); setY(y);
         setWidth(1f);
         setHeight(1f);
@@ -41,19 +43,23 @@ public class Block extends Actor {
     @Override
     public void draw(SpriteBatch batch, float parentAlpha) {
         switch (getType()) {
-            case BLUE:
+            case RED:
                 batch.setColor(1, 1, 1, 1);
+                batch.draw(regionRed, getX(), getY(), getWidth(), getHeight());
                 break;
             case GREEN:
                 batch.setColor(0, 1, 0.3f, 1);
+                batch.draw(regionBlue, getX(), getY(), getWidth(), getHeight());
+                break;
+            case BLUE:
+                batch.setColor(1, 1, 1, 1);
+                batch.draw(regionBlue, getX(), getY(), getWidth(), getHeight());
                 break;
             case TAIL:
-                batch.setColor(0.3f, 0.3f, 1f, 1);
+                batch.setColor(0.3f, 0.3f, 1, 1);
+                batch.draw(regionBlue, getX(), getY(), getWidth(), getHeight());
                 break;
-            default:
-                return;
         }
-        batch.draw(region, getX(), getY(), getWidth(), getHeight());
     }
 
     public boolean hasType(Type type) {
@@ -78,7 +84,7 @@ public class Block extends Actor {
     //---------------------------------------------------------------------
 
     public enum Type {
-        EMPTY, GREEN, BLUE, TAIL
+        EMPTY, RED, GREEN, BLUE, TAIL
     }
 
 }

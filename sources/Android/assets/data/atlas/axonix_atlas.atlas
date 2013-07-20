@@ -5,70 +5,84 @@ filter: MipMapLinearNearest,Nearest
 repeat: none
 logo
   rotate: false
-  xy: 1, 4
+  xy: 1, 133
   size: 512, 120
   orig: 512, 120
   offset: 0, 0
   index: -1
-block
+speed_bonus
   rotate: false
-  xy: 515, 60
+  xy: 1, 35
+  size: 96, 96
+  orig: 96, 96
+  offset: 0, 0
+  index: -1
+block_blue
+  rotate: false
+  xy: 515, 189
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+block_red
+  rotate: false
+  xy: 99, 67
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 circular_flare
   rotate: false
-  xy: 581, 60
+  xy: 581, 189
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 ic_forward_large
   rotate: false
-  xy: 647, 60
+  xy: 165, 67
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 ic_levels_large
   rotate: false
-  xy: 713, 60
+  xy: 647, 189
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 ic_repeat_large
   rotate: false
-  xy: 779, 60
+  xy: 231, 67
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 ic_forward_normal
   rotate: false
-  xy: 515, 10
+  xy: 515, 139
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 ic_levels_normal
   rotate: false
-  xy: 845, 76
+  xy: 713, 205
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 ic_repeat_normal
   rotate: false
-  xy: 565, 10
+  xy: 297, 83
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 window_bg
   rotate: false
-  xy: 895, 62
+  xy: 565, 125
   size: 19, 62
   split: 9, 9, 9, 9
   orig: 19, 62
@@ -76,28 +90,28 @@ window_bg
   index: -1
 ic_forward_small
   rotate: false
-  xy: 615, 26
+  xy: 1, 1
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ic_levels_small
   rotate: false
-  xy: 916, 92
+  xy: 763, 221
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ic_repeat_small
   rotate: false
-  xy: 649, 26
+  xy: 586, 155
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 slider_before
   rotate: false
-  xy: 950, 94
+  xy: 99, 35
   size: 19, 30
   split: 9, 9, 9, 9
   orig: 19, 30
@@ -105,7 +119,7 @@ slider_before
   index: -1
 slider_bg
   rotate: false
-  xy: 683, 28
+  xy: 347, 101
   size: 19, 30
   split: 6, 6, 6, 6
   pad: 18, 0, 6, 6
@@ -114,7 +128,7 @@ slider_bg
   index: -1
 button
   rotate: false
-  xy: 971, 94
+  xy: 35, 3
   size: 13, 30
   split: 6, 6, 6, 6
   orig: 13, 30
@@ -122,7 +136,7 @@ button
   index: -1
 button_over
   rotate: false
-  xy: 704, 28
+  xy: 797, 223
   size: 13, 30
   split: 6, 6, 6, 6
   orig: 13, 30
@@ -130,7 +144,7 @@ button_over
   index: -1
 window_bg_stage
   rotate: false
-  xy: 1, 1
+  xy: 713, 202
   size: 1, 1
   orig: 1, 1
   offset: 0, 0

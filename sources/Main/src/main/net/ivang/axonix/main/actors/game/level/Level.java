@@ -57,6 +57,10 @@ public class Level extends Group {
 
     private Protagonist protagonist;
     private List<Enemy> enemies;
+    private List<Block> tailBlocks;
+
+    private boolean containsRedBlocks;
+    private float redBlocksDelta;
 
     private Skin skin;
 
@@ -71,6 +75,7 @@ public class Level extends Group {
         this.height = pixmap.getHeight();
         this.levelMap = new Block[width][height];
         this.enemies = new ArrayList<Enemy>();
+        this.tailBlocks = new ArrayList<Block>();
 
         initFromPixmap(pixmap);
 
@@ -115,37 +120,11 @@ public class Level extends Group {
     @Override
     public void act(float delta) {
         if (isInState(State.PLAYING)) {
-            check();
             super.act(delta);
-            // change blocks states
-            if(protagonist.isOnNewBlock()) {
-                // previous block
-                Block prevBlock = getBlock(protagonist.getPrevX(), protagonist.getPrevY());
-                if (prevBlock.hasType(Type.EMPTY)) {
-                    prevBlock.setType(Type.TAIL);
-                    eventBus.post(new TailBlockFact());
-                }
-                // current block
-                switch (getBlock(protagonist.getX(), protagonist.getY()).getType()) {
-                    case TAIL:
-                        protagonist.setState(Protagonist.State.DYING);
-                        break;
-                    case BLUE:
-                        if (prevBlock.hasType(Type.TAIL)) {
-                            // fill areas
-                            int newBlocks = fillAreas();
-                            // update level score
-                            float bonus = 1 + newBlocks / 200f;
-                            int obtainedPoints = (int) (newBlocks * bonus);
-                            eventBus.post(new LevelScoreIntent(obtainedPoints));
-                            // update percentage
-                            filledBlocks += newBlocks;
-                            byte percentComplete = (byte) (((float) filledBlocks / ((width - 2) * (height - 2))) * 100) ;
-                            setPercentComplete(percentComplete);
-                        }
-                        break;
-                }
-            }
+            checkTail(delta);
+            checkEnemies();
+            checkProtagonist();
+            checkPercentComplete();
         }
     }
 
@@ -177,15 +156,7 @@ public class Level extends Group {
     public void onProtagonistStateChange(Protagonist.State protagonistState) {
         switch (protagonistState) {
             case DYING:
-                for(int i = 1; i < getWidth() - 1; i++) {
-                    for(int j = 1; j < getHeight() - 1; j++) {
-                        Block block = getBlock(i, j);
-                        if (block.hasType(Type.TAIL)) {
-                            block.setType(Type.EMPTY);
-                        }
-                    }
-                }
-                break;
+                clearTail(Type.EMPTY);
         }
     }
 
@@ -201,20 +172,37 @@ public class Level extends Group {
     // Helper methods
     //---------------------------------------------------------------------
 
-    private void check() {
-        // check percent
-        if (percentComplete > 80) {
-            setState(State.LEVEL_COMPLETED);
+    private void checkTail(float delta) {
+        if (containsRedBlocks) {
+            redBlocksDelta += delta;
+            float interval = 1 / (protagonist.getSpeed() * 3);
+            if (redBlocksDelta > interval) {
+                redBlocksDelta = 0;
+                int tailSize = tailBlocks.size() - 1;
+                for (int i = 1; i < tailSize; i++) {
+                    if (tailBlocks.get(i).hasType(Type.RED)) {
+                        tailBlocks.get(i-1).setType(Type.RED);
+                        while (tailBlocks.get(++i).hasType(Type.RED)) {
+                            if (i == tailSize) {
+                                protagonist.setState(Protagonist.State.DYING);
+                                return;
+                            }
+                        }
+                        tailBlocks.get(i).setType(Type.RED);
+                    }
+                }
+            }
         }
+    }
 
-        collision_check:
+    private void checkEnemies() {
         for (Enemy enemy : enemies) {
             // check collision with protagonist
             Circle enemyCircle = enemy.getCollisionCircle();
             Circle protagonistCircle = protagonist.getCollisionCircle();
             if (Intersector.overlapCircles(enemyCircle, protagonistCircle)) {
                 protagonist.setState(Protagonist.State.DYING);
-                break collision_check;
+                return;
             }
             // check collision with tail
             int ex = (int) enemy.getX();
@@ -225,12 +213,54 @@ public class Level extends Group {
                     if (block.hasType(Type.TAIL)) {
                         Rectangle blockRectangle = new Rectangle(i,j, 1, 1);
                         if (Intersector.overlapCircleRectangle(enemyCircle, blockRectangle)) {
-                            protagonist.setState(Protagonist.State.DYING);
-                            break collision_check;
+                            block.setType(Type.RED);
+                            containsRedBlocks = true;
+                            return;
                         }
                     }
                 }
             }
+        }
+    }
+
+    private void checkProtagonist() {
+        if(protagonist.hasState(Protagonist.State.ALIVE) && protagonist.isOnNewBlock()) {
+            // previous block
+            Block prevBlock = getBlock(protagonist.getPrevX(), protagonist.getPrevY());
+            if (prevBlock.hasType(Type.EMPTY)) {
+                prevBlock.setType(Type.TAIL);
+                tailBlocks.add(prevBlock);
+                eventBus.post(new TailBlockFact());
+            }
+            // current block
+            switch (getBlock(protagonist.getX(), protagonist.getY()).getType()) {
+                case TAIL:
+                    protagonist.setState(Protagonist.State.DYING);
+                    break;
+                case BLUE:
+                    if (prevBlock.hasType(Type.TAIL)) {
+                        // convert tail
+                        int newBlocks = tailBlocks.size();
+                        clearTail(Type.BLUE);
+                        // fill areas
+                        newBlocks += fillAreas();
+                        // update level score
+                        float bonus = 1 + newBlocks / 200f;
+                        int obtainedPoints = (int) (newBlocks * bonus);
+                        eventBus.post(new LevelScoreIntent(obtainedPoints));
+                        // update percentage
+                        filledBlocks += newBlocks;
+                        byte percentComplete = (byte) (((float) filledBlocks / ((width - 2) * (height - 2))) * 100) ;
+                        setPercentComplete(percentComplete);
+                    }
+                    break;
+            }
+        }
+    }
+
+    private void checkPercentComplete() {
+        if (percentComplete > 80) {
+            setState(State.LEVEL_COMPLETED);
         }
     }
 
@@ -289,11 +319,6 @@ public class Level extends Group {
                             }
                         }
                     }
-                } else if(A.hasType(Type.TAIL)) {
-                    // turn tail to blue blocks
-                    A.setType(Type.BLUE);
-                    blocks++;
-
                 }
             }
         }
@@ -336,12 +361,16 @@ public class Level extends Group {
         eventBus.post(new ObtainedPointsFact(points, labelX, labelY, moveY, subtractBounds));
     }
 
-    //---------------------------------------------------------------------
-    // Helper methods
-    //---------------------------------------------------------------------
-
     private void showNotification(String text, float showDelay, float hideDelay) {
         eventBus.post(new NotificationIntent(text, showDelay, hideDelay));
+    }
+
+    private void clearTail(Type newType) {
+        for (Block block : tailBlocks) {
+            block.setType(newType);
+        }
+        tailBlocks.clear();
+        containsRedBlocks = false;
     }
 
     private boolean isInState(State state) {

@@ -146,6 +146,10 @@ public class Protagonist extends Actor {
         }
     }
 
+    public boolean hasState(State state) {
+        return this.state == state;
+    }
+
     //---------------------------------------------------------------------
     // Helper Methods
     //---------------------------------------------------------------------
@@ -318,5 +322,9 @@ public class Protagonist extends Actor {
 
     public Circle getCollisionCircle() {
         return collisionCircle;
+    }
+
+    public float getSpeed() {
+        return speed;
     }
 }
