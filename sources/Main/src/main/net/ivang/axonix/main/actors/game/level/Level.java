@@ -180,16 +180,18 @@ public class Level extends Group {
             if (redBlocksDelta > interval) {
                 redBlocksDelta = 0;
                 int tailSize = tailBlocks.size() - 1;
-                for (int i = 1; i < tailSize; i++) {
+                for (int i = 0; i <= tailSize; i++) {
                     if (tailBlocks.get(i).hasType(Type.RED)) {
-                        tailBlocks.get(i-1).setType(Type.RED);
-                        while (tailBlocks.get(++i).hasType(Type.RED)) {
-                            if (i == tailSize) {
-                                protagonist.setState(Protagonist.State.DYING);
-                                return;
-                            }
+                        // burn previous block
+                        if (i > 0) tailBlocks.get(i-1).setType(Type.RED);
+                        // skip consequent red blocks
+                        while (i < tailSize && tailBlocks.get(++i).hasType(Type.RED));
+                        // check if we caught up the protagonist
+                        if (i == tailSize && tailBlocks.get(i).hasType(Type.RED)) {
+                            protagonist.setState(Protagonist.State.DYING);
+                        } else {
+                            tailBlocks.get(i).setType(Type.RED);
                         }
-                        tailBlocks.get(i).setType(Type.RED);
                     }
                 }
             }
