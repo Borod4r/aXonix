@@ -182,7 +182,7 @@ public class GameScreen extends BaseScreen {
     @Subscribe
     @SuppressWarnings("unused")
     public void onLivesNumberChange(LivesNumberFact fact) {
-        if (lives <= 0 && !isInState(State.GAME_OVER)) {
+        if (lives <= 0 && !hasState(State.GAME_OVER)) {
             setState(State.GAME_OVER);
         }
     }
@@ -384,7 +384,7 @@ public class GameScreen extends BaseScreen {
         return min(wScaling, hScaling);
     }
 
-    private boolean isInState(State state) {
+    private boolean hasState(State state) {
         return this.state == state;
     }
 

@@ -119,7 +119,7 @@ public class Level extends Group {
 
     @Override
     public void act(float delta) {
-        if (isInState(State.PLAYING)) {
+        if (hasState(State.PLAYING)) {
             super.act(delta);
             checkTail(delta);
             checkEnemies();
@@ -373,7 +373,7 @@ public class Level extends Group {
         containsRedBlocks = false;
     }
 
-    private boolean isInState(State state) {
+    private boolean hasState(State state) {
         return this.state == state;
     }
 
