@@ -46,7 +46,7 @@ public class Protagonist extends Actor {
     private float spawnX, spawnY;
     private float prevX, prevY;
     private float speed;
-    private Move move;
+    private Direction direction;
 
     private Circle collisionCircle;
 
@@ -62,10 +62,10 @@ public class Protagonist extends Actor {
 
         this.state = State.ALIVE;
         this.speed = 8;
-        this.move = Move.IDLE;
+        this.direction = Direction.IDLE;
         this.level = level;
         this.region = skin.getRegion("circular_flare");
-        this.collisionCircle = new Circle(x, y, 0.5f);
+        this.collisionCircle = new Circle(x, y, 0.4f);
 
         setX(x); setY(y);
         setSpawnX(x); setSpawnY(y);
@@ -134,7 +134,7 @@ public class Protagonist extends Actor {
                 particleDead.setPosition(getX(), getY());
                 particleDead.start();
                 // re-spawn
-                this.move = Move.IDLE;
+                this.direction = Direction.IDLE;
                 setX(spawnX); setY(spawnY);
                 setPrevX(spawnX); setPrevY(spawnY);
                 particleAlive.setPosition(spawnX, spawnY);
@@ -167,21 +167,21 @@ public class Protagonist extends Actor {
         Block block = level.getBlock(getX(), getY());
         boolean onFilledBlock = (block.hasType(Type.BLUE)) || ((block.hasType(Type.GREEN)));
 
-        if((onFilledBlock || move != Move.DOWN)
+        if((onFilledBlock || direction != Direction.DOWN)
                 && (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S) || isDraggedUp)) {
-            move = Move.UP;
+            direction = Direction.UP;
         }
-        if((onFilledBlock || move != Move.UP)
+        if((onFilledBlock || direction != Direction.UP)
                 && (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W) || isDraggedDown)) {
-            move = Move.DOWN;
+            direction = Direction.DOWN;
         }
-        if((onFilledBlock || move != Move.RIGHT)
+        if((onFilledBlock || direction != Direction.RIGHT)
                 && (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A) || isDraggedLeft)) {
-            move = Move.LEFT;
+            direction = Direction.LEFT;
         }
-        if((onFilledBlock || move != Move.LEFT)
+        if((onFilledBlock || direction != Direction.LEFT)
                 && (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D) || isDraggedRight)) {
-            move = Move.RIGHT;
+            direction = Direction.RIGHT;
         }
     }
 
@@ -190,39 +190,39 @@ public class Protagonist extends Actor {
         float x = getX();
         float y = getY();
 
-        switch (move) {
+        switch (direction) {
             case UP:
                 if (y > 0.5) {
                     y -= deltaPx;
                 } else {
-                    move = Move.IDLE;
+                    direction = Direction.IDLE;
                 }
                 break;
             case DOWN:
                 if (y < level.getHeight() - 0.5) {
                     y += deltaPx;
                 } else {
-                    move = Move.IDLE;
+                    direction = Direction.IDLE;
                 }
                 break;
             case LEFT:
                 if (x > 0.5) {
                     x -= deltaPx;
                 } else {
-                    move = Move.IDLE;
+                    direction = Direction.IDLE;
                 }
                 break;
             case RIGHT:
                 if (x < level.getWidth() - 0.5) {
                     x += deltaPx;
                 } else {
-                    move = Move.IDLE;
+                    direction = Direction.IDLE;
                 }
                 break;
         }
 
         float step = 0.05f;
-        switch (move) {
+        switch (direction) {
             case UP:
             case DOWN:
                 float nx = x + 0.5f;
@@ -255,7 +255,7 @@ public class Protagonist extends Actor {
         }
 
         // update previous coords
-        if (move != Move.IDLE) {
+        if (direction != Direction.IDLE) {
             prevX = getX();
             prevY = getY();
         }
@@ -295,24 +295,12 @@ public class Protagonist extends Actor {
         this.prevY = prevY;
     }
 
-    public float getSpawnX() {
-        return spawnX;
-    }
-
     public void setSpawnX(float spawnX) {
         this.spawnX = spawnX;
     }
 
-    public float getSpawnY() {
-        return spawnY;
-    }
-
     public void setSpawnY(float spawnY) {
         this.spawnY = spawnY;
-    }
-
-    public State getState() {
-        return state;
     }
 
     public void setState(State state) {

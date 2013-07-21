@@ -26,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import net.ivang.axonix.main.events.facts.EnemyVelocityFact;
 import net.ivang.axonix.main.events.facts.ObtainedPointsFact;
 import net.ivang.axonix.main.events.facts.TailBlockFact;
 import net.ivang.axonix.main.events.facts.level.LevelProgressFact;
@@ -98,7 +99,7 @@ public class Level extends Group {
                     levelMap[x][y] = new Block(x, y, Type.BLUE, skin);
                 }else if (pix == ENEMY) {
                     levelMap[x][y] = new Block(x, y, Type.EMPTY, skin);
-                    Enemy enemy = new Enemy(x + 0.5f, y + 0.5f, skin, eventBus);
+                    Enemy enemy = new Enemy(x + 0.5f, y + 0.5f, skin);
                     enemies.add(enemy);
                 } else if (pix == PROTAGONIST) {
                     levelMap[x][y] = new Block(x, y, Type.BLUE, skin);
@@ -204,19 +205,48 @@ public class Level extends Group {
                 protagonist.setState(Protagonist.State.DYING);
                 return;
             }
-            // check collision with tail
-            int ex = (int) enemy.getX();
-            int ey = (int) enemy.getY();
-            for (int i = ex - 1; i <= ex + 1; i++) {
-                for (int j = ey - 1; j <= ey + 1; j++) {
-                    Block block = getBlock(i, j);
+            // check collision with blocks
+            Vector2 velocity = enemy.getVelocity();
+            Vector2 signum = new Vector2(Math.signum(velocity.x), Math.signum(velocity.y));
+
+            Block b1 = getBlock(enemy.getX() + signum.x, enemy.getY());
+            Block b2 = getBlock(enemy.getX(), enemy.getY() + signum.y);
+            Block b3 = getBlock(enemy.getX() + signum.x, enemy.getY() + signum.y);
+
+            List<Block> collisions = new ArrayList<Block>();
+
+            if (!b1.isEmpty()) {
+                Rectangle r1 = b1.getCollisionRectangle();
+                if (Intersector.overlapCircleRectangle(enemyCircle, r1)) {
+                    collisions.add(b1);
+                    velocity.x = - velocity.x;
+                }
+            }
+            if (!b2.isEmpty()) {
+                Rectangle r2 = b2.getCollisionRectangle();
+                if (Intersector.overlapCircleRectangle(enemyCircle, r2)) {
+                    collisions.add(b2);
+                    velocity.y = - velocity.y;
+                }
+            }
+
+            if (collisions.isEmpty() && !b3.isEmpty()) {
+                Rectangle r3 = b3.getCollisionRectangle();
+                if (Intersector.overlapCircleRectangle(enemyCircle, r3)) {
+                    collisions.add(b3);
+                    velocity.x = - velocity.x;
+                    velocity.y = - velocity.y;
+                }
+            }
+
+            if (!collisions.isEmpty()) {
+                // velocity has changed
+                eventBus.post(new EnemyVelocityFact(velocity));
+                // burn tail
+                for (Block block : collisions) {
                     if (block.hasType(Type.TAIL)) {
-                        Rectangle blockRectangle = new Rectangle(i,j, 1, 1);
-                        if (Intersector.overlapCircleRectangle(enemyCircle, blockRectangle)) {
-                            block.setType(Type.RED);
-                            containsRedBlocks = true;
-                            return;
-                        }
+                        block.setType(Type.RED);
+                        containsRedBlocks = true;
                     }
                 }
             }
@@ -393,16 +423,8 @@ public class Level extends Group {
         return width;
     }
 
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
     public float getHeight() {
         return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
     }
 
     public int getScore() {
@@ -414,17 +436,9 @@ public class Level extends Group {
         eventBus.post(new LevelScoreFact(score));
     }
 
-    public byte getPercentComplete() {
-        return percentComplete;
-    }
-
     public void setPercentComplete(byte percentComplete) {
         this.percentComplete = percentComplete;
         eventBus.post(new LevelProgressFact(percentComplete));
-    }
-
-    public State getState() {
-        return state;
     }
 
     public void setState(State state) {

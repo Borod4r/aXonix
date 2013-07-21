@@ -21,12 +21,9 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.google.common.eventbus.EventBus;
-import net.ivang.axonix.main.events.facts.EnemyDirectionFact;
-
-import static net.ivang.axonix.main.actors.game.level.Block.Type;
 
 /**
  * @author Ivan Gadzhega
@@ -35,97 +32,33 @@ import static net.ivang.axonix.main.actors.game.level.Block.Type;
 public class Enemy extends Actor {
 
     private Circle collisionCircle;
-    private Move moveDirection;
+    private Vector2 velocity;
+
     private TextureRegion region;
     private ParticleEffect particleEffect;
-    private EventBus eventBus;
 
-    public Enemy(float x, float y, Skin skin, EventBus eventBus) {
-        this.collisionCircle = new Circle(x, y, 0.5f);
+    public Enemy(float x, float y, Skin skin) {
+        this.collisionCircle = new Circle(x, y, 0.45f);
+        float speed = 4f;
+        this.velocity = Direction.getRandomDiagonal().getUnitVector().mul(speed);
         setX(x); setY(y);
         setWidth(1f);
         setHeight(1f);
         setOriginX(0.5f);
         setOriginY(0.5f);
-        this.moveDirection = Move.getRandomDiagonal();
+        // appearance
         this.region = skin.getRegion("circular_flare");
         particleEffect = new ParticleEffect();
         particleEffect.load(Gdx.files.internal("data/particles/enemy.p"), skin.getAtlas());
         particleEffect.setPosition(x, y);
-        // register with the event bus
-        this.eventBus = eventBus;
-        eventBus.register(this);
     }
 
     @Override
     public void act(float deltaTime) {
         super.act(deltaTime);
 
-        float radius = getWidth() / 2;
-        float deltaPx = deltaTime * 4f;
-
-        float x = getX();
-        float y = getY();
-
-        Level level = (Level) getParent();
-
-        switch (moveDirection) {
-            case UP_LEFT:
-                x -= deltaPx;
-                y += deltaPx;
-                if (level.getBlock(x, y + radius).hasType(Type.BLUE)) {
-                    if (level.getBlock(x - radius, y).hasType(Type.BLUE)) {
-                        setMoveDirection(Move.DOWN_RIGHT);
-                    } else {
-                        setMoveDirection(Move.DOWN_LEFT);
-                    }
-                } else if (level.getBlock(x - radius, y).hasType(Type.BLUE)) {
-                    setMoveDirection(Move.UP_RIGHT);
-                }
-                break;
-            case UP_RIGHT:
-                x += deltaPx;
-                y += deltaPx;
-                if (level.getBlock(x, y + radius).hasType(Type.BLUE)) {
-                    if (level.getBlock(x + radius, y).hasType(Type.BLUE)) {
-                        setMoveDirection(Move.DOWN_LEFT);
-                    } else {
-                        setMoveDirection(Move.DOWN_RIGHT);
-                    }
-                } else if (level.getBlock(x + radius, y).hasType(Type.BLUE)) {
-                    setMoveDirection(Move.UP_LEFT);
-                }
-                break;
-            case DOWN_LEFT:
-                x -= deltaPx;
-                y -= deltaPx;
-                if (level.getBlock(x, y - radius).hasType(Type.BLUE)) {
-                    if (level.getBlock(x - radius, y).hasType(Type.BLUE)) {
-                        setMoveDirection(Move.UP_RIGHT);
-                    } else {
-                        setMoveDirection(Move.UP_LEFT);
-                    }
-                } else if (level.getBlock(x - radius, y).hasType(Type.BLUE)) {
-                    setMoveDirection(Move.DOWN_RIGHT);
-                }
-                break;
-            case DOWN_RIGHT:
-                x += deltaPx;
-                y -= deltaPx;
-                if (level.getBlock(x, y - radius).hasType(Type.BLUE)) {
-                    if (level.getBlock(x + radius, y).hasType(Type.BLUE)) {
-                        setMoveDirection(Move.UP_LEFT);
-                    } else {
-                        setMoveDirection(Move.UP_RIGHT);
-                    }
-                } else if (level.getBlock(x + radius, y).hasType(Type.BLUE)) {
-                    setMoveDirection(Move.DOWN_LEFT);
-                }
-                break;
-        }
-
-        setX(x);
-        setY(y);
+        setX(getX() + velocity.x * deltaTime);
+        setY(getY() + velocity.y * deltaTime);
 
         particleEffect.update(deltaTime);
     }
@@ -156,12 +89,11 @@ public class Enemy extends Actor {
         collisionCircle.y = y;
     }
 
-    public void setMoveDirection(Move moveDirection) {
-        this.moveDirection = moveDirection;
-        eventBus.post(new EnemyDirectionFact(moveDirection));
-    }
-
     public Circle getCollisionCircle() {
         return collisionCircle;
+    }
+
+    public Vector2 getVelocity() {
+        return velocity;
     }
 }

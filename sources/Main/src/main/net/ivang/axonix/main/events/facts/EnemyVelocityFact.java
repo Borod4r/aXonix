@@ -14,35 +14,23 @@
  * the License.
  */
 
-package net.ivang.axonix.main.actors.game.level;
+package net.ivang.axonix.main.events.facts;
 
-import java.util.Random;
+import com.badlogic.gdx.math.Vector2;
 
 /**
  * @author Ivan Gadzhega
- * @since 0.1
+ * @since 0.2
  */
-public enum Move {
-    UP,
-    UP_RIGHT,
-    RIGHT,
-    DOWN_RIGHT,
-    DOWN,
-    DOWN_LEFT,
-    LEFT,
-    UP_LEFT,
-    IDLE;
+public class EnemyVelocityFact {
 
-    private static final Move[] VALUES = values();
-    private static final Move[] VALUES_DIAGONAL = new Move[] {UP_RIGHT, UP_LEFT, DOWN_RIGHT, DOWN_LEFT};
-    private static final Random RANDOM = new Random();
+    private Vector2 velocity;
 
-    public static Move getRandom() {
-        return VALUES[(RANDOM.nextInt(VALUES.length))];
+    public EnemyVelocityFact(Vector2 velocity) {
+        this.velocity = velocity;
     }
 
-    public static Move getRandomDiagonal() {
-        return VALUES_DIAGONAL[(RANDOM.nextInt(VALUES_DIAGONAL.length))];
+    public Vector2 getVelocity() {
+        return velocity;
     }
-
 }

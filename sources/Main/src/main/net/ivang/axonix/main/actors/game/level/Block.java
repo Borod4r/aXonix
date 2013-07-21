@@ -18,6 +18,7 @@ package net.ivang.axonix.main.actors.game.level;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
@@ -31,6 +32,8 @@ public class Block extends Actor {
     private TextureRegion regionRed;
     private Type type;
 
+    private Rectangle collisionRectangle;
+
     public Block(float x, float y, Type type, Skin skin) {
         this.regionBlue = skin.getRegion("block_blue");
         this.regionRed = skin.getRegion("block_red");
@@ -38,6 +41,7 @@ public class Block extends Actor {
         setWidth(1f);
         setHeight(1f);
         setType(type);
+        this.collisionRectangle = new Rectangle(x, y, getWidth(), getHeight());
     }
 
     @Override
@@ -66,6 +70,10 @@ public class Block extends Actor {
         return this.type == type;
     }
 
+    public boolean isEmpty() {
+        return hasType(Type.EMPTY);
+    }
+
     //---------------------------------------------------------------------
     // Getters & Setters
     //---------------------------------------------------------------------
@@ -78,6 +86,9 @@ public class Block extends Actor {
         this.type = type;
     }
 
+    public Rectangle getCollisionRectangle() {
+        return collisionRectangle;
+    }
 
     //---------------------------------------------------------------------
     // Nested Classes
