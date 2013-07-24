@@ -69,7 +69,7 @@ public class GameScreen extends BaseScreen {
     private int lives;
     private int totalScore;
     private int levelIndex;
-    Level level;
+    private Level level;
 
     private Style style;
     private StatusBar statusBar;
@@ -117,7 +117,7 @@ public class GameScreen extends BaseScreen {
         if (level != null) {
             float scale = calculateScaling(stage, level, statusCell.getMaxHeight());
             level.setScale(scale);
-            levelCell.width(level.getWidth() * scale).height(level.getHeight() * scale);
+            levelCell.width(level.getMapWidth() * scale).height(level.getMapHeight() * scale);
         }
         background.update(true);
     }
@@ -328,7 +328,7 @@ public class GameScreen extends BaseScreen {
         // set widget size
         float scale = calculateScaling(stage, level, statusCell.getMaxHeight());
         level.setScale(scale);
-        levelCell.setWidget(level).width(level.getWidth() * scale).height(level.getHeight() * scale);
+        levelCell.setWidget(level).width(level.getMapWidth() * scale).height(level.getMapHeight() * scale);
         // get level info from preferences
         if (loadFromPrefs) {
             loadLevelInfoFromPrefs(index - 1);
@@ -379,8 +379,8 @@ public class GameScreen extends BaseScreen {
 
     private float calculateScaling(Stage stage, Level level, float statusBarHeight) {
         int padding = 5;
-        float wScaling = (stage.getWidth() - padding)/ level.getWidth();
-        float hScaling = (stage.getHeight() - statusBarHeight - padding) / level.getHeight();
+        float wScaling = (stage.getWidth() - padding)/ level.getMapWidth();
+        float hScaling = (stage.getHeight() - statusBarHeight - padding) / level.getMapHeight();
         return min(wScaling, hScaling);
     }
 
@@ -416,10 +416,6 @@ public class GameScreen extends BaseScreen {
 
     public Label getNotificationLabel() {
         return notificationLabel;
-    }
-
-    public StatusBar getStatusBar() {
-        return statusBar;
     }
 
     public Level getLevel() {

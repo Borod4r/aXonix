@@ -17,10 +17,8 @@
 package net.ivang.axonix.main.actors.game.level;
 
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.math.Circle;
-import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.google.common.eventbus.EventBus;
@@ -31,6 +29,7 @@ import net.ivang.axonix.main.events.facts.ObtainedPointsFact;
 import net.ivang.axonix.main.events.facts.TailBlockFact;
 import net.ivang.axonix.main.events.facts.level.LevelProgressFact;
 import net.ivang.axonix.main.events.facts.level.LevelScoreFact;
+import net.ivang.axonix.main.events.intents.bonus.SpeedBonusIntent;
 import net.ivang.axonix.main.events.intents.game.LevelScoreIntent;
 import net.ivang.axonix.main.events.intents.game.NotificationIntent;
 import net.ivang.axonix.main.screens.GameScreen;
@@ -48,10 +47,11 @@ public class Level extends Group {
     private State state;
     private EventBus eventBus;
 
-    private int width;
-    private int height;
+    private int mapWidth;
+    private int mapHeight;
     private Block[][] levelMap;
 
+    private int levelIndex;
     private int score;
     private byte percentComplete;
     private int filledBlocks;
@@ -59,6 +59,7 @@ public class Level extends Group {
     private Protagonist protagonist;
     private List<Enemy> enemies;
     private List<Block> tailBlocks;
+    private Group bonuses;
 
     private boolean containsRedBlocks;
     private float redBlocksDelta;
@@ -72,17 +73,21 @@ public class Level extends Group {
         eventBus.register(this);
 
         this.skin = skin;
-        this.width = pixmap.getWidth();
-        this.height = pixmap.getHeight();
-        this.levelMap = new Block[width][height];
-        this.enemies = new ArrayList<Enemy>();
+        this.mapWidth = pixmap.getWidth();
+        this.mapHeight = pixmap.getHeight();
+        this.levelMap = new Block[mapWidth][mapHeight];
         this.tailBlocks = new ArrayList<Block>();
+        this.enemies = new ArrayList<Enemy>();
+        this.bonuses = new Group();
 
         initFromPixmap(pixmap);
+
+        addActor(bonuses);
 
         setScore(0);
         setPercentComplete((byte) 0);
 
+        this.levelIndex = levelIndex;
         String level = Integer.toString(levelIndex);
         showNotification("Level " + level + ". Go-go-go!", 0.25f, 1.5f);
     }
@@ -91,10 +96,9 @@ public class Level extends Group {
         final int EARTH = 0x000000;
         final int ENEMY = 0xFF0000;
         final int PROTAGONIST = 0x00FF00;
-
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                int pix = (pixmap.getPixel(x, height-y-1) >>> 8) & 0xffffff;
+        for (int x = 0; x < mapWidth; x++) {
+            for (int y = 0; y < mapHeight; y++) {
+                int pix = (pixmap.getPixel(x, mapHeight-y-1) >>> 8) & 0xffffff;
                 if(pix == EARTH) {
                     levelMap[x][y] = new Block(x, y, Type.BLUE, skin);
                 }else if (pix == ENEMY) {
@@ -173,6 +177,7 @@ public class Level extends Group {
     // Helper methods
     //---------------------------------------------------------------------
 
+    @SuppressWarnings("StatementWithEmptyBody")
     private void checkTail(float delta) {
         if (containsRedBlocks) {
             redBlocksDelta += delta;
@@ -207,7 +212,14 @@ public class Level extends Group {
                 protagonist.setState(Protagonist.State.DYING);
                 return;
             }
-            // check collision with blocks
+            // check collisions with bonuses
+            for (Actor actor : bonuses.getChildren()) {
+                Bonus bonus = (Bonus) actor;
+                if (Intersector.overlapCircles(enemyCircle, bonus.getCollisionCircle())) {
+                    bonus.removeSmoothly();
+                }
+            }
+            // check collisions with blocks
             Vector2 velocity = enemy.getVelocity();
             Vector2 signum = new Vector2(Math.signum(velocity.x), Math.signum(velocity.y));
 
@@ -257,6 +269,16 @@ public class Level extends Group {
 
     private void checkProtagonist() {
         if(protagonist.hasState(Protagonist.State.ALIVE) && protagonist.isOnNewBlock()) {
+            // check bonuses
+            for (Actor actor : bonuses.getChildren()) {
+                Bonus bonus = (Bonus) actor;
+                Circle protagonistCircle = protagonist.getCollisionCircle();
+                Circle bonusCircle = bonus.getCollisionCircle();
+                if (Intersector.overlapCircles(protagonistCircle, bonusCircle)) {
+                    eventBus.post(new SpeedBonusIntent());
+                    bonus.removeSmoothly();
+                }
+            }
             // previous block
             Block prevBlock = getBlock(protagonist.getPrevX(), protagonist.getPrevY());
             if (prevBlock.hasType(Type.EMPTY)) {
@@ -282,8 +304,10 @@ public class Level extends Group {
                         eventBus.post(new LevelScoreIntent(obtainedPoints));
                         // update percentage
                         filledBlocks += newBlocks;
-                        byte percentComplete = (byte) (((float) filledBlocks / ((width - 2) * (height - 2))) * 100) ;
+                        byte percentComplete = (byte) (((float) filledBlocks / ((mapWidth - 2) * (mapHeight - 2))) * 100) ;
                         setPercentComplete(percentComplete);
+                        // add bonus with some probability
+                        addBonus();
                     }
                     break;
             }
@@ -304,12 +328,12 @@ public class Level extends Group {
 
     private int fillAreas() {
         // thanks to http://habrahabr.ru/post/119244/
-        byte[][] tmpState = new byte[width][height];
+        byte[][] tmpState = new byte[mapWidth][mapHeight];
         byte spotNum = 0;
         int blocks = 0;
         Map<Byte, List<Vector2>> spots = new HashMap<Byte, List<Vector2>>();
-        for(int i = 1; i < width - 1; i++) {
-            for(int j = 1; j < height - 1; j++) {
+        for(int i = 1; i < mapWidth - 1; i++) {
+            for(int j = 1; j < mapHeight - 1; j++) {
                 Block A = levelMap[i][j];
                 if (A.hasType(Type.EMPTY)) {
                     byte B = tmpState[i][j-1];
@@ -339,8 +363,8 @@ public class Level extends Group {
                             tmpState[i][j] = B;
                             spots.get(B).add(new Vector2(i,j));
                             if (B != C) {
-                                for(int m = 1; m < width - 1; m++) {
-                                    for(int n = 1; n < height; n++) {
+                                for(int m = 1; m < mapWidth - 1; m++) {
+                                    for(int n = 1; n < mapHeight; n++) {
                                         if (tmpState[m][n] == C) {
                                             tmpState[m][n] = B;
                                         }
@@ -386,9 +410,9 @@ public class Level extends Group {
         float labelX = (protX) * getScaleX() + this.getX();
         float labelY = (protY) * getScaleY() + this.getY();
         // movement distance and direction
-        float moveY = ((protY > getHeight()/2) ? -3 : 3) * getScaleY();
+        float moveY = ((protY > mapHeight/2) ? -3 : 3) * getScaleY();
         // correct position if is on the right side
-        boolean subtractBounds = protX > getWidth()/2;
+        boolean subtractBounds = protX > mapWidth/2;
         // post event
         eventBus.post(new ObtainedPointsFact(points, labelX, labelY, moveY, subtractBounds));
     }
@@ -403,6 +427,16 @@ public class Level extends Group {
         }
         tailBlocks.clear();
         containsRedBlocks = false;
+    }
+
+    private void addBonus() {
+        float probability = 0.1f + (levelIndex * 0.01f);
+        if (probability > MathUtils.random()) {
+            int x = MathUtils.random(1, mapWidth - 2);
+            int y = MathUtils.random(1, mapHeight - 2);
+            Bonus bonus = new Bonus(x + 0.5f, y + 0.5f, skin);
+            bonuses.addActor(bonus);
+        }
     }
 
     private boolean hasState(State state) {
@@ -421,12 +455,12 @@ public class Level extends Group {
         return getBlock((int) x, (int) y);
     }
 
-    public float getWidth() {
-        return width;
+    public float getMapWidth() {
+        return mapWidth;
     }
 
-    public float getHeight() {
-        return height;
+    public float getMapHeight() {
+        return mapHeight;
     }
 
     public int getScore() {

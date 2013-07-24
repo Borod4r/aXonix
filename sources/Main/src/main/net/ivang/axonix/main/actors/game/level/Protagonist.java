@@ -26,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import net.ivang.axonix.main.events.intents.bonus.SpeedBonusIntent;
 import net.ivang.axonix.main.events.intents.game.LivesIntent;
 
 import static net.ivang.axonix.main.actors.game.level.Block.Type;
@@ -46,6 +47,7 @@ public class Protagonist extends Actor {
     private float spawnX, spawnY;
     private float prevX, prevY;
     private float speed;
+    private float boost;
     private Direction direction;
 
     private Circle collisionCircle;
@@ -61,7 +63,7 @@ public class Protagonist extends Actor {
         eventBus.register(this);
 
         this.state = State.ALIVE;
-        this.speed = 8;
+        this.speed = 4;
         this.direction = Direction.IDLE;
         this.level = level;
         this.region = skin.getRegion("circular_flare");
@@ -125,6 +127,14 @@ public class Protagonist extends Actor {
         return ((int) getX() - (int) getPrevX() != 0) || ((int) getY() - (int) getPrevY() != 0);
     }
 
+    public boolean hasState(State state) {
+        return this.state == state;
+    }
+
+    //---------------------------------------------------------------------
+    // Subscribers
+    //---------------------------------------------------------------------
+
     @Subscribe
     @SuppressWarnings("unused")
     public void onStateChange(State state) {
@@ -135,6 +145,7 @@ public class Protagonist extends Actor {
                 particleDead.start();
                 // re-spawn
                 this.direction = Direction.IDLE;
+                this.boost = 0;
                 setX(spawnX); setY(spawnY);
                 setPrevX(spawnX); setPrevY(spawnY);
                 particleAlive.setPosition(spawnX, spawnY);
@@ -146,8 +157,10 @@ public class Protagonist extends Actor {
         }
     }
 
-    public boolean hasState(State state) {
-        return this.state == state;
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onSpeedBonus(SpeedBonusIntent intent) {
+        boost = 10;
     }
 
     //---------------------------------------------------------------------
@@ -186,81 +199,87 @@ public class Protagonist extends Actor {
     }
 
     private void updatePosition(float deltaTime) {
-        float deltaPx = deltaTime * speed;
-        float x = getX();
-        float y = getY();
-
-        switch (direction) {
-            case UP:
-                if (y > 0.5) {
-                    y -= deltaPx;
-                } else {
-                    direction = Direction.IDLE;
-                }
-                break;
-            case DOWN:
-                if (y < level.getHeight() - 0.5) {
-                    y += deltaPx;
-                } else {
-                    direction = Direction.IDLE;
-                }
-                break;
-            case LEFT:
-                if (x > 0.5) {
-                    x -= deltaPx;
-                } else {
-                    direction = Direction.IDLE;
-                }
-                break;
-            case RIGHT:
-                if (x < level.getWidth() - 0.5) {
-                    x += deltaPx;
-                } else {
-                    direction = Direction.IDLE;
-                }
-                break;
-        }
-
-        float step = 0.05f;
-        switch (direction) {
-            case UP:
-            case DOWN:
-                float nx = x + 0.5f;
-                float rx = Math.round(nx);
-                if (rx > nx) {
-                    x += step;
-                } else if (rx < nx) {
-                    if (rx - nx < step) {
-                        x = rx - 0.5f; // round x for smoother movement
-                    } else {
-                        x -= step;
-                    }
-                }
-                break;
-            case RIGHT:
-            case LEFT:
-                float ny = y + 0.5f;
-                float ry = Math.round(ny);
-                if (ry > ny) {
-                    y += step;
-                } else if (ry < ny) {
-                    if (ry - ny < step) {
-                        y = ry - 0.5f; // round y for smoother movement
-                    } else {
-                        y -= step;
-                    }
-                }
-                break;
-
-        }
-
-        // update previous coords
         if (direction != Direction.IDLE) {
+            float distance = deltaTime * speed;
+            // apply boost
+            if (boost > 0) {
+                boost -= deltaTime;
+                distance *= 2;
+            }
+
+            float x = getX();
+            float y = getY();
+
+            switch (direction) {
+                case UP:
+                    if (y > 0.5) {
+                        y -= distance;
+                    } else {
+                        direction = Direction.IDLE;
+                    }
+                    break;
+                case DOWN:
+                    if (y < level.getMapHeight() - 0.5) {
+                        y += distance;
+                    } else {
+                        direction = Direction.IDLE;
+                    }
+                    break;
+                case LEFT:
+                    if (x > 0.5) {
+                        x -= distance;
+                    } else {
+                        direction = Direction.IDLE;
+                    }
+                    break;
+                case RIGHT:
+                    if (x < level.getMapWidth() - 0.5) {
+                        x += distance;
+                    } else {
+                        direction = Direction.IDLE;
+                    }
+                    break;
+            }
+
+            float step = 0.05f;
+            switch (direction) {
+                case UP:
+                case DOWN:
+                    float nx = x + 0.5f;
+                    float rx = Math.round(nx);
+                    if (rx > nx) {
+                        x += step;
+                    } else if (rx < nx) {
+                        if (rx - nx < step) {
+                            x = rx - 0.5f; // round x for smoother movement
+                        } else {
+                            x -= step;
+                        }
+                    }
+                    break;
+                case RIGHT:
+                case LEFT:
+                    float ny = y + 0.5f;
+                    float ry = Math.round(ny);
+                    if (ry > ny) {
+                        y += step;
+                    } else if (ry < ny) {
+                        if (ry - ny < step) {
+                            y = ry - 0.5f; // round y for smoother movement
+                        } else {
+                            y -= step;
+                        }
+                    }
+                    break;
+
+            }
+
+            // update previous coords
             prevX = getX();
             prevY = getY();
-        }
 
-        setX(x); setY(y);
+            setX(x); setY(y);
+        }
     }
 
     //---------------------------------------------------------------------
