@@ -201,70 +201,80 @@ public class Protagonist extends Actor {
 
     private void updatePosition(float deltaTime) {
         if (direction != Direction.IDLE) {
-            float distance = deltaTime * speed;
-            // apply boost
-            if (boost > 0) {
-                boost -= deltaTime;
-                distance *= 2;
-            }
+            Vector2 position = new Vector2(getX(), getY());
+            float distance = calculateDistance(deltaTime);
 
-            // update coords
-            Vector2 unitVector = direction.getUnitVector();
-            float x = getX();
-            float y = getY();
+            updatePositon(position, distance);
+            correctForSmoothTurns(position);
 
-            x += distance * unitVector.x;
-            y += distance * unitVector.y;
-
-            // check the boundaries
-            x = Math.max(0.5f, x);
-            x = Math.min(x, level.getMapWidth() - 0.5f);
-            y = Math.max(0.5f, y);
-            y = Math.min(y, level.getMapHeight() - 0.5f);
-
-            if (x == getX() && y == getY()) {
+            if (position.x == getX() && position.y == getY()) {
                 direction = Direction.IDLE;
-                return;
+            } else {
+                // update previous coords
+                prevX = getX();
+                prevY = getY();
+                // update current coords
+                setX(position.x);
+                setY(position.y);
             }
+        }
+    }
 
-            float step = 0.05f;
-            switch (direction) {
-                case UP:
-                case DOWN:
-                    float nx = x + 0.5f;
-                    float rx = Math.round(nx);
-                    if (rx > nx) {
-                        x += step;
-                    } else if (rx < nx) {
-                        if (rx - nx < step) {
-                            x = rx - 0.5f; // round x for smoother movement
-                        } else {
-                            x -= step;
-                        }
+    private float calculateDistance(float deltaTime) {
+        float distance = deltaTime * speed;
+        // apply boost
+        if (boost > 0) {
+            boost -= deltaTime;
+            distance *= 2;
+        }
+        return Math.min(distance, 1f);
+    }
+
+    private void updatePositon(Vector2 position, float distance) {
+        Vector2 unitVector = direction.getUnitVector();
+
+        position.x += distance * unitVector.x;
+        position.y += distance * unitVector.y;
+
+        // check the boundaries
+        position.x = Math.max(0.5f, position.x);
+        position.x = Math.min(position.x, level.getMapWidth() - 0.5f);
+        position.y = Math.max(0.5f, position.y);
+        position.y = Math.min(position.y, level.getMapHeight() - 0.5f);
+    }
+
+    private void correctForSmoothTurns(Vector2 position) {
+        float step = 0.05f;
+        switch (direction) {
+            case UP:
+            case DOWN:
+                float nx = position.x + 0.5f;
+                float rx = Math.round(nx);
+                if (rx > nx) {
+                    position.x += step;
+                } else if (rx < nx) {
+                    if (rx - nx < step) {
+                        position.x = rx - 0.5f; // round x for smoother movement
+                    } else {
+                        position.x -= step;
                     }
-                    break;
-                case RIGHT:
-                case LEFT:
-                    float ny = y + 0.5f;
-                    float ry = Math.round(ny);
-                    if (ry > ny) {
-                        y += step;
-                    } else if (ry < ny) {
-                        if (ry - ny < step) {
-                            y = ry - 0.5f; // round y for smoother movement
-                        } else {
-                            y -= step;
-                        }
+                }
+                break;
+            case RIGHT:
+            case LEFT:
+                float ny = position.y + 0.5f;
+                float ry = Math.round(ny);
+                if (ry > ny) {
+                    position.y += step;
+                } else if (ry < ny) {
+                    if (ry - ny < step) {
+                        position.y = ry - 0.5f; // round y for smoother movement
+                    } else {
+                        position.y -= step;
                     }
-                    break;
+                }
+                break;
 
-            }
-
-            // update previous coords
-            prevX = getX();
-            prevY = getY();
-
-            setX(x); setY(y);
         }
     }
 
