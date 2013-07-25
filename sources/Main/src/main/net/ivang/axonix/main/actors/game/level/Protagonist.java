@@ -22,6 +22,7 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.google.common.eventbus.EventBus;
@@ -180,13 +181,13 @@ public class Protagonist extends Actor {
         Block block = level.getBlock(getX(), getY());
         boolean onFilledBlock = (block.hasType(Type.BLUE)) || ((block.hasType(Type.GREEN)));
 
-        if((onFilledBlock || direction != Direction.DOWN)
-                && (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S) || isDraggedUp)) {
-            direction = Direction.UP;
-        }
         if((onFilledBlock || direction != Direction.UP)
-                && (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W) || isDraggedDown)) {
+                && (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S) || isDraggedUp)) {
             direction = Direction.DOWN;
+        }
+        if((onFilledBlock || direction != Direction.DOWN)
+                && (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W) || isDraggedDown)) {
+            direction = Direction.UP;
         }
         if((onFilledBlock || direction != Direction.RIGHT)
                 && (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A) || isDraggedLeft)) {
@@ -207,38 +208,23 @@ public class Protagonist extends Actor {
                 distance *= 2;
             }
 
+            // update coords
+            Vector2 unitVector = direction.getUnitVector();
             float x = getX();
             float y = getY();
 
-            switch (direction) {
-                case UP:
-                    if (y > 0.5) {
-                        y -= distance;
-                    } else {
-                        direction = Direction.IDLE;
-                    }
-                    break;
-                case DOWN:
-                    if (y < level.getMapHeight() - 0.5) {
-                        y += distance;
-                    } else {
-                        direction = Direction.IDLE;
-                    }
-                    break;
-                case LEFT:
-                    if (x > 0.5) {
-                        x -= distance;
-                    } else {
-                        direction = Direction.IDLE;
-                    }
-                    break;
-                case RIGHT:
-                    if (x < level.getMapWidth() - 0.5) {
-                        x += distance;
-                    } else {
-                        direction = Direction.IDLE;
-                    }
-                    break;
+            x += distance * unitVector.x;
+            y += distance * unitVector.y;
+
+            // check the boundaries
+            x = Math.max(0.5f, x);
+            x = Math.min(x, level.getMapWidth() - 0.5f);
+            y = Math.max(0.5f, y);
+            y = Math.min(y, level.getMapHeight() - 0.5f);
+
+            if (x == getX() && y == getY()) {
+                direction = Direction.IDLE;
+                return;
             }
 
             float step = 0.05f;
