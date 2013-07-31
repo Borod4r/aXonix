@@ -22,15 +22,15 @@ import com.badlogic.gdx.math.Vector2;
  * @author Ivan Gadzhega
  * @since 0.2
  */
-public class EnemyVelocityFact {
+public class EnemyDirectionFact {
 
-    private Vector2 velocity;
+    private Vector2 direction;
 
-    public EnemyVelocityFact(Vector2 velocity) {
-        this.velocity = velocity;
+    public EnemyDirectionFact(Vector2 direction) {
+        this.direction = direction;
     }
 
-    public Vector2 getVelocity() {
-        return velocity;
+    public Vector2 getDirection() {
+        return direction;
     }
 }

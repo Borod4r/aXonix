@@ -24,7 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import net.ivang.axonix.main.events.facts.EnemyVelocityFact;
+import net.ivang.axonix.main.events.facts.EnemyDirectionFact;
 import net.ivang.axonix.main.events.facts.ObtainedPointsFact;
 import net.ivang.axonix.main.events.facts.TailBlockFact;
 import net.ivang.axonix.main.events.facts.level.LevelProgressFact;
@@ -107,7 +107,7 @@ public class Level extends Group {
                     enemies.add(enemy);
                 } else if (pix == PROTAGONIST) {
                     levelMap[x][y] = new Block(x, y, Type.BLUE, skin);
-                    protagonist = new Protagonist(eventBus, x + 0.5f, y + 0.5f, this, skin);
+                    protagonist = new Protagonist(x + 0.5f, y + 0.5f, this, skin, eventBus);
                 } else {
                     levelMap[x][y] = new Block(x, y, Type.EMPTY, skin);
                 }
@@ -220,8 +220,8 @@ public class Level extends Group {
                 }
             }
             // check collisions with blocks
-            Vector2 velocity = enemy.getVelocity();
-            Vector2 signum = new Vector2(Math.signum(velocity.x), Math.signum(velocity.y));
+            Vector2 direction = enemy.getDirection();
+            Vector2 signum = new Vector2(Math.signum(direction.x), Math.signum(direction.y));
 
             Block b1 = getBlock(enemy.getX() + signum.x, enemy.getY());
             Block b2 = getBlock(enemy.getX(), enemy.getY() + signum.y);
@@ -233,14 +233,14 @@ public class Level extends Group {
                 Rectangle r1 = b1.getCollisionRectangle();
                 if (Intersector.overlapCircleRectangle(enemyCircle, r1)) {
                     collisions.add(b1);
-                    velocity.x = - velocity.x;
+                    direction.x = - direction.x;
                 }
             }
             if (!b2.isEmpty()) {
                 Rectangle r2 = b2.getCollisionRectangle();
                 if (Intersector.overlapCircleRectangle(enemyCircle, r2)) {
                     collisions.add(b2);
-                    velocity.y = - velocity.y;
+                    direction.y = - direction.y;
                 }
             }
 
@@ -248,14 +248,14 @@ public class Level extends Group {
                 Rectangle r3 = b3.getCollisionRectangle();
                 if (Intersector.overlapCircleRectangle(enemyCircle, r3)) {
                     collisions.add(b3);
-                    velocity.x = - velocity.x;
-                    velocity.y = - velocity.y;
+                    direction.x = - direction.x;
+                    direction.y = - direction.y;
                 }
             }
 
             if (!collisions.isEmpty()) {
-                // velocity has changed
-                eventBus.post(new EnemyVelocityFact(velocity));
+                // direction has changed
+                eventBus.post(new EnemyDirectionFact(direction));
                 // burn tail
                 for (Block block : collisions) {
                     if (block.hasType(Type.TAIL)) {

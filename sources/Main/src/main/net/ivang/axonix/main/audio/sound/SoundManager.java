@@ -59,7 +59,7 @@ public class SoundManager {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onEnemyCollision(EnemyVelocityFact fact) {
+    public void onEnemyCollision(EnemyDirectionFact fact) {
         Sounds.ENEMY_DIRECTION.play(sfxVolume);
     }
 

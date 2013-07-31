@@ -21,31 +21,46 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import net.ivang.axonix.main.actors.game.KinematicActor;
 
 /**
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class Enemy extends Actor {
+public class Enemy extends KinematicActor {
+
+    private static final Vector2 UP_RIGHT = new Vector2(1, 1).nor();
+    private static final Vector2 DOWN_RIGHT = new Vector2(1, -1).nor();
+    private static final Vector2 DOWN_LEFT = new Vector2(-1, -1).nor();
+    private static final Vector2 UP_LEFT = new Vector2(-1, 1).nor();
+
+    private static final Vector2[] DIAGONALS = new Vector2[] {UP_RIGHT, UP_LEFT, DOWN_RIGHT, DOWN_LEFT};
+
+    private static Vector2 getRandomDiagonal() {
+        return DIAGONALS[(MathUtils.random(DIAGONALS.length - 1))];
+    }
+
+    //---------------------------------------------------------------------
+    // Instance
+    //---------------------------------------------------------------------
 
     private Circle collisionCircle;
-    private Vector2 velocity;
 
     private TextureRegion region;
     private ParticleEffect particleEffect;
 
     public Enemy(float x, float y, Skin skin) {
         this.collisionCircle = new Circle(x, y, 0.45f);
-        float speed = 4f;
-        this.velocity = Direction.getRandomDiagonal().getUnitVector().mul(speed);
         setX(x); setY(y);
         setWidth(1f);
         setHeight(1f);
         setOriginX(0.5f);
         setOriginY(0.5f);
+        setSpeed(4f);
+        setDirection(getRandomDiagonal());
         // appearance
         this.region = skin.getRegion("circular_flare");
         particleEffect = new ParticleEffect();
@@ -57,8 +72,8 @@ public class Enemy extends Actor {
     public void act(float deltaTime) {
         super.act(deltaTime);
 
-        setX(getX() + velocity.x * deltaTime);
-        setY(getY() + velocity.y * deltaTime);
+        setX(getX() + direction.x * speed * deltaTime);
+        setY(getY() + direction.y * speed * deltaTime);
 
         particleEffect.update(deltaTime);
     }
@@ -93,7 +108,4 @@ public class Enemy extends Actor {
         return collisionCircle;
     }
 
-    public Vector2 getVelocity() {
-        return velocity;
-    }
 }

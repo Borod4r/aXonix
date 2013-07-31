@@ -19,20 +19,17 @@ package net.ivang.axonix.main.actors.game.background;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.scenes.scene2d.Actor;
+import net.ivang.axonix.main.actors.game.KinematicActor;
 
 /**
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class BackgroundFlare extends Actor {
+public class BackgroundFlare extends KinematicActor {
 
-    private final static int VELOCITY_MULTIPLIER = 50;
+    private final static int BASE_SPEED = 50;
 
     private TextureRegion texture;
-
-    private float velocityX;
-    private float velocityY;
     private float maxScale;
 
     public BackgroundFlare(TextureRegion texture) {
@@ -54,15 +51,16 @@ public class BackgroundFlare extends Actor {
         this.maxScale = MathUtils.random(0.1f, 1f) * scaleCorrection;
 
         float angle = MathUtils.random(359);
-        velocityX = MathUtils.cosDeg(angle) * maxScale * VELOCITY_MULTIPLIER;
-        velocityY = MathUtils.sinDeg(angle) * maxScale * VELOCITY_MULTIPLIER;
+        direction.x = MathUtils.cosDeg(angle);
+        direction.y = MathUtils.sinDeg(angle);
+        speed = BASE_SPEED * maxScale;
     }
 
     @Override
     public void act(float delta) {
         super.act(delta);
-        setX(getX() + velocityX * delta);
-        setY(getY() + velocityY * delta);
+        setX(getX() + direction.x * speed * delta);
+        setY(getY() + direction.y * speed * delta);
         if (getScaleX() < maxScale) {
             setScale(getScaleX() + 0.01f);
         }

@@ -23,10 +23,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import net.ivang.axonix.main.actors.game.KinematicActor;
 import net.ivang.axonix.main.events.intents.bonus.SpeedBonusIntent;
 import net.ivang.axonix.main.events.intents.game.LivesIntent;
 
@@ -36,20 +36,20 @@ import static net.ivang.axonix.main.actors.game.level.Block.Type;
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class Protagonist extends Actor {
+public class Protagonist extends KinematicActor {
 
-    public enum State {
-        ALIVE, DYING, DEAD
-    }
+    private static final Vector2 IDLE = new Vector2(0, 0);
+    private static final Vector2 UP = new Vector2(0, 1);
+    private static final Vector2 RIGHT = new Vector2(1, 0);
+    private static final Vector2 DOWN = new Vector2(0, -1);
+    private static final Vector2 LEFT = new Vector2(-1, 0);
 
     private State state;
     private EventBus eventBus;
 
     private float spawnX, spawnY;
     private float prevX, prevY;
-    private float speed;
     private float boost;
-    private Direction direction;
 
     private Circle collisionCircle;
 
@@ -59,13 +59,8 @@ public class Protagonist extends Actor {
     private ParticleEffect particleAlive;
     private ParticleEffect particleDead;
 
-    public Protagonist(EventBus eventBus, float x, float y, Level level, Skin skin) {
-        this.eventBus = eventBus;
-        eventBus.register(this);
-
+    public Protagonist(float x, float y, Level level, Skin skin, EventBus eventBus) {
         this.state = State.ALIVE;
-        this.speed = 4;
-        this.direction = Direction.IDLE;
         this.level = level;
         this.region = skin.getRegion("circular_flare");
         this.collisionCircle = new Circle(x, y, 0.4f);
@@ -73,6 +68,8 @@ public class Protagonist extends Actor {
         setX(x); setY(y);
         setSpawnX(x); setSpawnY(y);
         setPrevX(x); setPrevY(y);
+        setSpeed(4f);
+        setDirection(IDLE);
 
         setWidth(1.5f);
         setHeight(1.5f);
@@ -84,6 +81,10 @@ public class Protagonist extends Actor {
 
         particleDead = new ParticleEffect();
         particleDead.load(Gdx.files.internal("data/particles/protagonist_dead.p"), skin.getAtlas());
+
+        // register with the event bus
+        this.eventBus = eventBus;
+        eventBus.register(this);
     }
 
     @Override
@@ -145,7 +146,7 @@ public class Protagonist extends Actor {
                 particleDead.setPosition(getX(), getY());
                 particleDead.start();
                 // re-spawn
-                this.direction = Direction.IDLE;
+                this.direction = IDLE;
                 this.boost = 0;
                 setX(spawnX); setY(spawnY);
                 setPrevX(spawnX); setPrevY(spawnY);
@@ -181,26 +182,26 @@ public class Protagonist extends Actor {
         Block block = level.getBlock(getX(), getY());
         boolean onFilledBlock = (block.hasType(Type.BLUE)) || ((block.hasType(Type.GREEN)));
 
-        if((onFilledBlock || direction != Direction.UP)
+        if((onFilledBlock || direction != UP)
                 && (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S) || isDraggedUp)) {
-            direction = Direction.DOWN;
+            direction = DOWN;
         }
-        if((onFilledBlock || direction != Direction.DOWN)
+        if((onFilledBlock || direction != DOWN)
                 && (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W) || isDraggedDown)) {
-            direction = Direction.UP;
+            direction = UP;
         }
-        if((onFilledBlock || direction != Direction.RIGHT)
+        if((onFilledBlock || direction != RIGHT)
                 && (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A) || isDraggedLeft)) {
-            direction = Direction.LEFT;
+            direction = LEFT;
         }
-        if((onFilledBlock || direction != Direction.LEFT)
+        if((onFilledBlock || direction != LEFT)
                 && (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D) || isDraggedRight)) {
-            direction = Direction.RIGHT;
+            direction = RIGHT;
         }
     }
 
     private void updatePosition(float deltaTime) {
-        if (direction != Direction.IDLE) {
+        if (direction != IDLE) {
             Vector2 position = new Vector2(getX(), getY());
             float distance = calculateDistance(deltaTime);
 
@@ -208,7 +209,7 @@ public class Protagonist extends Actor {
             correctForSmoothTurns(position);
 
             if (position.x == getX() && position.y == getY()) {
-                direction = Direction.IDLE;
+                direction = IDLE;
             } else {
                 // update previous coords
                 prevX = getX();
@@ -231,10 +232,8 @@ public class Protagonist extends Actor {
     }
 
     private void updatePositon(Vector2 position, float distance) {
-        Vector2 unitVector = direction.getUnitVector();
-
-        position.x += distance * unitVector.x;
-        position.y += distance * unitVector.y;
+        position.x += distance * direction.x;
+        position.y += distance * direction.y;
 
         // check the boundaries
         position.x = Math.max(0.5f, position.x);
@@ -245,36 +244,30 @@ public class Protagonist extends Actor {
 
     private void correctForSmoothTurns(Vector2 position) {
         float step = 0.05f;
-        switch (direction) {
-            case UP:
-            case DOWN:
-                float nx = position.x + 0.5f;
-                float rx = Math.round(nx);
-                if (rx > nx) {
-                    position.x += step;
-                } else if (rx < nx) {
-                    if (rx - nx < step) {
-                        position.x = rx - 0.5f; // round x for smoother movement
-                    } else {
-                        position.x -= step;
-                    }
+        if (direction.x != 0) {
+            float ny = position.y + 0.5f;
+            float ry = Math.round(ny);
+            if (ry > ny) {
+                position.y += step;
+            } else if (ry < ny) {
+                if (ry - ny < step) {
+                    position.y = ry - 0.5f; // round y for smoother movement
+                } else {
+                    position.y -= step;
                 }
-                break;
-            case RIGHT:
-            case LEFT:
-                float ny = position.y + 0.5f;
-                float ry = Math.round(ny);
-                if (ry > ny) {
-                    position.y += step;
-                } else if (ry < ny) {
-                    if (ry - ny < step) {
-                        position.y = ry - 0.5f; // round y for smoother movement
-                    } else {
-                        position.y -= step;
-                    }
+            }
+        } else if (direction.y != 0) {
+            float nx = position.x + 0.5f;
+            float rx = Math.round(nx);
+            if (rx > nx) {
+                position.x += step;
+            } else if (rx < nx) {
+                if (rx - nx < step) {
+                    position.x = rx - 0.5f; // round x for smoother movement
+                } else {
+                    position.x -= step;
                 }
-                break;
-
+            }
         }
     }
 
@@ -330,4 +323,13 @@ public class Protagonist extends Actor {
     public float getSpeed() {
         return speed;
     }
+
+    //---------------------------------------------------------------------
+    // Nested Classes
+    //---------------------------------------------------------------------
+
+    public enum State {
+        ALIVE, DYING, DEAD
+    }
+
 }
