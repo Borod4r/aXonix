@@ -16,7 +16,6 @@
 
 package net.ivang.axonix.main.actors.game.background;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -34,30 +33,29 @@ public class BackgroundFlare extends Actor {
 
     private float velocityX;
     private float velocityY;
-    private Color color;
-    private float scale;
+    private float maxScale;
 
-    public BackgroundFlare(float x, float y, float scale, float angle, Color color, TextureRegion texture) {
+    public BackgroundFlare(TextureRegion texture) {
         this.texture = texture;
+        setX(-texture.getRegionWidth() - 1);
+        setY(-texture.getRegionHeight() - 1);
         setWidth(texture.getRegionWidth());
         setHeight(texture.getRegionHeight());
-        setOrigin(getWidth()/2, getHeight()/2);
-        this.scale = (scale < 0.1f) ? 0.1f : scale;
-        update(x, y, angle, color);
+        setOrigin(getWidth() / 2, getHeight() / 2);
     }
 
-    public void update(float x, float y, float angle, Color color) {
-        setX(x);
-        setY(y);
+    public void randomize(float width, float height, float scaleCorrection) {
+        setX(width * MathUtils.random());
+        setY(height * MathUtils.random());
+
+        setColor(MathUtils.random(), MathUtils.random(), MathUtils.random(), 0.2f);
+
         setScale(0);
-        velocityX = MathUtils.cosDeg(angle) * scale * VELOCITY_MULTIPLIER;
-        velocityY = MathUtils.sinDeg(angle) * scale * VELOCITY_MULTIPLIER;
-        this.color = color;
-    }
+        this.maxScale = MathUtils.random(0.1f, 1f) * scaleCorrection;
 
-    public void update(float x, float y, float angle, float scale, Color color) {
-        this.scale = (scale < 0.1f) ? 0.1f : scale;
-        update(x, y, angle, color);
+        float angle = MathUtils.random(359);
+        velocityX = MathUtils.cosDeg(angle) * maxScale * VELOCITY_MULTIPLIER;
+        velocityY = MathUtils.sinDeg(angle) * maxScale * VELOCITY_MULTIPLIER;
     }
 
     @Override
@@ -65,7 +63,7 @@ public class BackgroundFlare extends Actor {
         super.act(delta);
         setX(getX() + velocityX * delta);
         setY(getY() + velocityY * delta);
-        if (getScaleX() < scale) {
+        if (getScaleX() < maxScale) {
             setScale(getScaleX() + 0.01f);
         }
 
@@ -73,7 +71,7 @@ public class BackgroundFlare extends Actor {
 
     @Override
     public void draw(SpriteBatch batch, float parentAlpha) {
-        batch.setColor(color);
+        batch.setColor(getColor());
         batch.draw(texture, getX(), getY(), getOriginX(), getOriginY(),
                 getWidth(), getHeight(), getScaleX(), getScaleY(), getRotation());
     }
