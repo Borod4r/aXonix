@@ -33,6 +33,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 public class Bonus extends Actor {
 
     private Circle collisionCircle;
+    private boolean active;
 
     private TextureRegion region;
     private ParticleEffect particleEffect;
@@ -45,6 +46,7 @@ public class Bonus extends Actor {
         setOriginY(0.75f);
         setColor(1,1,1,1);
 
+        this.active = true;
         this.collisionCircle = new Circle(x, y, 0.5f);
         this.region = skin.getRegion("speed_bonus");
 
@@ -69,6 +71,7 @@ public class Bonus extends Actor {
     }
 
     public void removeSmoothly() {
+        active = false;
         particleEffect.allowCompletion();
         Action sequence = Actions.sequence(Actions.fadeOut(0.35f), Actions.delay(0.15f), Actions.removeActor());
         addAction(sequence);
@@ -78,7 +81,16 @@ public class Bonus extends Actor {
     // Getters & Setters
     //---------------------------------------------------------------------
 
+    public boolean isActive() {
+        return active;
+    }
+
     public Circle getCollisionCircle() {
         return collisionCircle;
     }
+
+    public ParticleEffect getParticleEffect() {
+        return particleEffect;
+    }
+
 }

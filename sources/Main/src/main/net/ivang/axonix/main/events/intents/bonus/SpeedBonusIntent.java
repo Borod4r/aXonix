@@ -16,8 +16,22 @@
 
 package net.ivang.axonix.main.events.intents.bonus;
 
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+
 /**
  * @author Ivan Gadzhega
  * @since 0.3
  */
-public class SpeedBonusIntent { }
+public class SpeedBonusIntent {
+
+    private ParticleEffect particleEffect;
+
+    public SpeedBonusIntent(ParticleEffect particleEffect) {
+        this.particleEffect = particleEffect;
+    }
+
+    public ParticleEffect getParticleEffect() {
+        return particleEffect;
+    }
+
+}

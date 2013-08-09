@@ -272,11 +272,13 @@ public class Level extends Group {
             // check bonuses
             for (Actor actor : bonuses.getChildren()) {
                 Bonus bonus = (Bonus) actor;
-                Circle protagonistCircle = protagonist.getCollisionCircle();
-                Circle bonusCircle = bonus.getCollisionCircle();
-                if (Intersector.overlapCircles(protagonistCircle, bonusCircle)) {
-                    eventBus.post(new SpeedBonusIntent());
-                    bonus.removeSmoothly();
+                if (bonus.isActive()) {
+                    Circle protagonistCircle = protagonist.getCollisionCircle();
+                    Circle bonusCircle = bonus.getCollisionCircle();
+                    if (Intersector.overlapCircles(protagonistCircle, bonusCircle)) {
+                        eventBus.post(new SpeedBonusIntent(bonus.getParticleEffect()));
+                        bonus.removeSmoothly();
+                    }
                 }
             }
             // previous block

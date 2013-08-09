@@ -27,8 +27,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import net.ivang.axonix.main.actors.game.KinematicActor;
+import net.ivang.axonix.main.effects.Effect;
+import net.ivang.axonix.main.effects.SpeedEffect;
 import net.ivang.axonix.main.events.intents.bonus.SpeedBonusIntent;
 import net.ivang.axonix.main.events.intents.game.LivesIntent;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import static net.ivang.axonix.main.actors.game.level.Block.Type;
 
@@ -45,12 +51,10 @@ public class Protagonist extends KinematicActor {
     private static final Vector2 LEFT = new Vector2(-1, 0);
 
     private State state;
-    private EventBus eventBus;
+    private List<Effect> effects;
 
     private float spawnX, spawnY;
     private float prevX, prevY;
-    private float boost;
-
     private Circle collisionCircle;
 
     private Level level;
@@ -58,6 +62,8 @@ public class Protagonist extends KinematicActor {
     private TextureRegion region;
     private ParticleEffect particleAlive;
     private ParticleEffect particleDead;
+
+    private EventBus eventBus;
 
     public Protagonist(float x, float y, Level level, Skin skin, EventBus eventBus) {
         this.state = State.ALIVE;
@@ -82,6 +88,8 @@ public class Protagonist extends KinematicActor {
         particleDead = new ParticleEffect();
         particleDead.load(Gdx.files.internal("data/particles/protagonist_dead.p"), skin.getAtlas());
 
+        effects = new ArrayList<Effect>();
+
         // register with the event bus
         this.eventBus = eventBus;
         eventBus.register(this);
@@ -96,6 +104,13 @@ public class Protagonist extends KinematicActor {
                 updatePosition(delta);
                 particleAlive.setPosition(getX(), getY());
                 particleAlive.update(delta);
+                // effects
+                Iterator<Effect> iterator = effects.iterator();
+                while (iterator.hasNext()) {
+                    if (iterator.next().act(delta)) {
+                        iterator.remove();
+                    }
+                }
                 break;
             case DYING:
                 if (particleDead.isComplete()) {
@@ -118,6 +133,10 @@ public class Protagonist extends KinematicActor {
                 batch.setColor(1, 1, 1, 1);
                 batch.draw(region, getX() - getOriginX(), getY() - getOriginY(), getOriginX(), getOriginY(),
                         getWidth(), getHeight(), getScaleX(), getScaleY(), getRotation());
+                // effects
+                for (Effect effect : effects) {
+                    effect.draw(batch);
+                }
                 break;
             case DYING:
                 particleDead.draw(batch);
@@ -133,6 +152,10 @@ public class Protagonist extends KinematicActor {
         return this.state == state;
     }
 
+    public void addEffect(Effect effect) {
+        effects.add(effect);
+    }
+
     //---------------------------------------------------------------------
     // Subscribers
     //---------------------------------------------------------------------
@@ -146,11 +169,14 @@ public class Protagonist extends KinematicActor {
                 particleDead.setPosition(getX(), getY());
                 particleDead.start();
                 // re-spawn
-                this.direction = IDLE;
-                this.boost = 0;
+                direction = IDLE;
                 setX(spawnX); setY(spawnY);
                 setPrevX(spawnX); setPrevY(spawnY);
                 particleAlive.setPosition(spawnX, spawnY);
+                // remove all effects
+                for (Effect effect : effects) {
+                    effect.complete();
+                }
                 break;
             case DEAD:
                 eventBus.post(new LivesIntent(-1));
@@ -162,7 +188,7 @@ public class Protagonist extends KinematicActor {
     @Subscribe
     @SuppressWarnings("unused")
     public void onSpeedBonus(SpeedBonusIntent intent) {
-        boost = 10;
+        addEffect(new SpeedEffect(this, 2, 10, intent.getParticleEffect()));
     }
 
     //---------------------------------------------------------------------
@@ -223,11 +249,6 @@ public class Protagonist extends KinematicActor {
 
     private float calculateDistance(float deltaTime) {
         float distance = deltaTime * speed;
-        // apply boost
-        if (boost > 0) {
-            boost -= deltaTime;
-            distance *= 2;
-        }
         return Math.min(distance, 1f);
     }
 
