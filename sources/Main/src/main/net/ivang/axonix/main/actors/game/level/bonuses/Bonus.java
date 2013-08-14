@@ -14,7 +14,7 @@
  * the License.
  */
 
-package net.ivang.axonix.main.actors.game.level;
+package net.ivang.axonix.main.actors.game.level.bonuses;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
@@ -38,7 +38,7 @@ public class Bonus extends Actor {
     private TextureRegion region;
     private ParticleEffect particleEffect;
 
-    public Bonus(float x, float y, Skin skin) {
+    public Bonus(float x, float y, Skin skin, String regionName, String particlePath) {
         setX(x); setY(y);
         setWidth(1.5f);
         setHeight(1.5f);
@@ -48,10 +48,11 @@ public class Bonus extends Actor {
 
         this.active = true;
         this.collisionCircle = new Circle(x, y, 0.5f);
-        this.region = skin.getRegion("speed_bonus");
+
+        this.region = skin.getRegion(regionName);
 
         particleEffect = new ParticleEffect();
-        particleEffect.load(Gdx.files.internal("data/particles/bonus.p"), skin.getAtlas());
+        particleEffect.load(Gdx.files.internal(particlePath), skin.getAtlas());
         particleEffect.setPosition(x, y);
     }
 

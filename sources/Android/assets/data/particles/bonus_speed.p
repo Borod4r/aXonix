@@ -142,4 +142,4 @@ aligned: false
 additive: false
 behind: false
 - Image Path -
-speed_bonus
+bonus_speed

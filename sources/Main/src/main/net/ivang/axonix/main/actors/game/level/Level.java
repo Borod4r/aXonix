@@ -24,12 +24,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import net.ivang.axonix.main.actors.game.level.bonuses.Bonus;
+import net.ivang.axonix.main.actors.game.level.bonuses.SlowBonus;
+import net.ivang.axonix.main.actors.game.level.bonuses.SpeedBonus;
 import net.ivang.axonix.main.events.facts.EnemyDirectionFact;
 import net.ivang.axonix.main.events.facts.ObtainedPointsFact;
 import net.ivang.axonix.main.events.facts.TailBlockFact;
 import net.ivang.axonix.main.events.facts.level.LevelProgressFact;
 import net.ivang.axonix.main.events.facts.level.LevelScoreFact;
-import net.ivang.axonix.main.events.intents.bonus.SpeedBonusIntent;
 import net.ivang.axonix.main.events.intents.game.LevelScoreIntent;
 import net.ivang.axonix.main.events.intents.game.NotificationIntent;
 import net.ivang.axonix.main.screens.GameScreen;
@@ -103,7 +105,7 @@ public class Level extends Group {
                     levelMap[x][y] = new Block(x, y, Type.BLUE, skin);
                 }else if (pix == ENEMY) {
                     levelMap[x][y] = new Block(x, y, Type.EMPTY, skin);
-                    Enemy enemy = new Enemy(x + 0.5f, y + 0.5f, skin);
+                    Enemy enemy = new Enemy(x + 0.5f, y + 0.5f, skin, eventBus);
                     enemies.add(enemy);
                 } else if (pix == PROTAGONIST) {
                     levelMap[x][y] = new Block(x, y, Type.BLUE, skin);
@@ -276,7 +278,7 @@ public class Level extends Group {
                     Circle protagonistCircle = protagonist.getCollisionCircle();
                     Circle bonusCircle = bonus.getCollisionCircle();
                     if (Intersector.overlapCircles(protagonistCircle, bonusCircle)) {
-                        eventBus.post(new SpeedBonusIntent(bonus.getParticleEffect()));
+                        eventBus.post(bonus);
                         bonus.removeSmoothly();
                     }
                 }
@@ -436,8 +438,14 @@ public class Level extends Group {
         if (probability > MathUtils.random()) {
             int x = MathUtils.random(1, mapWidth - 2);
             int y = MathUtils.random(1, mapHeight - 2);
-            Bonus bonus = new Bonus(x + 0.5f, y + 0.5f, skin);
-            bonuses.addActor(bonus);
+            switch (MathUtils.random(1)) {
+                case 0:
+                    bonuses.addActor(new SpeedBonus(x + 0.5f, y + 0.5f, skin));
+                    break;
+                case 1:
+                    bonuses.addActor(new SlowBonus(x + 0.5f, y + 0.5f, skin));
+                    break;
+            }
         }
     }
 

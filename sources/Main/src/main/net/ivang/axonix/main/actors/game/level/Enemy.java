@@ -24,7 +24,16 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import net.ivang.axonix.main.actors.game.KinematicActor;
+import net.ivang.axonix.main.actors.game.level.bonuses.SlowBonus;
+import net.ivang.axonix.main.effects.Effect;
+import net.ivang.axonix.main.effects.SpeedEffect;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Ivan Gadzhega
@@ -48,12 +57,14 @@ public class Enemy extends KinematicActor {
     //---------------------------------------------------------------------
 
     private Circle collisionCircle;
+    private List<Effect> effects;
 
     private TextureRegion region;
     private ParticleEffect particleEffect;
 
-    public Enemy(float x, float y, Skin skin) {
+    public Enemy(float x, float y, Skin skin, EventBus eventBus) {
         this.collisionCircle = new Circle(x, y, 0.45f);
+        this.effects = new ArrayList<Effect>();
         setX(x); setY(y);
         setWidth(1f);
         setHeight(1f);
@@ -66,6 +77,8 @@ public class Enemy extends KinematicActor {
         particleEffect = new ParticleEffect();
         particleEffect.load(Gdx.files.internal("data/particles/enemy.p"), skin.getAtlas());
         particleEffect.setPosition(x, y);
+        // register with the event bus
+        eventBus.register(this);
     }
 
     @Override
@@ -76,6 +89,14 @@ public class Enemy extends KinematicActor {
         setY(getY() + direction.y * speed * deltaTime);
 
         particleEffect.update(deltaTime);
+
+        // effects
+        Iterator<Effect> iterator = effects.iterator();
+        while (iterator.hasNext()) {
+            if (iterator.next().act(deltaTime)) {
+                iterator.remove();
+            }
+        }
     }
 
     @Override
@@ -86,6 +107,21 @@ public class Enemy extends KinematicActor {
         // draw texture
         batch.setColor(1, 0.2f, 0.1f, 1);
         batch.draw(region, getX() - getOriginX(), getY() - getOriginY(), getWidth(), getHeight());
+        // draw effects
+        for (Effect effect : effects) {
+            effect.draw(batch);
+        }
+    }
+
+    //---------------------------------------------------------------------
+    // Subscribers
+    //---------------------------------------------------------------------
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onSlowBonus(SlowBonus bonus) {
+        ParticleEffect particles = new ParticleEffect(bonus.getParticleEffect());
+        effects.add(new SpeedEffect(this, 0.5f, 10, particles));
     }
 
     //---------------------------------------------------------------------

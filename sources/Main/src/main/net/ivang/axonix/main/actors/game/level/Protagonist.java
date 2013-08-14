@@ -27,9 +27,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import net.ivang.axonix.main.actors.game.KinematicActor;
+import net.ivang.axonix.main.actors.game.level.bonuses.SpeedBonus;
 import net.ivang.axonix.main.effects.Effect;
 import net.ivang.axonix.main.effects.SpeedEffect;
-import net.ivang.axonix.main.events.intents.bonus.SpeedBonusIntent;
 import net.ivang.axonix.main.events.intents.game.LivesIntent;
 
 import java.util.ArrayList;
@@ -152,10 +152,6 @@ public class Protagonist extends KinematicActor {
         return this.state == state;
     }
 
-    public void addEffect(Effect effect) {
-        effects.add(effect);
-    }
-
     //---------------------------------------------------------------------
     // Subscribers
     //---------------------------------------------------------------------
@@ -187,8 +183,8 @@ public class Protagonist extends KinematicActor {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onSpeedBonus(SpeedBonusIntent intent) {
-        addEffect(new SpeedEffect(this, 2, 10, intent.getParticleEffect()));
+    public void onSpeedBonus(SpeedBonus bonus) {
+        effects.add(new SpeedEffect(this, 2, 10, bonus.getParticleEffect()));
     }
 
     //---------------------------------------------------------------------

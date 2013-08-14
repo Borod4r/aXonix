@@ -14,24 +14,17 @@
  * the License.
  */
 
-package net.ivang.axonix.main.events.intents.bonus;
+package net.ivang.axonix.main.actors.game.level.bonuses;
 
-import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 /**
  * @author Ivan Gadzhega
  * @since 0.3
  */
-public class SpeedBonusIntent {
+public class SlowBonus extends Bonus {
 
-    private ParticleEffect particleEffect;
-
-    public SpeedBonusIntent(ParticleEffect particleEffect) {
-        this.particleEffect = particleEffect;
+    public SlowBonus(float x, float y, Skin skin) {
+        super(x, y, skin, "bonus_slow", "data/particles/bonus_slow.p");
     }
-
-    public ParticleEffect getParticleEffect() {
-        return particleEffect;
-    }
-
 }
