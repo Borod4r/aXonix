@@ -37,6 +37,7 @@ import net.ivang.axonix.main.actors.game.bar.DebugBar;
 import net.ivang.axonix.main.actors.game.bar.StatusBar;
 import net.ivang.axonix.main.actors.game.dialog.AlertDialog;
 import net.ivang.axonix.main.actors.game.dialog.ScreenStateDialog;
+import net.ivang.axonix.main.actors.game.level.bonuses.LifeBonus;
 import net.ivang.axonix.main.events.facts.LivesNumberFact;
 import net.ivang.axonix.main.events.facts.ObtainedPointsFact;
 import net.ivang.axonix.main.events.facts.TotalScoreFact;
@@ -218,6 +219,12 @@ public class GameScreen extends BaseScreen {
         ParallelAction fadeAndMove = Actions.parallel(Actions.moveTo(x, y + fact.getDeltaY(), 1.5f), fadeInFadeOut);
         label.clearActions();
         label.addAction(fadeAndMove);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void doBacktAction(LifeBonus bonus) {
+        eventBus.post(new LivesIntent(1));
     }
 
     @Subscribe

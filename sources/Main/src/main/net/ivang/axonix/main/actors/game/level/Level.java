@@ -25,6 +25,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.actors.game.level.bonuses.Bonus;
+import net.ivang.axonix.main.actors.game.level.bonuses.LifeBonus;
 import net.ivang.axonix.main.actors.game.level.bonuses.SlowBonus;
 import net.ivang.axonix.main.actors.game.level.bonuses.SpeedBonus;
 import net.ivang.axonix.main.events.facts.EnemyDirectionFact;
@@ -438,12 +439,15 @@ public class Level extends Group {
         if (probability > MathUtils.random()) {
             int x = MathUtils.random(1, mapWidth - 2);
             int y = MathUtils.random(1, mapHeight - 2);
-            switch (MathUtils.random(1)) {
+            switch (MathUtils.random(2)) {
                 case 0:
                     bonuses.addActor(new SpeedBonus(x + 0.5f, y + 0.5f, skin));
                     break;
                 case 1:
                     bonuses.addActor(new SlowBonus(x + 0.5f, y + 0.5f, skin));
+                    break;
+                case 2:
+                    bonuses.addActor(new LifeBonus(x + 0.5f, y + 0.5f, skin));
                     break;
             }
         }
