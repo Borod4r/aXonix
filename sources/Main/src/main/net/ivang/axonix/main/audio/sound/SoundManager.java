@@ -20,11 +20,15 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import net.ivang.axonix.main.actors.game.level.Protagonist;
+import net.ivang.axonix.main.actors.game.level.bonuses.Bonus;
 import net.ivang.axonix.main.audio.sound.wrappers.CustomSoundWrapper;
 import net.ivang.axonix.main.audio.sound.wrappers.SequentialSoundWrapper;
 import net.ivang.axonix.main.audio.sound.wrappers.SimpleSoundWrapper;
 import net.ivang.axonix.main.audio.sound.wrappers.SoundWrapper;
-import net.ivang.axonix.main.events.facts.*;
+import net.ivang.axonix.main.events.facts.ButtonClickFact;
+import net.ivang.axonix.main.events.facts.EnemyDirectionFact;
+import net.ivang.axonix.main.events.facts.ObtainedPointsFact;
+import net.ivang.axonix.main.events.facts.TailBlockFact;
 import net.ivang.axonix.main.events.intents.BackIntent;
 import net.ivang.axonix.main.events.intents.DefaultIntent;
 import net.ivang.axonix.main.events.intents.SfxVolumeIntent;
@@ -86,6 +90,12 @@ public class SoundManager {
 
     @Subscribe
     @SuppressWarnings("unused")
+    public void onBonusObtained(Bonus bonus) {
+        Sounds.BONUS.play(sfxVolume);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
     public void onProtagonistStateChange(Protagonist.State state) {
         if (state == Protagonist.State.DYING) {
             Sounds.PROT_DYING.play(sfxVolume);
@@ -120,6 +130,7 @@ public class SoundManager {
         BACK_INTENT("data/audio/sounds/back_intent.ogg"),
         PROT_DYING("data/audio/sounds/prot_dying.ogg"),
         TAIL_BLOCK("data/audio/sounds/tail_block.ogg"),
+        BONUS("data/audio/sounds/bonus.ogg"),
         FILLING_SHORT_1("data/audio/sounds/filling_short_1.ogg"),
         FILLING_SHORT_2("data/audio/sounds/filling_short_2.ogg"),
         FILLING_SHORT_3("data/audio/sounds/filling_short_3.ogg"),
