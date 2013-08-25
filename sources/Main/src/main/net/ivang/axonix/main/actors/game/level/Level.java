@@ -96,23 +96,29 @@ public class Level extends Group {
     }
 
     private void initFromPixmap(Pixmap pixmap) {
-        final int EARTH = 0x000000;
+        final int BLOCK_BLUE_HARD = 0x000055;
         final int ENEMY = 0xFF0000;
         final int PROTAGONIST = 0x00FF00;
+
         for (int x = 0; x < mapWidth; x++) {
             for (int y = 0; y < mapHeight; y++) {
                 int pix = (pixmap.getPixel(x, mapHeight-y-1) >>> 8) & 0xffffff;
-                if(pix == EARTH) {
-                    levelMap[x][y] = new Block(x, y, Type.BLUE, skin);
-                }else if (pix == ENEMY) {
-                    levelMap[x][y] = new Block(x, y, Type.EMPTY, skin);
-                    Enemy enemy = new Enemy(x + 0.5f, y + 0.5f, skin, eventBus);
-                    enemies.add(enemy);
-                } else if (pix == PROTAGONIST) {
-                    levelMap[x][y] = new Block(x, y, Type.BLUE, skin);
-                    protagonist = new Protagonist(x + 0.5f, y + 0.5f, this, skin, eventBus);
-                } else {
-                    levelMap[x][y] = new Block(x, y, Type.EMPTY, skin);
+                switch (pix) {
+                    case BLOCK_BLUE_HARD:
+                        levelMap[x][y] = new Block(x, y, Type.BLUE_HARD, skin);
+                        break;
+                    case PROTAGONIST:
+                        levelMap[x][y] = new Block(x, y, Type.BLUE_HARD, skin);
+                        protagonist = new Protagonist(x + 0.5f, y + 0.5f, this, skin, eventBus);
+                        break;
+                    case ENEMY:
+                        levelMap[x][y] = new Block(x, y, Type.EMPTY, skin);
+                        Enemy enemy = new Enemy(x + 0.5f, y + 0.5f, skin, eventBus);
+                        enemies.add(enemy);
+                        break;
+                    default:
+                        levelMap[x][y] = new Block(x, y, Type.EMPTY, skin);
+                        break;
                 }
                 addActor(levelMap[x][y]);
             }
@@ -297,6 +303,7 @@ public class Level extends Group {
                     protagonist.setState(Protagonist.State.DYING);
                     break;
                 case BLUE:
+                case BLUE_HARD:
                     if (prevBlock.hasType(Type.TAIL)) {
                         // convert tail
                         int newBlocks = tailBlocks.size();

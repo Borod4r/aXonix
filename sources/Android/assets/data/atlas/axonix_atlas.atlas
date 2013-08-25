@@ -38,65 +38,72 @@ block_blue
   orig: 64, 64
   offset: 0, 0
   index: -1
-block_red
+block_blue_hard
   rotate: false
   xy: 197, 67
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-circular_flare
+block_red
   rotate: false
   xy: 679, 189
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-ic_forward_large
+circular_flare
   rotate: false
   xy: 263, 67
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-ic_levels_large
+ic_forward_large
   rotate: false
   xy: 745, 189
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-ic_repeat_large
+ic_levels_large
   rotate: false
   xy: 329, 67
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-ic_forward_normal
+ic_repeat_large
   rotate: false
-  xy: 811, 205
-  size: 48, 48
-  orig: 48, 48
+  xy: 811, 189
+  size: 64, 64
+  orig: 64, 64
   offset: 0, 0
   index: -1
-ic_levels_normal
+ic_forward_normal
   rotate: false
   xy: 395, 83
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
+ic_levels_normal
+  rotate: false
+  xy: 877, 205
+  size: 48, 48
+  orig: 48, 48
+  offset: 0, 0
+  index: -1
 ic_repeat_normal
   rotate: false
-  xy: 861, 205
+  xy: 445, 83
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 window_bg
   rotate: false
-  xy: 445, 69
+  xy: 927, 191
   size: 19, 62
   split: 9, 9, 9, 9
   orig: 19, 62
@@ -111,14 +118,14 @@ ic_forward_small
   index: -1
 ic_levels_small
   rotate: false
-  xy: 911, 221
+  xy: 948, 221
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 ic_repeat_small
   rotate: false
-  xy: 466, 99
+  xy: 35, 1
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -142,7 +149,7 @@ slider_bg
   index: -1
 button
   rotate: false
-  xy: 35, 3
+  xy: 495, 101
   size: 13, 30
   split: 6, 6, 6, 6
   orig: 13, 30
@@ -150,7 +157,7 @@ button
   index: -1
 button_over
   rotate: false
-  xy: 945, 223
+  xy: 982, 223
   size: 13, 30
   split: 6, 6, 6, 6
   orig: 13, 30

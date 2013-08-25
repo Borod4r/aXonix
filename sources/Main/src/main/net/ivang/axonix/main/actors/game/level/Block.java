@@ -28,15 +28,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
  */
 public class Block extends Actor {
 
-    private TextureRegion regionBlue;
-    private TextureRegion regionRed;
+    private Skin skin;
     private Type type;
-
+    private TextureRegion region;
     private Rectangle collisionRectangle;
 
     public Block(float x, float y, Type type, Skin skin) {
-        this.regionBlue = skin.getRegion("block_blue");
-        this.regionRed = skin.getRegion("block_red");
+        this.skin = skin;
         setX(x); setY(y);
         setWidth(1f);
         setHeight(1f);
@@ -46,23 +44,38 @@ public class Block extends Actor {
 
     @Override
     public void draw(SpriteBatch batch, float parentAlpha) {
+        if (!isEmpty()) {
+            batch.setColor(getColor());
+            batch.draw(region, getX(), getY(), getWidth(), getHeight());
+        }
+    }
+
+    public void setType(Type type) {
+        this.type = type;
         switch (getType()) {
             case RED:
-                batch.setColor(1, 1, 1, 1);
-                batch.draw(regionRed, getX(), getY(), getWidth(), getHeight());
+                setColor(1, 1, 1, 1);
+                setRegion(skin.getRegion("block_red"));
                 break;
             case GREEN:
-                batch.setColor(0, 1, 0.3f, 1);
-                batch.draw(regionBlue, getX(), getY(), getWidth(), getHeight());
+                setColor(0, 1, 0.3f, 1);
+                setRegion(skin.getRegion("block_blue"));
                 break;
             case BLUE:
-                batch.setColor(1, 1, 1, 1);
-                batch.draw(regionBlue, getX(), getY(), getWidth(), getHeight());
+                setColor(1, 1, 1, 1);
+                setRegion(skin.getRegion("block_blue"));
+                break;
+            case BLUE_HARD:
+                setColor(1, 1, 1, 1);
+                setRegion(skin.getRegion("block_blue_hard"));
                 break;
             case TAIL:
-                batch.setColor(0.3f, 0.3f, 1, 1);
-                batch.draw(regionBlue, getX(), getY(), getWidth(), getHeight());
+                setColor(0.3f, 0.3f, 1, 1);
+                setRegion(skin.getRegion("block_blue"));
                 break;
+            default:
+                setColor(1, 1, 1, 1);
+                setRegion(null);
         }
     }
 
@@ -82,12 +95,12 @@ public class Block extends Actor {
         return type;
     }
 
-    public void setType(Type type) {
-        this.type = type;
-    }
-
     public Rectangle getCollisionRectangle() {
         return collisionRectangle;
+    }
+
+    public void setRegion(TextureRegion region) {
+        this.region = region;
     }
 
     //---------------------------------------------------------------------
@@ -95,7 +108,7 @@ public class Block extends Actor {
     //---------------------------------------------------------------------
 
     public enum Type {
-        EMPTY, RED, GREEN, BLUE, TAIL
+        EMPTY, RED, GREEN, BLUE, BLUE_HARD, TAIL
     }
 
 }

@@ -202,7 +202,7 @@ public class Protagonist extends KinematicActor {
         boolean isDraggedRight = (Gdx.input.isTouched() && dx > 0 && diff >= 0);
 
         Block block = level.getBlock(getX(), getY());
-        boolean onFilledBlock = (block.hasType(Type.BLUE)) || ((block.hasType(Type.GREEN)));
+        boolean onFilledBlock = block.hasType(Type.BLUE) || block.hasType(Type.BLUE_HARD) || block.hasType(Type.GREEN);
 
         if((onFilledBlock || direction != UP)
                 && (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S) || isDraggedUp)) {
