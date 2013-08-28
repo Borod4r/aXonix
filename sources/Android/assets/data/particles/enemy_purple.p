@@ -20,26 +20,26 @@ timeline0: 0.0
 - Life - 
 lowMin: 0.0
 lowMax: 0.0
-highMin: 500.0
+highMin: 1000.0
 highMax: 1000.0
 relative: false
 scalingCount: 3
 scaling0: 1.0
-scaling1: 1.0
-scaling2: 0.3
+scaling1: 0.75
+scaling2: 1.0
 timelineCount: 3
 timeline0: 0.0
-timeline1: 0.66
+timeline1: 0.5
 timeline2: 1.0
-- Life Offset - 
+- Life Offset -
 active: false
-- X Offset - 
+- X Offset -
 active: false
-- Y Offset - 
+- Y Offset -
 active: false
-- Spawn Shape - 
+- Spawn Shape -
 shape: point
-- Spawn Width - 
+- Spawn Width -
 lowMin: 0.0
 lowMax: 0.0
 highMin: 0.0
@@ -49,7 +49,7 @@ scalingCount: 1
 scaling0: 1.0
 timelineCount: 1
 timeline0: 0.0
-- Spawn Height - 
+- Spawn Height -
 lowMin: 0.0
 lowMax: 0.0
 highMin: 0.0
@@ -59,11 +59,11 @@ scalingCount: 1
 scaling0: 1.0
 timelineCount: 1
 timeline0: 0.0
-- Scale - 
+- Scale -
 lowMin: 0.0
 lowMax: 0.0
-highMin: 1
-highMax: 1
+highMin: 1.0
+highMax: 1.0
 relative: false
 scalingCount: 4
 scaling0: 0.6666667
@@ -72,10 +72,10 @@ scaling2: 0.29411766
 scaling3: 0.15730338
 timelineCount: 4
 timeline0: 0.0
-timeline1: 0.15068494
-timeline2: 0.38356164
-timeline3: 0.9929763
-- Velocity - 
+timeline1: 0.15
+timeline2: 0.4
+timeline3: 1.0
+- Velocity -
 active: true
 lowMin: 0.0
 lowMax: 0.0
@@ -86,7 +86,7 @@ scalingCount: 1
 scaling0: 1.0
 timelineCount: 1
 timeline0: 0.0
-- Angle - 
+- Angle -
 active: true
 lowMin: 0.0
 lowMax: 0.0
@@ -99,20 +99,20 @@ scaling1: 1.0
 timelineCount: 2
 timeline0: 0.0
 timeline1: 1.0
-- Rotation - 
+- Rotation -
 active: false
-- Wind - 
+- Wind -
 active: false
-- Gravity - 
+- Gravity -
 active: false
-- Tint - 
+- Tint -
 colorsCount: 3
-colors0: 1.0
-colors1: 0.12156863
-colors2: 0.047058824
+colors0: 0.6784314
+colors1: 0.047058824
+colors2: 1.0
 timelineCount: 1
 timeline0: 0.0
-- Transparency - 
+- Transparency -
 lowMin: 0.0
 lowMax: 0.0
 highMin: 1.0
@@ -128,7 +128,7 @@ timeline0: 0.0
 timeline1: 0.2
 timeline2: 0.8
 timeline3: 1.0
-- Options - 
+- Options -
 attached: false
 continuous: true
 aligned: false
@@ -136,4 +136,3 @@ additive: true
 behind: false
 - Image Path -
 circular_flare
-

@@ -14,16 +14,14 @@
  * the License.
  */
 
-package net.ivang.axonix.main.actors.game.level;
+package net.ivang.axonix.main.actors.game.level.enemies;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import net.ivang.axonix.main.actors.game.KinematicActor;
@@ -39,7 +37,7 @@ import java.util.List;
  * @author Ivan Gadzhega
  * @since 0.1
  */
-public class Enemy extends KinematicActor {
+public abstract class Enemy extends KinematicActor {
 
     private static final Vector2 UP_RIGHT = new Vector2(1, 1).nor();
     private static final Vector2 DOWN_RIGHT = new Vector2(1, -1).nor();
@@ -56,26 +54,24 @@ public class Enemy extends KinematicActor {
     // Instance
     //---------------------------------------------------------------------
 
-    private Circle collisionCircle;
+    protected boolean blockDestroyer;
+    protected TextureRegion region;
+    protected ParticleEffect particleEffect;
+
+    protected Circle collisionCircle;
     private List<Effect> effects;
 
-    private TextureRegion region;
-    private ParticleEffect particleEffect;
-
-    public Enemy(float x, float y, Skin skin, EventBus eventBus) {
-        this.collisionCircle = new Circle(x, y, 0.45f);
+    public Enemy(float x, float y, float radius, EventBus eventBus) {
+        this.collisionCircle = new Circle(x, y, radius - 0.05f);
         this.effects = new ArrayList<Effect>();
         setX(x); setY(y);
-        setWidth(1f);
-        setHeight(1f);
-        setOriginX(0.5f);
-        setOriginY(0.5f);
+        setWidth(radius * 2);
+        setHeight(radius * 2);
+        setOriginX(radius);
+        setOriginY(radius);
         setSpeed(4f);
         setDirection(getRandomDiagonal());
-        // appearance
-        this.region = skin.getRegion("circular_flare");
         particleEffect = new ParticleEffect();
-        particleEffect.load(Gdx.files.internal("data/particles/enemy.p"), skin.getAtlas());
         particleEffect.setPosition(x, y);
         // register with the event bus
         eventBus.register(this);
@@ -105,7 +101,7 @@ public class Enemy extends KinematicActor {
         particleEffect.setPosition(getX(), getY());
         particleEffect.draw(batch);
         // draw texture
-        batch.setColor(1, 0.2f, 0.1f, 1);
+        batch.setColor(getColor());
         batch.draw(region, getX() - getOriginX(), getY() - getOriginY(), getWidth(), getHeight());
         // draw effects
         for (Effect effect : effects) {
@@ -144,4 +140,7 @@ public class Enemy extends KinematicActor {
         return collisionCircle;
     }
 
+    public boolean isBlockDestroyer() {
+        return blockDestroyer;
+    }
 }

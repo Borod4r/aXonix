@@ -28,11 +28,15 @@ import net.ivang.axonix.main.actors.game.level.bonuses.Bonus;
 import net.ivang.axonix.main.actors.game.level.bonuses.LifeBonus;
 import net.ivang.axonix.main.actors.game.level.bonuses.SlowBonus;
 import net.ivang.axonix.main.actors.game.level.bonuses.SpeedBonus;
+import net.ivang.axonix.main.actors.game.level.enemies.Enemy;
+import net.ivang.axonix.main.actors.game.level.enemies.PurpleEnemy;
+import net.ivang.axonix.main.actors.game.level.enemies.RedEnemy;
 import net.ivang.axonix.main.events.facts.EnemyDirectionFact;
 import net.ivang.axonix.main.events.facts.ObtainedPointsFact;
 import net.ivang.axonix.main.events.facts.TailBlockFact;
 import net.ivang.axonix.main.events.facts.level.LevelProgressFact;
 import net.ivang.axonix.main.events.facts.level.LevelScoreFact;
+import net.ivang.axonix.main.events.intents.game.DestroyBlockIntent;
 import net.ivang.axonix.main.events.intents.game.LevelScoreIntent;
 import net.ivang.axonix.main.events.intents.game.NotificationIntent;
 import net.ivang.axonix.main.screens.GameScreen;
@@ -88,7 +92,7 @@ public class Level extends Group {
         addActor(bonuses);
 
         setScore(0);
-        setPercentComplete((byte) 0);
+        updateLevelProgress(0);
 
         this.levelIndex = levelIndex;
         String level = Integer.toString(levelIndex);
@@ -97,7 +101,8 @@ public class Level extends Group {
 
     private void initFromPixmap(Pixmap pixmap) {
         final int BLOCK_BLUE_HARD = 0x000055;
-        final int ENEMY = 0xFF0000;
+        final int ENEMY_RED = 0xFF0000;
+        final int ENEMY_PURPLE = 0xFF00FF;
         final int PROTAGONIST = 0x00FF00;
 
         for (int x = 0; x < mapWidth; x++) {
@@ -111,10 +116,15 @@ public class Level extends Group {
                         levelMap[x][y] = new Block(x, y, Type.BLUE_HARD, skin);
                         protagonist = new Protagonist(x + 0.5f, y + 0.5f, this, skin, eventBus);
                         break;
-                    case ENEMY:
+                    case ENEMY_RED:
                         levelMap[x][y] = new Block(x, y, Type.EMPTY, skin);
-                        Enemy enemy = new Enemy(x + 0.5f, y + 0.5f, skin, eventBus);
-                        enemies.add(enemy);
+                        Enemy redEnemy = new RedEnemy(x + 0.5f, y + 0.5f, skin, eventBus);
+                        enemies.add(redEnemy);
+                        break;
+                    case ENEMY_PURPLE:
+                        levelMap[x][y] = new Block(x, y, Type.EMPTY, skin);
+                        Enemy purpleEnemy = new PurpleEnemy(x + 0.5f, y + 0.5f, skin, eventBus);
+                        enemies.add(purpleEnemy);
                         break;
                     default:
                         levelMap[x][y] = new Block(x, y, Type.EMPTY, skin);
@@ -179,7 +189,18 @@ public class Level extends Group {
     public void onScoreChange(LevelScoreIntent event) {
         int scoreDelta = event.getScoreDelta();
         setScore(score + scoreDelta);
-        showObtainedPoints(scoreDelta);
+        if (scoreDelta > 0) {
+            showObtainedPoints(scoreDelta);
+        }
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void destroyBlock(DestroyBlockIntent intent) {
+        Block block = intent.getBlock();
+        block.setType(Type.EMPTY);
+        eventBus.post(new LevelScoreIntent(-1));
+        updateLevelProgress(-1);
     }
 
     //---------------------------------------------------------------------
@@ -267,9 +288,17 @@ public class Level extends Group {
                 eventBus.post(new EnemyDirectionFact(direction));
                 // burn tail
                 for (Block block : collisions) {
-                    if (block.hasType(Type.TAIL)) {
-                        block.setType(Type.RED);
-                        containsRedBlocks = true;
+                    switch (block.getType()) {
+                        case TAIL:
+                            block.setType(Type.RED);
+                            containsRedBlocks = true;
+                            break;
+                        case BLUE:
+                        case GREEN:
+                            if (enemy.isBlockDestroyer()) {
+                                eventBus.post(new DestroyBlockIntent(block));
+                            }
+                            break;
                     }
                 }
             }
@@ -302,6 +331,7 @@ public class Level extends Group {
                 case TAIL:
                     protagonist.setState(Protagonist.State.DYING);
                     break;
+                case GREEN:
                 case BLUE:
                 case BLUE_HARD:
                     if (prevBlock.hasType(Type.TAIL)) {
@@ -315,9 +345,7 @@ public class Level extends Group {
                         int obtainedPoints = (int) (newBlocks * bonus);
                         eventBus.post(new LevelScoreIntent(obtainedPoints));
                         // update percentage
-                        filledBlocks += newBlocks;
-                        byte percentComplete = (byte) (((float) filledBlocks / ((mapWidth - 2) * (mapHeight - 2))) * 100) ;
-                        setPercentComplete(percentComplete);
+                        updateLevelProgress(newBlocks);
                         // add bonus with some probability
                         addBonus();
                     }
@@ -460,6 +488,12 @@ public class Level extends Group {
         }
     }
 
+    private void updateLevelProgress(int blocksDelta) {
+        filledBlocks += blocksDelta;
+        percentComplete = (byte) (((float) filledBlocks / ((mapWidth - 2) * (mapHeight - 2))) * 100) ;
+        eventBus.post(new LevelProgressFact(percentComplete));
+    }
+
     private boolean hasState(State state) {
         return this.state == state;
     }
@@ -491,11 +525,6 @@ public class Level extends Group {
     public void setScore(int score) {
         this.score = score;
         eventBus.post(new LevelScoreFact(score));
-    }
-
-    public void setPercentComplete(byte percentComplete) {
-        this.percentComplete = percentComplete;
-        eventBus.post(new LevelProgressFact(percentComplete));
     }
 
     public void setState(State state) {
