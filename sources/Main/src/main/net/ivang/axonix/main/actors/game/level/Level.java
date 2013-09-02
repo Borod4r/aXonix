@@ -24,6 +24,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import net.ivang.axonix.main.actors.game.level.blocks.Block;
+import net.ivang.axonix.main.actors.game.level.blocks.BlocksParticlesHolder;
 import net.ivang.axonix.main.actors.game.level.bonuses.Bonus;
 import net.ivang.axonix.main.actors.game.level.bonuses.LifeBonus;
 import net.ivang.axonix.main.actors.game.level.bonuses.SlowBonus;
@@ -43,7 +45,7 @@ import net.ivang.axonix.main.screens.GameScreen;
 
 import java.util.*;
 
-import static net.ivang.axonix.main.actors.game.level.Block.Type;
+import static net.ivang.axonix.main.actors.game.level.blocks.Block.Type;
 
 /**
  * @author Ivan Gadzhega
@@ -67,6 +69,7 @@ public class Level extends Group {
     private List<Enemy> enemies;
     private List<Block> tailBlocks;
     private Group bonuses;
+    private BlocksParticlesHolder blocksParticles;
 
     private boolean containsRedBlocks;
     private float redBlocksDelta;
@@ -86,9 +89,11 @@ public class Level extends Group {
         this.tailBlocks = new ArrayList<Block>();
         this.enemies = new ArrayList<Enemy>();
         this.bonuses = new Group();
+        this.blocksParticles = new BlocksParticlesHolder(skin, eventBus);
 
         initFromPixmap(pixmap);
 
+        addActor(blocksParticles);
         addActor(bonuses);
 
         setScore(0);
@@ -154,7 +159,11 @@ public class Level extends Group {
 
     public void unregister() {
         eventBus.unregister(this);
+        eventBus.unregister(blocksParticles);
         eventBus.unregister(protagonist);
+        for (Enemy enemy : enemies) {
+            eventBus.unregister(enemy);
+        }
     }
 
     //---------------------------------------------------------------------

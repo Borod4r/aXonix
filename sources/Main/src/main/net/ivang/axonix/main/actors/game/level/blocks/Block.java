@@ -14,7 +14,7 @@
  * the License.
  */
 
-package net.ivang.axonix.main.actors.game.level;
+package net.ivang.axonix.main.actors.game.level.blocks;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;

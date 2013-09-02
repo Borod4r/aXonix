@@ -27,6 +27,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import net.ivang.axonix.main.actors.game.KinematicActor;
+import net.ivang.axonix.main.actors.game.level.blocks.Block;
 import net.ivang.axonix.main.actors.game.level.bonuses.SpeedBonus;
 import net.ivang.axonix.main.effects.Effect;
 import net.ivang.axonix.main.effects.SpeedEffect;
@@ -36,7 +37,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static net.ivang.axonix.main.actors.game.level.Block.Type;
+import static net.ivang.axonix.main.actors.game.level.blocks.Block.Type;
 
 /**
  * @author Ivan Gadzhega

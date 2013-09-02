@@ -16,7 +16,7 @@
 
 package net.ivang.axonix.main.events.intents.game;
 
-import net.ivang.axonix.main.actors.game.level.Block;
+import net.ivang.axonix.main.actors.game.level.blocks.Block;
 
 /**
  * @author Ivan Gadzhega
