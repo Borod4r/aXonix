@@ -208,6 +208,18 @@ public class Level extends Group {
     public void destroyBlock(DestroyBlockIntent intent) {
         Block block = intent.getBlock();
         block.setType(Type.EMPTY);
+        // update the adjacent blocks
+        int bx = (int) block.getX();
+        int by = (int) block.getY();
+        for (int i = bx - 1; i <= bx + 1; i++) {
+            for (int j = by - 1; j <= by + 1; j++) {
+                Block adjacentBlock = getBlock(i, j);
+                if (adjacentBlock.hasType(Type.GREEN)) {
+                    adjacentBlock.setType(Type.BLUE);
+                }
+            }
+        }
+        // update score and progress
         eventBus.post(new LevelScoreIntent(-1));
         updateLevelProgress(-1);
     }
