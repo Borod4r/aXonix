@@ -18,8 +18,11 @@ package net.ivang.axonix.main.actors.game.level.blocks;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 /**
@@ -38,6 +41,8 @@ public class Block extends Actor {
         setX(x); setY(y);
         setWidth(1f);
         setHeight(1f);
+        setOriginX(0.5f);
+        setOriginY(0.5f);
         setType(type);
         this.collisionRectangle = new Rectangle(x, y, getWidth(), getHeight());
     }
@@ -46,7 +51,7 @@ public class Block extends Actor {
     public void draw(SpriteBatch batch, float parentAlpha) {
         if (!isEmpty()) {
             batch.setColor(getColor());
-            batch.draw(region, getX(), getY(), getWidth(), getHeight());
+            batch.draw(region, getX(), getY(), getOriginX(), getOriginY(), getWidth(), getHeight(), getScaleX(), getScaleY(), getRotation());
         }
     }
 
@@ -60,6 +65,7 @@ public class Block extends Actor {
             case GREEN:
                 setColor(0, 1, 0.3f, 1);
                 setRegion(skin.getRegion("block_blue"));
+                applyVisualEffects();
                 break;
             case BLUE:
                 setColor(1, 1, 1, 1);
@@ -85,6 +91,26 @@ public class Block extends Actor {
 
     public boolean isEmpty() {
         return hasType(Type.EMPTY);
+    }
+
+    //---------------------------------------------------------------------
+    // Helper methods
+    //---------------------------------------------------------------------
+
+    private void applyVisualEffects() {
+        float duration1 = 0.1f;
+        float duration2 = 0.15f;
+        // scale actions
+        Action scaleDown = Actions.scaleTo(0.5f, 0.5f, duration1);
+        Action scaleUp = Actions.scaleTo(1, 1, duration2);
+        // rotate actions
+        int angle = MathUtils.random(-45, 45);
+        Action rotate = Actions.rotateBy(angle, duration1);
+        Action rotateBack = Actions.rotateBy(-angle, duration2);
+        // sequence
+        Action act1 = Actions.parallel(scaleDown, rotate);
+        Action act2 = Actions.parallel(scaleUp, rotateBack);
+        addAction(Actions.sequence(act1, act2));
     }
 
     //---------------------------------------------------------------------
