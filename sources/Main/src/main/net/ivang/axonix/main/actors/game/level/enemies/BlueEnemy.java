@@ -29,7 +29,7 @@ public class BlueEnemy extends Enemy {
 
     public BlueEnemy(float x, float y, Skin skin, Vector2 direction, EventBus eventBus) {
         super(x, y, 0.5f, direction, eventBus);
-        particleEffect.load(Gdx.files.internal("data/particles/enemy_blue.p"), skin.getAtlas());
+        particleEffect.load(Gdx.files.internal("data/particles/enemies/enemy_blue.p"), skin.getAtlas());
     }
 
 }

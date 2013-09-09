@@ -25,6 +25,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 public class LifeBonus extends Bonus {
 
     public LifeBonus(float x, float y, Skin skin) {
-        super(x, y, skin, "bonus_life", "data/particles/bonus_life.p");
+        super(x, y, skin, "bonus_life", "data/particles/bonuses/bonus_life.p");
     }
 }

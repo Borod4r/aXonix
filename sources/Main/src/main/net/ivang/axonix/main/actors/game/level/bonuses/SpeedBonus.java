@@ -25,6 +25,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 public class SpeedBonus extends Bonus {
 
     public SpeedBonus(float x, float y, Skin skin) {
-        super(x, y, skin, "bonus_speed", "data/particles/bonus_speed.p");
+        super(x, y, skin, "bonus_speed", "data/particles/bonuses/bonus_speed.p");
     }
 }

@@ -78,10 +78,10 @@ public class Protagonist extends KinematicActor {
         setOriginY(0.75f);
 
         particleAlive = new ParticleEffect();
-        particleAlive.load(Gdx.files.internal("data/particles/protagonist_alive.p"), skin.getAtlas());
+        particleAlive.load(Gdx.files.internal("data/particles/protagonist/protagonist_alive.p"), skin.getAtlas());
 
         particleDead = new ParticleEffect();
-        particleDead.load(Gdx.files.internal("data/particles/protagonist_dead.p"), skin.getAtlas());
+        particleDead.load(Gdx.files.internal("data/particles/protagonist/protagonist_dead.p"), skin.getAtlas());
 
         effects = new ArrayList<Effect>();
 

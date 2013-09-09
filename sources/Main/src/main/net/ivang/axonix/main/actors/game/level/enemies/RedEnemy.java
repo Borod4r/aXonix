@@ -32,7 +32,7 @@ public class RedEnemy extends Enemy {
         // appearance
         setColor(1, 0.2f, 0.1f, 1);
         this.region = skin.getRegion("circular_flare");
-        particleEffect.load(Gdx.files.internal("data/particles/enemy_red.p"), skin.getAtlas());
+        particleEffect.load(Gdx.files.internal("data/particles/enemies/enemy_red.p"), skin.getAtlas());
     }
 
 }
