@@ -14,23 +14,22 @@
  * the License.
  */
 
-package net.ivang.axonix.main.events.facts;
+package net.ivang.axonix.main.actors.game.level.enemies;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.google.common.eventbus.EventBus;
 
 /**
  * @author Ivan Gadzhega
- * @since 0.2
+ * @since 0.4
  */
-public class EnemyDirectionFact {
+public class BlueEnemy extends Enemy {
 
-    private Vector2 direction;
-
-    public EnemyDirectionFact(Vector2 direction) {
-        this.direction = direction;
+    public BlueEnemy(float x, float y, Skin skin, Vector2 direction, EventBus eventBus) {
+        super(x, y, 0.5f, direction, eventBus);
+        particleEffect.load(Gdx.files.internal("data/particles/enemy_blue.p"), skin.getAtlas());
     }
 
-    public Vector2 getDirection() {
-        return direction;
-    }
 }

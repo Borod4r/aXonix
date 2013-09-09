@@ -14,25 +14,23 @@
  * the License.
  */
 
-package net.ivang.axonix.main.actors.game.level.enemies;
+package net.ivang.axonix.main.events.facts;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.google.common.eventbus.EventBus;
+import com.badlogic.gdx.math.Vector2;
 
 /**
  * @author Ivan Gadzhega
- * @since 0.4
+ * @since 0.2
  */
-public class RedEnemy extends Enemy {
+public class EnemyBounceFact {
 
-    public RedEnemy(float x, float y, Skin skin, EventBus eventBus) {
-        super(x, y, 0.5f, Direction.getRandomDiagonal(), eventBus);
-        this.bouncingOffBlocks = true;
-        // appearance
-        setColor(1, 0.2f, 0.1f, 1);
-        this.region = skin.getRegion("circular_flare");
-        particleEffect.load(Gdx.files.internal("data/particles/enemy_red.p"), skin.getAtlas());
+    private Vector2 direction;
+
+    public EnemyBounceFact(Vector2 direction) {
+        this.direction = direction;
     }
 
+    public Vector2 getDirection() {
+        return direction;
+    }
 }

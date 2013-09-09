@@ -20,7 +20,6 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -39,29 +38,16 @@ import java.util.List;
  */
 public abstract class Enemy extends KinematicActor {
 
-    private static final Vector2 UP_RIGHT = new Vector2(1, 1).nor();
-    private static final Vector2 DOWN_RIGHT = new Vector2(1, -1).nor();
-    private static final Vector2 DOWN_LEFT = new Vector2(-1, -1).nor();
-    private static final Vector2 UP_LEFT = new Vector2(-1, 1).nor();
+    protected boolean bouncingOffBlocks;
+    protected boolean destroyingBlocks;
 
-    private static final Vector2[] DIAGONALS = new Vector2[] {UP_RIGHT, UP_LEFT, DOWN_RIGHT, DOWN_LEFT};
-
-    private static Vector2 getRandomDiagonal() {
-        return DIAGONALS[(MathUtils.random(DIAGONALS.length - 1))];
-    }
-
-    //---------------------------------------------------------------------
-    // Instance
-    //---------------------------------------------------------------------
-
-    protected boolean blockDestroyer;
     protected TextureRegion region;
     protected ParticleEffect particleEffect;
 
     protected Circle collisionCircle;
     private List<Effect> effects;
 
-    public Enemy(float x, float y, float radius, EventBus eventBus) {
+    public Enemy(float x, float y, float radius, Vector2 direction, EventBus eventBus) {
         this.collisionCircle = new Circle(x, y, radius - 0.05f);
         this.effects = new ArrayList<Effect>();
         setX(x); setY(y);
@@ -70,7 +56,7 @@ public abstract class Enemy extends KinematicActor {
         setOriginX(radius);
         setOriginY(radius);
         setSpeed(4f);
-        setDirection(getRandomDiagonal());
+        setDirection(direction);
         particleEffect = new ParticleEffect();
         particleEffect.setPosition(x, y);
         // register with the event bus
@@ -80,12 +66,12 @@ public abstract class Enemy extends KinematicActor {
     @Override
     public void act(float deltaTime) {
         super.act(deltaTime);
-
+        // position
         setX(getX() + direction.x * speed * deltaTime);
         setY(getY() + direction.y * speed * deltaTime);
-
+        // particles
+        particleEffect.setPosition(getX(), getY());
         particleEffect.update(deltaTime);
-
         // effects
         Iterator<Effect> iterator = effects.iterator();
         while (iterator.hasNext()) {
@@ -98,11 +84,12 @@ public abstract class Enemy extends KinematicActor {
     @Override
     public void draw(SpriteBatch batch, float parentAlpha) {
         //draw particles
-        particleEffect.setPosition(getX(), getY());
         particleEffect.draw(batch);
         // draw texture
-        batch.setColor(getColor());
-        batch.draw(region, getX() - getOriginX(), getY() - getOriginY(), getWidth(), getHeight());
+        if (region != null) {
+            batch.setColor(getColor());
+            batch.draw(region, getX() - getOriginX(), getY() - getOriginY(), getWidth(), getHeight());
+        }
         // draw effects
         for (Effect effect : effects) {
             effect.draw(batch);
@@ -140,7 +127,11 @@ public abstract class Enemy extends KinematicActor {
         return collisionCircle;
     }
 
-    public boolean isBlockDestroyer() {
-        return blockDestroyer;
+    public boolean isBouncingOffBlocks() {
+        return bouncingOffBlocks;
+    }
+
+    public boolean isDestroyingBlocks() {
+        return destroyingBlocks;
     }
 }

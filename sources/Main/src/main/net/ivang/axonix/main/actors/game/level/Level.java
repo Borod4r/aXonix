@@ -20,6 +20,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -30,10 +31,11 @@ import net.ivang.axonix.main.actors.game.level.bonuses.Bonus;
 import net.ivang.axonix.main.actors.game.level.bonuses.LifeBonus;
 import net.ivang.axonix.main.actors.game.level.bonuses.SlowBonus;
 import net.ivang.axonix.main.actors.game.level.bonuses.SpeedBonus;
+import net.ivang.axonix.main.actors.game.level.enemies.BlueEnemy;
 import net.ivang.axonix.main.actors.game.level.enemies.Enemy;
 import net.ivang.axonix.main.actors.game.level.enemies.PurpleEnemy;
 import net.ivang.axonix.main.actors.game.level.enemies.RedEnemy;
-import net.ivang.axonix.main.events.facts.EnemyDirectionFact;
+import net.ivang.axonix.main.events.facts.EnemyBounceFact;
 import net.ivang.axonix.main.events.facts.ObtainedPointsFact;
 import net.ivang.axonix.main.events.facts.TailBlockFact;
 import net.ivang.axonix.main.events.facts.level.LevelProgressFact;
@@ -45,6 +47,7 @@ import net.ivang.axonix.main.screens.GameScreen;
 
 import java.util.*;
 
+import static net.ivang.axonix.main.actors.game.KinematicActor.Direction;
 import static net.ivang.axonix.main.actors.game.level.blocks.Block.Type;
 
 /**
@@ -108,34 +111,57 @@ public class Level extends Group {
         final int BLOCK_BLUE_HARD = 0x000055;
         final int ENEMY_RED = 0xFF0000;
         final int ENEMY_PURPLE = 0xFF00FF;
+        final int ENEMY_BLUE_U = 0x0000FC;
+        final int ENEMY_BLUE_R = 0x0000FD;
+        final int ENEMY_BLUE_D = 0x0000FE;
+        final int ENEMY_BLUE_L = 0x0000FF;
         final int PROTAGONIST = 0x00FF00;
 
         for (int x = 0; x < mapWidth; x++) {
             for (int y = 0; y < mapHeight; y++) {
                 int pix = (pixmap.getPixel(x, mapHeight-y-1) >>> 8) & 0xffffff;
+
                 switch (pix) {
                     case BLOCK_BLUE_HARD:
-                        levelMap[x][y] = new Block(x, y, Type.BLUE_HARD, skin);
-                        break;
                     case PROTAGONIST:
                         levelMap[x][y] = new Block(x, y, Type.BLUE_HARD, skin);
-                        protagonist = new Protagonist(x + 0.5f, y + 0.5f, this, skin, eventBus);
-                        break;
-                    case ENEMY_RED:
-                        levelMap[x][y] = new Block(x, y, Type.EMPTY, skin);
-                        Enemy redEnemy = new RedEnemy(x + 0.5f, y + 0.5f, skin, eventBus);
-                        enemies.add(redEnemy);
-                        break;
-                    case ENEMY_PURPLE:
-                        levelMap[x][y] = new Block(x, y, Type.EMPTY, skin);
-                        Enemy purpleEnemy = new PurpleEnemy(x + 0.5f, y + 0.5f, skin, eventBus);
-                        enemies.add(purpleEnemy);
                         break;
                     default:
                         levelMap[x][y] = new Block(x, y, Type.EMPTY, skin);
                         break;
                 }
+
                 addActor(levelMap[x][y]);
+
+                switch (pix) {
+                    case PROTAGONIST:
+                        protagonist = new Protagonist(x + 0.5f, y + 0.5f, this, skin, eventBus);
+                        break;
+                    case ENEMY_RED:
+                        Enemy redEnemy = new RedEnemy(x + 0.5f, y + 0.5f, skin, eventBus);
+                        enemies.add(redEnemy);
+                        break;
+                    case ENEMY_PURPLE:
+                        Enemy purpleEnemy = new PurpleEnemy(x + 0.5f, y + 0.5f, skin, eventBus);
+                        enemies.add(purpleEnemy);
+                        break;
+                    case ENEMY_BLUE_U:
+                        Enemy blueEnemyU = new BlueEnemy(x + 0.5f, y + 0.8f, skin, Direction.UP, eventBus);
+                        enemies.add(blueEnemyU);
+                        break;
+                    case ENEMY_BLUE_R:
+                        Enemy blueEnemyR = new BlueEnemy(x + 0.8f, y + 0.5f, skin, Direction.RIGHT, eventBus);
+                        enemies.add(blueEnemyR);
+                        break;
+                    case ENEMY_BLUE_D:
+                        Enemy blueEnemyD = new BlueEnemy(x + 0.5f, y + 0.2f, skin, Direction.DOWN, eventBus);
+                        enemies.add(blueEnemyD);
+                        break;
+                    case ENEMY_BLUE_L:
+                        Enemy blueEnemyL = new BlueEnemy(x + 0.2f, y + 0.5f, skin, Direction.LEFT, eventBus);
+                        enemies.add(blueEnemyL);
+                        break;
+                }
             }
         }
 
@@ -151,7 +177,7 @@ public class Level extends Group {
         if (hasState(State.PLAYING)) {
             super.act(delta);
             checkTail(delta);
-            checkEnemies();
+            checkEnemies(delta);
             checkProtagonist();
             checkPercentComplete();
         }
@@ -254,74 +280,117 @@ public class Level extends Group {
         }
     }
 
-    private void checkEnemies() {
+    private void checkEnemies(float delta) {
         for (Enemy enemy : enemies) {
-            // check collision with protagonist
-            Circle enemyCircle = enemy.getCollisionCircle();
-            Circle protagonistCircle = protagonist.getCollisionCircle();
-            if (Intersector.overlapCircles(enemyCircle, protagonistCircle)) {
-                protagonist.setState(Protagonist.State.DYING);
-                return;
+            checkEnemyCollisionWithProtagonist(enemy);
+            checkEnemyCollisionsWithBonuses(enemy);
+            checkEnemyCollisionsWithBlocks(enemy, delta);
+        }
+    }
+
+    private void checkEnemyCollisionWithProtagonist(Enemy enemy) {
+        Circle enemyCircle = enemy.getCollisionCircle();
+        Circle protagonistCircle = protagonist.getCollisionCircle();
+        if (Intersector.overlapCircles(enemyCircle, protagonistCircle)) {
+            protagonist.setState(Protagonist.State.DYING);
+        }
+    }
+
+    private void checkEnemyCollisionsWithBonuses(Enemy enemy) {
+        for (Actor actor : bonuses.getChildren()) {
+            Bonus bonus = (Bonus) actor;
+            if (Intersector.overlapCircles(enemy.getCollisionCircle(), bonus.getCollisionCircle())) {
+                bonus.removeSmoothly();
             }
-            // check collisions with bonuses
-            for (Actor actor : bonuses.getChildren()) {
-                Bonus bonus = (Bonus) actor;
-                if (Intersector.overlapCircles(enemyCircle, bonus.getCollisionCircle())) {
-                    bonus.removeSmoothly();
+        }
+    }
+
+    private void checkEnemyCollisionsWithBlocks(Enemy enemy, float delta) {
+        if (enemy.isBouncingOffBlocks()) {
+            checkBouncingEnemyCollisionsWithBlocks(enemy);
+        } else {
+            checkCrawlingEnemyCollisionsWithBlocks(enemy, delta);
+        }
+    }
+
+    private void checkBouncingEnemyCollisionsWithBlocks(Enemy enemy) {
+        Vector2 direction = enemy.getDirection();
+        Vector2 signum = new Vector2(Math.signum(direction.x), Math.signum(direction.y));
+
+        Block b1 = getBlock(enemy.getX() + signum.x, enemy.getY());
+        Block b2 = getBlock(enemy.getX(), enemy.getY() + signum.y);
+        Block b3 = getBlock(enemy.getX() + signum.x, enemy.getY() + signum.y);
+
+        List<Block> collisions = new ArrayList<Block>();
+
+        if (!b1.isEmpty()) {
+            Rectangle r1 = b1.getCollisionRectangle();
+            if (Intersector.overlapCircleRectangle(enemy.getCollisionCircle(), r1)) {
+                collisions.add(b1);
+                direction.x = - direction.x;
+            }
+        }
+        if (!b2.isEmpty()) {
+            Rectangle r2 = b2.getCollisionRectangle();
+            if (Intersector.overlapCircleRectangle(enemy.getCollisionCircle(), r2)) {
+                collisions.add(b2);
+                direction.y = - direction.y;
+            }
+        }
+
+        if (collisions.isEmpty() && !b3.isEmpty()) {
+            Rectangle r3 = b3.getCollisionRectangle();
+            if (Intersector.overlapCircleRectangle(enemy.getCollisionCircle(), r3)) {
+                collisions.add(b3);
+                direction.x = - direction.x;
+                direction.y = - direction.y;
+            }
+        }
+
+        if (!collisions.isEmpty()) {
+            // direction has changed
+            eventBus.post(new EnemyBounceFact(direction));
+            // burn tail
+            for (Block block : collisions) {
+                switch (block.getType()) {
+                    case TAIL:
+                        block.setType(Type.RED);
+                        containsRedBlocks = true;
+                        break;
+                    case BLUE:
+                    case GREEN:
+                        if (enemy.isDestroyingBlocks()) {
+                            eventBus.post(new DestroyBlockIntent(block));
+                        }
+                        break;
                 }
             }
-            // check collisions with blocks
-            Vector2 direction = enemy.getDirection();
-            Vector2 signum = new Vector2(Math.signum(direction.x), Math.signum(direction.y));
+        }
+    }
 
-            Block b1 = getBlock(enemy.getX() + signum.x, enemy.getY());
-            Block b2 = getBlock(enemy.getX(), enemy.getY() + signum.y);
-            Block b3 = getBlock(enemy.getX() + signum.x, enemy.getY() + signum.y);
-
-            List<Block> collisions = new ArrayList<Block>();
-
-            if (!b1.isEmpty()) {
-                Rectangle r1 = b1.getCollisionRectangle();
-                if (Intersector.overlapCircleRectangle(enemyCircle, r1)) {
-                    collisions.add(b1);
-                    direction.x = - direction.x;
-                }
-            }
-            if (!b2.isEmpty()) {
-                Rectangle r2 = b2.getCollisionRectangle();
-                if (Intersector.overlapCircleRectangle(enemyCircle, r2)) {
-                    collisions.add(b2);
-                    direction.y = - direction.y;
-                }
-            }
-
-            if (collisions.isEmpty() && !b3.isEmpty()) {
-                Rectangle r3 = b3.getCollisionRectangle();
-                if (Intersector.overlapCircleRectangle(enemyCircle, r3)) {
-                    collisions.add(b3);
-                    direction.x = - direction.x;
-                    direction.y = - direction.y;
-                }
-            }
-
-            if (!collisions.isEmpty()) {
-                // direction has changed
-                eventBus.post(new EnemyDirectionFact(direction));
-                // burn tail
-                for (Block block : collisions) {
-                    switch (block.getType()) {
-                        case TAIL:
-                            block.setType(Type.RED);
-                            containsRedBlocks = true;
-                            break;
-                        case BLUE:
-                        case GREEN:
-                            if (enemy.isBlockDestroyer()) {
-                                eventBus.post(new DestroyBlockIntent(block));
-                            }
-                            break;
-                    }
-                }
+    private void checkCrawlingEnemyCollisionsWithBlocks(Enemy enemy, float delta) {
+        float dx = enemy.getDirection().x;
+        float dy = enemy.getDirection().y;
+        float speed = enemy.getSpeed();
+        // next block
+        float nx = enemy.getX() + delta * speed * dx;
+        float ny = enemy.getY() + delta * speed * dy;
+        Block nextBlock = getBlock(nx, ny);
+        // check whether enemy should turn left
+        if (!nextBlock.isEmpty()) {
+            enemy.getDirection().set(-dy, dx);
+        } else {
+            // right block (-90 degrees)
+            float rx = enemy.getX() + dy;
+            float ry = enemy.getY() - dx;
+            Block rightBlock = getBlock(rx, ry);
+            // right rear block (-135 degrees)
+            float rrx = enemy.getX() - 0.7f * dx + 0.7f * dy;
+            float rry = enemy.getY() - 0.7f * dx - 0.7f * dy;
+            Block rightRearBlock = getBlock(rrx , rry);
+            // check whether enemy should turn right
+            if (rightBlock.isEmpty() && !rightRearBlock.isEmpty()) {
+                enemy.getDirection().set(dy, -dx);
             }
         }
     }
@@ -340,21 +409,23 @@ public class Level extends Group {
                     }
                 }
             }
-            // previous block
-            Block prevBlock = getBlock(protagonist.getPrevX(), protagonist.getPrevY());
-            if (prevBlock.hasType(Type.EMPTY)) {
-                prevBlock.setType(Type.TAIL);
-                tailBlocks.add(prevBlock);
-                eventBus.post(new TailBlockFact());
-            }
-            // current block
-            switch (getBlock(protagonist.getX(), protagonist.getY()).getType()) {
+            // check blocks
+            Block currentBlock = getBlock(protagonist.getX(), protagonist.getY());
+            switch (currentBlock.getType()) {
+                case EMPTY:
+                    currentBlock.setType(Type.TAIL);
+                    float duration = 0.5f / protagonist.getSpeed();
+                    currentBlock.addAction(Actions.sequence(Actions.delay(duration), Actions.fadeIn(duration)));
+                    tailBlocks.add(currentBlock);
+                    eventBus.post(new TailBlockFact());
+                    break;
                 case TAIL:
                     protagonist.setState(Protagonist.State.DYING);
                     break;
                 case GREEN:
                 case BLUE:
                 case BLUE_HARD:
+                    Block prevBlock = getBlock(protagonist.getPrevX(), protagonist.getPrevY());
                     if (prevBlock.hasType(Type.TAIL)) {
                         // convert tail
                         int newBlocks = tailBlocks.size();

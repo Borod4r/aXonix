@@ -27,8 +27,9 @@ import com.google.common.eventbus.EventBus;
 public class PurpleEnemy extends Enemy {
 
     public PurpleEnemy(float x, float y, Skin skin, EventBus eventBus) {
-        super(x, y, 0.75f, eventBus);
-        blockDestroyer = true;
+        super(x, y, 0.75f, Direction.getRandomDiagonal(), eventBus);
+        this.destroyingBlocks = true;
+        this.bouncingOffBlocks = true;
         // appearance
         setColor(1, 0.2f, 1f, 1);
         this.region = skin.getRegion("circular_flare");

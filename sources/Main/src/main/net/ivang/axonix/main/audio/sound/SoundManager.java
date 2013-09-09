@@ -26,7 +26,7 @@ import net.ivang.axonix.main.audio.sound.wrappers.SequentialSoundWrapper;
 import net.ivang.axonix.main.audio.sound.wrappers.SimpleSoundWrapper;
 import net.ivang.axonix.main.audio.sound.wrappers.SoundWrapper;
 import net.ivang.axonix.main.events.facts.ButtonClickFact;
-import net.ivang.axonix.main.events.facts.EnemyDirectionFact;
+import net.ivang.axonix.main.events.facts.EnemyBounceFact;
 import net.ivang.axonix.main.events.facts.ObtainedPointsFact;
 import net.ivang.axonix.main.events.facts.TailBlockFact;
 import net.ivang.axonix.main.events.intents.BackIntent;
@@ -58,13 +58,13 @@ public class SoundManager {
     public void onSfxVolumeChange(SfxVolumeIntent intent) {
         sfxVolume = intent.getVolume();
         // play sample sound
-        Sounds.ENEMY_DIRECTION.play(sfxVolume);
+        Sounds.ENEMY_BOUNCE.play(sfxVolume);
     }
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onEnemyCollision(EnemyDirectionFact fact) {
-        Sounds.ENEMY_DIRECTION.play(sfxVolume);
+    public void onEnemyBounce(EnemyBounceFact fact) {
+        Sounds.ENEMY_BOUNCE.play(sfxVolume);
     }
 
     @Subscribe
@@ -125,7 +125,7 @@ public class SoundManager {
     //---------------------------------------------------------------------
 
     private enum Sounds {
-        ENEMY_DIRECTION("data/audio/sounds/enemy_direction.ogg", false, 150, 100),
+        ENEMY_BOUNCE("data/audio/sounds/enemy_bounce.ogg", false, 150, 100),
         BUTTON_CLICK("data/audio/sounds/button_click.ogg", false, 100, 0),
         BACK_INTENT("data/audio/sounds/back_intent.ogg"),
         PROT_DYING("data/audio/sounds/prot_dying.ogg"),

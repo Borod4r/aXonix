@@ -76,7 +76,7 @@ public class Block extends Actor {
                 setRegion(skin.getRegion("block_blue_hard"));
                 break;
             case TAIL:
-                setColor(0.3f, 0.3f, 1, 1);
+                setColor(0.3f, 0.3f, 1, 0);
                 setRegion(skin.getRegion("block_blue"));
                 break;
             default:

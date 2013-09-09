@@ -45,12 +45,6 @@ import static net.ivang.axonix.main.actors.game.level.blocks.Block.Type;
  */
 public class Protagonist extends KinematicActor {
 
-    private static final Vector2 IDLE = new Vector2(0, 0);
-    private static final Vector2 UP = new Vector2(0, 1);
-    private static final Vector2 RIGHT = new Vector2(1, 0);
-    private static final Vector2 DOWN = new Vector2(0, -1);
-    private static final Vector2 LEFT = new Vector2(-1, 0);
-
     private State state;
     private List<Effect> effects;
 
@@ -76,7 +70,7 @@ public class Protagonist extends KinematicActor {
         setSpawnX(x); setSpawnY(y);
         setPrevX(x); setPrevY(y);
         setSpeed(4f);
-        setDirection(IDLE);
+        setDirection(Direction.IDLE);
 
         setWidth(1.5f);
         setHeight(1.5f);
@@ -153,6 +147,13 @@ public class Protagonist extends KinematicActor {
         return this.state == state;
     }
 
+    public void setState(State state) {
+        if (!hasState(state)) {
+            this.state = state;
+            eventBus.post(state);
+        }
+    }
+
     //---------------------------------------------------------------------
     // Subscribers
     //---------------------------------------------------------------------
@@ -166,7 +167,7 @@ public class Protagonist extends KinematicActor {
                 particleDead.setPosition(getX(), getY());
                 particleDead.start();
                 // re-spawn
-                direction = IDLE;
+                direction = Direction.IDLE;
                 setX(spawnX); setY(spawnY);
                 setPrevX(spawnX); setPrevY(spawnY);
                 particleAlive.setPosition(spawnX, spawnY);
@@ -205,26 +206,26 @@ public class Protagonist extends KinematicActor {
         Block block = level.getBlock(getX(), getY());
         boolean onFilledBlock = block.hasType(Type.BLUE) || block.hasType(Type.BLUE_HARD) || block.hasType(Type.GREEN);
 
-        if((onFilledBlock || direction != UP)
+        if((onFilledBlock || direction != Direction.UP)
                 && (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S) || isDraggedUp)) {
-            direction = DOWN;
+            direction = Direction.DOWN;
         }
-        if((onFilledBlock || direction != DOWN)
+        if((onFilledBlock || direction != Direction.DOWN)
                 && (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W) || isDraggedDown)) {
-            direction = UP;
+            direction = Direction.UP;
         }
-        if((onFilledBlock || direction != RIGHT)
+        if((onFilledBlock || direction != Direction.RIGHT)
                 && (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A) || isDraggedLeft)) {
-            direction = LEFT;
+            direction = Direction.LEFT;
         }
-        if((onFilledBlock || direction != LEFT)
+        if((onFilledBlock || direction != Direction.LEFT)
                 && (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D) || isDraggedRight)) {
-            direction = RIGHT;
+            direction = Direction.RIGHT;
         }
     }
 
     private void updatePosition(float deltaTime) {
-        if (direction != IDLE) {
+        if (direction != Direction.IDLE) {
             Vector2 position = new Vector2(getX(), getY());
             float distance = calculateDistance(deltaTime);
 
@@ -232,7 +233,7 @@ public class Protagonist extends KinematicActor {
             correctForSmoothTurns(position);
 
             if (position.x == getX() && position.y == getY()) {
-                direction = IDLE;
+                direction = Direction.IDLE;
             } else {
                 // update previous coords
                 prevX = getX();
@@ -327,11 +328,6 @@ public class Protagonist extends KinematicActor {
 
     public void setSpawnY(float spawnY) {
         this.spawnY = spawnY;
-    }
-
-    public void setState(State state) {
-        this.state = state;
-        eventBus.post(state);
     }
 
     public Circle getCollisionCircle() {
