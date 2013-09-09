@@ -17,6 +17,7 @@
 package net.ivang.axonix.main.actors.game.level.enemies;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.google.common.eventbus.EventBus;
@@ -29,6 +30,7 @@ public class BlueEnemy extends Enemy {
 
     public BlueEnemy(float x, float y, Skin skin, Vector2 direction, EventBus eventBus) {
         super(x, y, 0.5f, direction, eventBus);
+        movingClockwise = MathUtils.randomBoolean();
         particleEffect.load(Gdx.files.internal("data/particles/enemies/enemy_blue.p"), skin.getAtlas());
     }
 

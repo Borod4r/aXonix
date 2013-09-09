@@ -40,6 +40,7 @@ public abstract class Enemy extends KinematicActor {
 
     protected boolean bouncingOffBlocks;
     protected boolean destroyingBlocks;
+    protected boolean movingClockwise;
 
     protected TextureRegion region;
     protected ParticleEffect particleEffect;
@@ -134,4 +135,9 @@ public abstract class Enemy extends KinematicActor {
     public boolean isDestroyingBlocks() {
         return destroyingBlocks;
     }
+
+    public boolean isMovingClockwise() {
+        return movingClockwise;
+    }
+
 }

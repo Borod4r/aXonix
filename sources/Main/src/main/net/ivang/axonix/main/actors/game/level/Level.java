@@ -376,21 +376,24 @@ public class Level extends Group {
         float nx = enemy.getX() + delta * speed * dx;
         float ny = enemy.getY() + delta * speed * dy;
         Block nextBlock = getBlock(nx, ny);
-        // check whether enemy should turn left
+        // check whether enemy should turn in CW/CCW direction
+        int cwFactor = enemy.isMovingClockwise() ? 1: -1;
         if (!nextBlock.isEmpty()) {
-            enemy.getDirection().set(-dy, dx);
+                enemy.getDirection().set(cwFactor * dy, cwFactor * -dx);
         } else {
-            // right block (-90 degrees)
-            float rx = enemy.getX() + dy;
-            float ry = enemy.getY() - dx;
+            // CW: left block (90 degrees)
+            // CCW: right block (-90 degrees)
+            float rx = enemy.getX() - cwFactor * dy;
+            float ry = enemy.getY() + cwFactor * dx;
             Block rightBlock = getBlock(rx, ry);
-            // right rear block (-135 degrees)
-            float rrx = enemy.getX() - 0.7f * dx + 0.7f * dy;
-            float rry = enemy.getY() - 0.7f * dx - 0.7f * dy;
+            // CW: left rear block (135 degrees)
+            // CCW: right rear block (-135 degrees)
+            float rrx = enemy.getX() - 0.7f * dx - 0.7f * cwFactor * dy;
+            float rry = enemy.getY() + 0.7f * cwFactor * dx - 0.7f * dy;
             Block rightRearBlock = getBlock(rrx , rry);
-            // check whether enemy should turn right
+            // check whether enemy should turn in the opposite direction
             if (rightBlock.isEmpty() && !rightRearBlock.isEmpty()) {
-                enemy.getDirection().set(dy, -dx);
+                enemy.getDirection().set(cwFactor * -dy, cwFactor *dx);
             }
         }
     }
