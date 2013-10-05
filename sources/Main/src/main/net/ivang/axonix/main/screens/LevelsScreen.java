@@ -19,7 +19,6 @@ package net.ivang.axonix.main.screens;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.esotericsoftware.tablelayout.Cell;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -31,8 +30,6 @@ import net.ivang.axonix.main.events.intents.DefaultIntent;
 import net.ivang.axonix.main.events.intents.screen.GameScreenIntent;
 import net.ivang.axonix.main.events.intents.screen.StartScreenIntent;
 import net.ivang.axonix.main.preferences.PreferencesWrapper;
-
-import static com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 
 /**
  * @author Ivan Gadzhega
@@ -104,7 +101,7 @@ public class LevelsScreen extends BaseScreen {
     @Override
     protected void applyStyle() {
         for(Cell cell : levelsTable.getCells()) {
-            TextButton button = (TextButton) cell.getWidget();
+            LevelButton button = (LevelButton) cell.getWidget();
             if (button != null) {
                 button.setStyle(style.button);
             }
@@ -118,13 +115,26 @@ public class LevelsScreen extends BaseScreen {
         if (levelIndex == 1 || preferences.containsLives(levelIndex - 1)) {
             button.setColor(1f, 1f, 1f, 1f);
             button.setDisabled(false);
+            // update the "star" rating
+            int levelRating = getRatingByScore(levelIndex);
+            button.setRating(levelRating);
+            // update default level index
             if (defaultLevelIndex < levelIndex) {
                 defaultLevelIndex = levelIndex;
             }
         } else {
             button.setColor(1f, 1f, 1f, 0.35f);
             button.setDisabled(true);
+            button.setRating(0);
         }
+    }
+
+    private int getRatingByScore(int levelIndex) {
+        int score = preferences.getLevelScore(levelIndex);
+        if (score > 1000) return 3;
+        if (score > 750)  return 2;
+        if (score > 500)  return 1;
+        return 0;
     }
 
     //---------------------------------------------------------------------
@@ -132,7 +142,7 @@ public class LevelsScreen extends BaseScreen {
     //---------------------------------------------------------------------
 
     public static class Style {
-        public TextButtonStyle button;
+        public LevelButton.Style button;
         public float buttonWidth;
         public float buttonHeight;
         public float buttonPad;

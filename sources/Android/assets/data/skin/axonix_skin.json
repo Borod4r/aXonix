@@ -68,6 +68,27 @@
         }
     },
 
+    "net.ivang.axonix.main.actors.levels.LevelButton$Style": {
+        "small":{
+            "buttonStyle": "small",
+            "starOn": "star",
+            "starOff": "star_off",
+            "starsHeight": 12
+        },
+        "normal":{
+            "buttonStyle": "normal",
+            "starOn": "star",
+            "starOff": "star_off",
+            "starsHeight": 18
+        },
+        "large":{
+            "buttonStyle": "large",
+            "starOn": "star",
+            "starOff": "star_off",
+            "starsHeight": 28
+        }
+    },
+
     "com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle": {
         "levels_small":{
             "up": "button",
@@ -281,24 +302,23 @@
     "net.ivang.axonix.main.screens.LevelsScreen$Style": {
         "small": {
             "button": "small",
-            "buttonWidth": 37,
-            "buttonHeight": 37,
+            "buttonWidth": 38,
+            "buttonHeight": 38,
             "buttonPad": 9
         },
         "normal": {
             "button": "normal",
-            "buttonWidth": 57,
-            "buttonHeight": 57,
+            "buttonWidth": 58,
+            "buttonHeight": 58,
             "buttonPad": 13
         },
         "large": {
             "button": "large",
-            "buttonWidth": 85,
-            "buttonHeight": 85,
+            "buttonWidth": 86,
+            "buttonHeight": 86,
             "buttonPad": 20
         }
     },
-
 
     "net.ivang.axonix.main.screens.GameScreen$Style": {
         "small": {

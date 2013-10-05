@@ -108,9 +108,9 @@ public abstract class BaseScreen implements Screen {
         }
     }
 
-    protected void setStyleByName(String styleName) { }
+    protected abstract void setStyleByName(String styleName);
 
-    protected void applyStyle() { }
+    protected abstract void applyStyle();
 
     protected void setStyleByName(String styleName, boolean apply) {
         setStyleByName(styleName);

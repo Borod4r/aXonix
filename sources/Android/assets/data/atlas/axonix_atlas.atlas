@@ -80,30 +80,44 @@ ic_repeat_large
   orig: 64, 64
   offset: 0, 0
   index: -1
+star
+  rotate: false
+  xy: 395, 67
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+star_off
+  rotate: false
+  xy: 877, 189
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
 ic_forward_normal
   rotate: false
-  xy: 395, 83
+  xy: 461, 83
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 ic_levels_normal
   rotate: false
-  xy: 877, 205
+  xy: 943, 205
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 ic_repeat_normal
   rotate: false
-  xy: 445, 83
+  xy: 613, 139
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 window_bg
   rotate: false
-  xy: 927, 191
+  xy: 993, 191
   size: 19, 62
   split: 9, 9, 9, 9
   orig: 19, 62
@@ -118,7 +132,7 @@ ic_forward_small
   index: -1
 ic_levels_small
   rotate: false
-  xy: 948, 221
+  xy: 663, 155
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -132,7 +146,7 @@ ic_repeat_small
   index: -1
 slider_before
   rotate: false
-  xy: 613, 157
+  xy: 197, 35
   size: 19, 30
   split: 9, 9, 9, 9
   orig: 19, 30
@@ -140,7 +154,7 @@ slider_before
   index: -1
 slider_bg
   rotate: false
-  xy: 197, 35
+  xy: 697, 157
   size: 19, 30
   split: 6, 6, 6, 6
   pad: 18, 0, 6, 6
@@ -149,7 +163,7 @@ slider_bg
   index: -1
 button
   rotate: false
-  xy: 495, 101
+  xy: 69, 3
   size: 13, 30
   split: 6, 6, 6, 6
   orig: 13, 30
@@ -157,7 +171,7 @@ button
   index: -1
 button_over
   rotate: false
-  xy: 982, 223
+  xy: 218, 35
   size: 13, 30
   split: 6, 6, 6, 6
   orig: 13, 30
@@ -165,7 +179,7 @@ button_over
   index: -1
 window_bg_stage
   rotate: false
-  xy: 515, 154
+  xy: 461, 80
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
