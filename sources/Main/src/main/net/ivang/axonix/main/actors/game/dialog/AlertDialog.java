@@ -37,33 +37,24 @@ public abstract class AlertDialog extends Table {
 
     private Table window;
     private Label title;
-    private Label levelScoreLabel, levelScoreValue;
-    private Label totalScoreLabel, totalScoreValue;
     private DialogActionsGroup actionsGroup;
 
     public AlertDialog(String titleText, Style style) {
         this.style = style;
+//        debug();
 
         setFillParent(true);
         setVisible(false);
 
         window = new Table();
+//        window.debug();
         window.setBackground(style.background);
         window.pad(style.vPad, style.hPad, style.vPad, style.hPad);
 
+        // title
         title = new Label(titleText, style.title);
-        levelScoreLabel = new Label("Level Score: ", style.label);
-        totalScoreLabel = new Label("Total Score: ", style.label);
-        levelScoreValue = new Label(null, style.value);
-        totalScoreValue = new Label(null, style.value);
-
-        window.add(title).colspan(2);
+        window.add(title);
         window.row();
-        window.add(levelScoreLabel).right();
-        window.add(levelScoreValue).left();
-        window.row();
-        window.add(totalScoreLabel).right();
-        window.add(totalScoreValue).left();
 
         add(window);
         row();
@@ -76,26 +67,14 @@ public abstract class AlertDialog extends Table {
         title.setText(text);
     }
 
-    public void setLevelScore(int score) {
-        levelScoreValue.setText(Integer.toString(score));
-    }
-
-    public void setTotalScore(int score) {
-        totalScoreValue.setText(Integer.toString(score));
-    }
-
     public void setStyle(Style style) {
         this.style = style;
-
+        // window
         window.setBackground(style.background);
         window.pad(style.vPad, style.hPad, style.vPad, style.hPad);
-
+        // title
         title.setStyle(style.title);
-        levelScoreLabel.setStyle(style.label);
-        levelScoreValue.setStyle(style.value);
-        totalScoreLabel.setStyle(style.label);
-        totalScoreValue.setStyle(style.value);
-
+        // action buttons
         actionsGroup.setStyle(style.actionsGroup);
     }
 
@@ -119,6 +98,9 @@ public abstract class AlertDialog extends Table {
     // Getters & Setters
     //---------------------------------------------------------------------
 
+    public Table getWindow() {
+        return window;
+    }
 
     public Label getTitle() {
         return title;
@@ -137,8 +119,6 @@ public abstract class AlertDialog extends Table {
         public Drawable stageBackground;
         public float hPad, vPad;
         public LabelStyle title;
-        public LabelStyle label;
-        public LabelStyle value;
         public DialogActionsGroup.Style actionsGroup;
     }
 

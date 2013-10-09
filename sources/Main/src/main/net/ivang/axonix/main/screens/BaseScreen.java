@@ -22,6 +22,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.google.common.eventbus.EventBus;
 import net.ivang.axonix.main.AxonixGame;
 
@@ -55,6 +56,7 @@ public abstract class BaseScreen implements Screen {
         Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
         stage.act();
         stage.draw();
+        Table.drawDebug(stage);
     }
 
     @Override

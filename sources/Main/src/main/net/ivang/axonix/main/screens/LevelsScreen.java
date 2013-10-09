@@ -30,6 +30,7 @@ import net.ivang.axonix.main.events.intents.DefaultIntent;
 import net.ivang.axonix.main.events.intents.screen.GameScreenIntent;
 import net.ivang.axonix.main.events.intents.screen.StartScreenIntent;
 import net.ivang.axonix.main.preferences.PreferencesWrapper;
+import net.ivang.axonix.main.utils.ScoreUtils;
 
 /**
  * @author Ivan Gadzhega
@@ -131,10 +132,7 @@ public class LevelsScreen extends BaseScreen {
 
     private int getRatingByScore(int levelIndex) {
         int score = preferences.getLevelScore(levelIndex);
-        if (score > 1000) return 3;
-        if (score > 750)  return 2;
-        if (score > 500)  return 1;
-        return 0;
+        return ScoreUtils.getRatingByScore(score);
     }
 
     //---------------------------------------------------------------------

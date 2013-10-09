@@ -191,6 +191,45 @@
         }
     },
 
+    "net.ivang.axonix.main.actors.game.dialog.DialogRatingTable$Style": {
+        "small": {
+            "starOn": "star",
+            "starOff": "star_off",
+            "sizeSmall": 26,
+            "sizeBig": 28,
+            "padding": 4
+        },
+        "normal": {
+            "starOn": "star",
+            "starOff": "star_off",
+            "sizeSmall": 38,
+            "sizeBig": 42,
+            "padding": 7
+        },
+        "large": {
+            "starOn": "star",
+            "starOff": "star_off",
+            "sizeSmall": 58,
+            "sizeBig": 64,
+            "padding": 10
+        }
+    },
+
+    "net.ivang.axonix.main.actors.game.dialog.DialogScoresTable$Style": {
+        "small": {
+            "label": "small_white",
+            "value": "small_yellow"
+        },
+        "normal": {
+            "label": "normal_white",
+            "value": "normal_yellow"
+        },
+        "large": {
+            "label": "large_white",
+            "value": "large_yellow"
+        }
+    },
+
     "net.ivang.axonix.main.actors.game.dialog.AlertDialog$Style": {
         "small": {
             "background": "window_bg",
@@ -198,8 +237,6 @@
             "hPad": 24,
             "vPad": 12,
             "title": "normal_white",
-            "label": "small_white",
-            "value": "small_yellow",
             "actionsGroup": "small"
         },
         "normal": {
@@ -208,8 +245,6 @@
             "hPad": 36,
             "vPad": 18,
             "title": "large_white",
-            "label": "normal_white",
-            "value": "normal_yellow",
             "actionsGroup": "normal"
         },
         "large": {
@@ -218,9 +253,34 @@
             "hPad": 56,
             "vPad": 28,
             "title": "xlarge_white",
-            "label": "large_white",
-            "value": "large_yellow",
             "actionsGroup": "large"
+        }
+    },
+
+    "net.ivang.axonix.main.actors.game.dialog.ScreenStateDialog$Style": {
+        "small": {
+            "dialog": "small",
+            "starTable": "small",
+            "scoresTable": "small",
+            "line": "line",
+            "linePad1": 2,
+            "linePad2": 3
+        },
+        "normal": {
+            "dialog": "normal",
+            "starTable": "normal",
+            "scoresTable": "normal",
+            "line": "line",
+            "linePad1": 3,
+            "linePad2": 5
+        },
+        "large": {
+            "dialog": "large",
+            "starTable": "large",
+            "scoresTable": "large",
+            "line": "line",
+            "linePad1": 5,
+            "linePad2": 8
         }
     },
 

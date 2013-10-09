@@ -79,7 +79,7 @@ public class GameScreen extends BaseScreen {
     private Label pointsLabel;
     private Label bigPointsLabel;
     private Label notificationLabel;
-    private AlertDialog stateDialog;
+    private ScreenStateDialog stateDialog;
     private Background background;
 
     @Inject
@@ -460,7 +460,7 @@ public class GameScreen extends BaseScreen {
         public LabelStyle points;
         public LabelStyle bigPoints;
         public LabelStyle notification;
-        public AlertDialog.Style stateDialog;
+        public ScreenStateDialog.Style stateDialog;
         public DebugBar.Style debugBar;
     }
 
