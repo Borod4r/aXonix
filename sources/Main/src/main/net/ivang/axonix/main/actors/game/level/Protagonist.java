@@ -52,6 +52,9 @@ public class Protagonist extends KinematicActor {
     private float prevX, prevY;
     private Circle collisionCircle;
 
+    private Vector2 nextDirection;
+    boolean canChangeDirection;
+
     private Level level;
 
     private TextureRegion region;
@@ -96,6 +99,7 @@ public class Protagonist extends KinematicActor {
         switch (state) {
             case ALIVE:
                 processKeys();
+                updateDirection();
                 updatePosition(delta);
                 particleAlive.setPosition(getX(), getY());
                 particleAlive.update(delta);
@@ -206,22 +210,52 @@ public class Protagonist extends KinematicActor {
         Block block = level.getBlock(getX(), getY());
         boolean onFilledBlock = block.hasType(Type.BLUE) || block.hasType(Type.BLUE_HARD) || block.hasType(Type.GREEN);
 
-        if((onFilledBlock || direction != Direction.UP)
-                && (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S) || isDraggedUp)) {
-            direction = Direction.DOWN;
+        // DOWN
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S) || isDraggedUp) {
+            if (onFilledBlock || direction != Direction.UP) {
+                nextDirection = Direction.DOWN;
+            }
+        // UP
+        } else if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W) || isDraggedDown) {
+            if(onFilledBlock || direction != Direction.DOWN) {
+                nextDirection = Direction.UP;
+            }
+        // LEFT
+        } else if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A) || isDraggedLeft) {
+            if (onFilledBlock || direction != Direction.RIGHT) {
+                nextDirection = Direction.LEFT;
+            }
+        // RIGHT
+        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D) || isDraggedRight) {
+            if (onFilledBlock || direction != Direction.LEFT) {
+                nextDirection = Direction.RIGHT;
+            }
         }
-        if((onFilledBlock || direction != Direction.DOWN)
-                && (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W) || isDraggedDown)) {
-            direction = Direction.UP;
+    }
+
+    private void updateDirection() {
+        if (direction == Direction.IDLE || isOnNewBlock()) {
+            canChangeDirection = true;
         }
-        if((onFilledBlock || direction != Direction.RIGHT)
-                && (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A) || isDraggedLeft)) {
-            direction = Direction.LEFT;
+
+        if (shouldChangeDirection()) {
+            direction = nextDirection;
+            nextDirection = null;
+            canChangeDirection = false;
         }
-        if((onFilledBlock || direction != Direction.LEFT)
-                && (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D) || isDraggedRight)) {
-            direction = Direction.RIGHT;
+    }
+
+    private boolean shouldChangeDirection() {
+        if (canChangeDirection && nextDirection != null && direction != nextDirection) {
+            double floorX = getX() - Math.floor(getX());
+            double floorY = getY() - Math.floor(getY());
+            if (direction == Direction.IDLE
+                    || direction.x != 0 && floorX >= 0.25f && floorX <= 0.75f
+                    || direction.y != 0 && floorY >= 0.25f && floorY <= 0.75f) {
+                return true;
+            }
         }
+        return false;
     }
 
     private void updatePosition(float deltaTime) {
@@ -230,7 +264,6 @@ public class Protagonist extends KinematicActor {
             float distance = calculateDistance(deltaTime);
 
             updatePositon(position, distance);
-            correctForSmoothTurns(position);
 
             if (position.x == getX() && position.y == getY()) {
                 direction = Direction.IDLE;
@@ -259,34 +292,30 @@ public class Protagonist extends KinematicActor {
         position.x = Math.min(position.x, level.getMapWidth() - 0.5f);
         position.y = Math.max(0.5f, position.y);
         position.y = Math.min(position.y, level.getMapHeight() - 0.5f);
+
+        // correct for smooth turns
+        if (direction.x != 0) {
+            position.y = roundPosition(position.y);
+        } else if (direction.y != 0) {
+            position.x = roundPosition(position.x);
+        }
     }
 
-    private void correctForSmoothTurns(Vector2 position) {
+    private float roundPosition(float position) {
         float step = 0.05f;
-        if (direction.x != 0) {
-            float ny = position.y + 0.5f;
-            float ry = Math.round(ny);
-            if (ry > ny) {
-                position.y += step;
-            } else if (ry < ny) {
-                if (ry - ny < step) {
-                    position.y = ry - 0.5f; // round y for smoother movement
-                } else {
-                    position.y -= step;
-                }
-            }
-        } else if (direction.y != 0) {
-            float nx = position.x + 0.5f;
-            float rx = Math.round(nx);
-            if (rx > nx) {
-                position.x += step;
-            } else if (rx < nx) {
-                if (rx - nx < step) {
-                    position.x = rx - 0.5f; // round x for smoother movement
-                } else {
-                    position.x -= step;
-                }
-            }
+        // move for 0.5f to be able to round it
+        float nearPos = position + 0.5f;
+        float roundPos = Math.round(nearPos);
+
+        if (Math.abs(nearPos - roundPos) < step) {
+            // return rounded value (just move back for 0.5f)
+            return roundPos - 0.5f;
+        }
+
+        if (roundPos > nearPos) {
+            return position + step;
+        } else {
+            return position - step;
         }
     }
 
