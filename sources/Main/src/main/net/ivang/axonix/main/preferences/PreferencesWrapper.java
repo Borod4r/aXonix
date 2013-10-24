@@ -26,9 +26,9 @@ import com.badlogic.gdx.Preferences;
 public class PreferencesWrapper {
 
     private static final String PREFS_NAME = "aXonix";
-    private static final String PREF_KEY_LIVES = "lives_";
-    private static final String PREF_KEY_LVL_SCORE = "level_score_";
-    private static final String PREF_KEY_TTL_SCORE = "total_score";
+    private static final String PREF_KEY_LIVES = "lives_1_";
+    private static final String PREF_KEY_LVL_SCORE = "level_score_1_";
+    private static final String PREF_KEY_TTL_SCORE = "total_score_1_";
 
     private static final String PREF_KEY_MUSIC_VOLUME = "music_volume";
     private static final float MUSIC_VOLUME_DEF_VALUE = 0.7f;

@@ -38,7 +38,7 @@ import net.ivang.axonix.main.utils.ScoreUtils;
  */
 public class LevelsScreen extends BaseScreen {
 
-    private final static int LEVELS_TABLE_COLS = 6;
+    private final static int LEVELS_TABLE_COLS = 5;
 
     private Style style;
     private Table levelsTable;
