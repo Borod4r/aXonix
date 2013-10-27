@@ -198,14 +198,21 @@ public class Protagonist extends KinematicActor {
     //---------------------------------------------------------------------
 
     private void processKeys() {
-        int dx = Gdx.input.getDeltaX();
-        int dy = Gdx.input.getDeltaY();
-        float diff = Math.abs(dx) - Math.abs(dy);
+        boolean isDraggedLeft = false;
+        boolean isDraggedRight = false;
+        boolean isDraggedDown = false;
+        boolean isDraggedUp = false;
 
-        boolean isDraggedDown = (Gdx.input.isTouched() && dy < 0 && diff < 0);
-        boolean isDraggedUp = (Gdx.input.isTouched() && dy > 0 && diff <= 0);
-        boolean isDraggedLeft = (Gdx.input.isTouched() && dx < 0 && diff > 0);
-        boolean isDraggedRight = (Gdx.input.isTouched() && dx > 0 && diff >= 0);
+        if (Gdx.input.isTouched()) {
+            int dx = Gdx.input.getDeltaX();
+            int dy = Gdx.input.getDeltaY();
+            float diff = Math.abs(dx) - Math.abs(dy);
+            int deadZone = Gdx.graphics.getHeight() / 240;
+            isDraggedLeft = dx < -deadZone && diff > 0;
+            isDraggedRight = dx > deadZone && diff >= 0;
+            isDraggedDown = dy < -deadZone && diff < 0;
+            isDraggedUp =  dy > deadZone && diff <= 0;
+        }
 
         Block block = level.getBlock(getX(), getY());
         boolean onFilledBlock = block.hasType(Type.BLUE) || block.hasType(Type.BLUE_HARD) || block.hasType(Type.GREEN);
